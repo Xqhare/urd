@@ -1,6 +1,7 @@
 use std::sync::{atomic::AtomicBool, Arc};
 
 use eframe::egui::Color32;
+use horae::TimeZone;
 
 // TODO: get from config
 // TODO: save to config
@@ -9,6 +10,7 @@ pub struct Settings {
     pub font: FontSettings,
     pub continuous_saving: bool,
     pub show_settings_viewport: Arc<AtomicBool>,
+    pub timezone: Option<TimeZone>,
 }
 
 impl Default for Settings {
@@ -18,6 +20,7 @@ impl Default for Settings {
         Self {
             size: SizeSettings::default(),
             font: FontSettings::default(),
+            timezone: None,
             // default true
             continuous_saving: true,
             // default false
@@ -35,8 +38,8 @@ pub struct FontSettings {
 impl Default for FontSettings {
     fn default() -> Self {
         Self {
-            size: 16.0,
-            text_colour: Color32::from_rgba_premultiplied(0, 0, 0, 255),
+            size: 14.0,
+            text_colour: Color32::from_rgba_premultiplied(255, 255, 255, 255),
             monospace: false,
         }
     }
