@@ -1,9 +1,8 @@
 use settings::Settings;
 
-
-mod settings;
 mod gui;
 mod journal_entries;
+mod settings;
 
 fn main() {
     let settings = Settings::default();

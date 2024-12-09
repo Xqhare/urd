@@ -1,17 +1,23 @@
-use std::{str::FromStr, sync::{atomic::AtomicBool, Arc}};
+use std::{
+    str::FromStr,
+    sync::{atomic::AtomicBool, Arc},
+};
 
+use crate::{
+    journal_entries::{Journal, JournalEntry},
+    settings::Settings,
+};
 use eframe::{
     egui::{CentralPanel, Ui},
     epaint::Vec2,
     *,
 };
 use egui::{Align, FontId, Margin, ScrollArea, SidePanel, TextEdit, TopBottomPanel};
-use crate::{journal_entries::{Journal, JournalEntry}, settings::Settings};
 
-mod settings;
 mod about;
-mod licenses;
 mod help;
+mod licenses;
+mod settings;
 
 const APP_NAME: &str = "Urd";
 
@@ -63,36 +69,53 @@ impl UrdState {
         self.main_side_panel(ctx, frame);
         // Remember, central panel last
         self.main_central_panel(ctx, frame);
-        
     }
 
     fn main_top_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
             ui.horizontal(|ui: &mut Ui| {
-                    if ui.button("Settings").clicked() {
-                        self.settings.show_settings_viewport.store(true, std::sync::atomic::Ordering::Relaxed);
-                    }
-                    if ui.button("About").clicked() {
-                        self.show_about_viewport.store(true, std::sync::atomic::Ordering::Relaxed);
-                    }
-                    if ui.button("Licenses").clicked() {
-                        self.show_licenses_viewport.store(true, std::sync::atomic::Ordering::Relaxed);
-                    }
-                    if ui.button("Help").clicked() {
-                        self.show_help_viewport.store(true, std::sync::atomic::Ordering::Relaxed);
-                    }
+                if ui.button("Settings").clicked() {
+                    self.settings
+                        .show_settings_viewport
+                        .store(true, std::sync::atomic::Ordering::Relaxed);
+                }
+                if ui.button("About").clicked() {
+                    self.show_about_viewport
+                        .store(true, std::sync::atomic::Ordering::Relaxed);
+                }
+                if ui.button("Licenses").clicked() {
+                    self.show_licenses_viewport
+                        .store(true, std::sync::atomic::Ordering::Relaxed);
+                }
+                if ui.button("Help").clicked() {
+                    self.show_help_viewport
+                        .store(true, std::sync::atomic::Ordering::Relaxed);
+                }
             });
         });
-        if self.settings.show_settings_viewport.load(std::sync::atomic::Ordering::Relaxed) {
+        if self
+            .settings
+            .show_settings_viewport
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
             self.settings_viewport_startup(ctx);
         }
-        if self.show_about_viewport.load(std::sync::atomic::Ordering::Relaxed) {
+        if self
+            .show_about_viewport
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
             self.about_viewport_startup(ctx);
         }
-        if self.show_licenses_viewport.load(std::sync::atomic::Ordering::Relaxed) {
+        if self
+            .show_licenses_viewport
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
             self.licenses_viewport_startup(ctx);
         }
-        if self.show_help_viewport.load(std::sync::atomic::Ordering::Relaxed) {
+        if self
+            .show_help_viewport
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
             self.help_viewport_startup(ctx);
         }
     }
@@ -118,7 +141,6 @@ impl UrdState {
                             ui.add_enabled(false, |ui: &mut Ui| {
                                 TextEdit::multiline(&mut tmp_body_str).frame(false).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()).show(ui).response
                             })
-                            
                         });
                         group.response
                     });
@@ -144,8 +166,21 @@ impl UrdState {
             self.central_panel_menu(ui);
             ui.separator();
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                let title = TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center).frame(false).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()).show(ui);
-                let text_edit = ui.add_sized(ui.available_size(), TextEdit::multiline(&mut self.current_journal_entry).horizontal_align(Align::Center).lock_focus(true).text_color(self.settings.font.text_colour).font(font.clone()));
+                let title = TextEdit::singleline(&mut self.journal.current_entry.title)
+                    .horizontal_align(Align::Center)
+                    .frame(false)
+                    .desired_width(f32::INFINITY)
+                    .text_color(self.settings.font.text_colour)
+                    .font(font.clone())
+                    .show(ui);
+                let text_edit = ui.add_sized(
+                    ui.available_size(),
+                    TextEdit::multiline(&mut self.current_journal_entry)
+                        .horizontal_align(Align::Center)
+                        .lock_focus(true)
+                        .text_color(self.settings.font.text_colour)
+                        .font(font.clone()),
+                );
                 if self.settings.continuous_saving {
                     if title.response.changed() || text_edit.changed() {
                         // TODO: save journal entry
@@ -159,7 +194,6 @@ impl UrdState {
                         println!("testing lost focus");
                     }
                 }
-                
             })
         });
     }
@@ -184,17 +218,23 @@ impl UrdState {
     }
 
     fn save_journal_entry(&mut self) {
-        self.journal.entries.push(self.journal.current_entry.clone());
+        self.journal
+            .entries
+            .push(self.journal.current_entry.clone());
     }
 }
 
 pub fn gui_startup(settings: Settings) {
-    let size: Vec2 = Vec2 { x: settings.size.size[0], y: settings.size.size[1] };
+    let size: Vec2 = Vec2 {
+        x: settings.size.size[0],
+        y: settings.size.size[1],
+    };
     let mut native_options = NativeOptions::default();
     native_options.viewport.inner_size = Option::from(size);
     run_native(
         APP_NAME,
         native_options,
         Box::new(|_cc| Ok(Box::<UrdState>::new(UrdState::new(settings)))),
-    ).expect("E 01");
+    )
+    .expect("E 01");
 }

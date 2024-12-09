@@ -1,6 +1,5 @@
 use crate::settings::Settings;
 
-
 #[derive(Clone)]
 pub struct Journal {
     pub entries: Vec<JournalEntry>,
@@ -9,7 +8,6 @@ pub struct Journal {
 
 impl Journal {
     pub fn new(settings: &Settings) -> Self {
-        
         Self {
             entries: Vec::new(),
             current_entry: JournalEntry::new(settings),

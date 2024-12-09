@@ -14,7 +14,6 @@ pub struct Settings {
 }
 
 impl Default for Settings {
-    
     // TODO: sensible defaults
     fn default() -> Self {
         Self {
