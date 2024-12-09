@@ -5,8 +5,8 @@ use eframe::{
     epaint::Vec2,
     *,
 };
-use egui::{FontId, ScrollArea, SidePanel, TextEdit, TopBottomPanel};
-use crate::settings::Settings;
+use egui::{Align, FontId, Margin, ScrollArea, SidePanel, TextEdit, TopBottomPanel};
+use crate::{journal_entries::{Journal, JournalEntry}, settings::Settings};
 
 mod settings;
 mod about;
@@ -17,19 +17,18 @@ const APP_NAME: &str = "Urd";
 
 pub struct UrdState {
     settings: Settings,
-    current_journal_entry: String,
-    current_journal_entry_title: String,
     show_about_viewport: Arc<AtomicBool>,
     show_licenses_viewport: Arc<AtomicBool>,
     show_help_viewport: Arc<AtomicBool>,
+    journal: Journal,
 }
 
 impl Default for UrdState {
     fn default() -> Self {
+        let settings = Settings::default();
         UrdState {
-            settings: Settings::default(),
-            current_journal_entry: String::new(),
-            current_journal_entry_title: String::new(),
+            journal: Journal::new(&settings),
+            settings,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
@@ -42,9 +41,8 @@ impl UrdState {
     // TODO: if settings have been found, there are probably journal entries to check for
     pub fn new(settings: Settings) -> Self {
         UrdState {
+            journal: Journal::new(&settings),
             settings,
-            current_journal_entry: String::from_str("Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.").unwrap(),
-            current_journal_entry_title: String::from_str("2024-12-09").unwrap(),
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
@@ -144,18 +142,18 @@ impl UrdState {
         };
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             self.central_panel_menu(ui);
-            
+            ui.separator();
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                let title = TextEdit::singleline(&mut self.current_journal_entry_title).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()).show(ui);
-                let text_edit = TextEdit::multiline(&mut self.current_journal_entry).desired_width(f32::INFINITY).lock_focus(true).text_color(self.settings.font.text_colour).font(font.clone()).show(ui);
+                let title = TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center).frame(false).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()).show(ui);
+                let text_edit = ui.add_sized(ui.available_size(), TextEdit::multiline(&mut self.current_journal_entry).horizontal_align(Align::Center).lock_focus(true).text_color(self.settings.font.text_colour).font(font.clone()));
                 if self.settings.continuous_saving {
-                    if title.response.changed() || text_edit.response.changed() {
+                    if title.response.changed() || text_edit.changed() {
                         // TODO: save journal entry
                         // this saves every frame
                         println!("testing changed");
                     }
                 } else {
-                    if title.response.lost_focus() || text_edit.response.lost_focus() {
+                    if title.response.lost_focus() || text_edit.lost_focus() {
                         // TODO: save journal entry
                         // this saves only if the focus leaves the text box
                         println!("testing lost focus");
@@ -183,6 +181,10 @@ impl UrdState {
             });
             let _ = ui.button("Save");
         });
+    }
+
+    fn save_journal_entry(&mut self) {
+        self.journal.entries.push(self.journal.current_entry.clone());
     }
 }
 
