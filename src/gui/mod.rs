@@ -1,7 +1,4 @@
-use std::{
-    str::FromStr,
-    sync::{atomic::AtomicBool, Arc},
-};
+use std::sync::{atomic::AtomicBool, Arc};
 
 use crate::{
     journal_entries::{Journal, JournalEntry},
@@ -12,7 +9,7 @@ use eframe::{
     epaint::Vec2,
     *,
 };
-use egui::{Align, FontId, Margin, ScrollArea, SidePanel, TextEdit, TopBottomPanel};
+use egui::{Align, FontId, ScrollArea, SidePanel, TextEdit, TopBottomPanel};
 
 mod about;
 mod help;
@@ -27,6 +24,7 @@ pub struct UrdState {
     show_licenses_viewport: Arc<AtomicBool>,
     show_help_viewport: Arc<AtomicBool>,
     journal: Journal,
+    editing_index: Option<usize>,
 }
 
 impl Default for UrdState {
@@ -35,6 +33,7 @@ impl Default for UrdState {
         UrdState {
             journal: Journal::new(&settings),
             settings,
+            editing_index: None,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
@@ -49,6 +48,7 @@ impl UrdState {
         UrdState {
             journal: Journal::new(&settings),
             settings,
+            editing_index: None,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
@@ -130,23 +130,21 @@ impl UrdState {
         };
         SidePanel::left("entry_browser").default_width(self.settings.size.side_panel_width).show(ctx, |ui: &mut Ui| {
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                for n in 0..25 {
+                for (index, entry) in self.journal.entries.iter_mut().enumerate() {
                     let entry_reaction = ui.add(|ui: &mut Ui| {
                         let group = ui.group(|ui: &mut Ui| {
-                            let mut tmp_title_str = format!("Entry {}", n);
-                            let mut tmp_body_str = "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.".to_string();
                             ui.add_enabled(false, |ui: &mut Ui| {
-                                TextEdit::singleline(&mut tmp_title_str).frame(false).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()).show(ui).response
+                                TextEdit::singleline(&mut entry.title).frame(false).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()).show(ui).response
                             });
                             ui.add_enabled(false, |ui: &mut Ui| {
-                                TextEdit::multiline(&mut tmp_body_str).frame(false).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()).show(ui).response
+                                TextEdit::multiline(&mut entry.text).frame(false).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()).show(ui).response
                             })
                         });
                         group.response
                     });
                     // TODO: open this journal entry if clicked
                     if entry_reaction.interact(egui::Sense::click()).clicked() {
-                        println!("Entry reaction! {} clicked", n);
+                        println!("Entry reaction! {:?} clicked", entry);
                     }
                 }
                 ui.separator();
@@ -166,34 +164,27 @@ impl UrdState {
             self.central_panel_menu(ui);
             ui.separator();
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                let title = TextEdit::singleline(&mut self.journal.current_entry.title)
+                let _title = TextEdit::singleline(&mut self.journal.current_entry.title)
                     .horizontal_align(Align::Center)
                     .frame(false)
                     .desired_width(f32::INFINITY)
                     .text_color(self.settings.font.text_colour)
                     .font(font.clone())
                     .show(ui);
-                let text_edit = ui.add_sized(
+                let _text_edit = ui.add_sized(
                     ui.available_size(),
-                    TextEdit::multiline(&mut self.current_journal_entry)
+                    TextEdit::multiline(&mut self.journal.current_entry.text)
                         .horizontal_align(Align::Center)
                         .lock_focus(true)
                         .text_color(self.settings.font.text_colour)
                         .font(font.clone()),
                 );
-                if self.settings.continuous_saving {
-                    if title.response.changed() || text_edit.changed() {
-                        // TODO: save journal entry
-                        // this saves every frame
-                        println!("testing changed");
-                    }
-                } else {
-                    if title.response.lost_focus() || text_edit.lost_focus() {
-                        // TODO: save journal entry
-                        // this saves only if the focus leaves the text box
-                        println!("testing lost focus");
-                    }
-                }
+                /* if title.response.lost_focus() || text_edit.lost_focus() {
+                    // TODO: save journal entry
+                    // this saves only if the focus leaves the text box
+                    println!("testing lost focus");
+                    self.save_journal_entry();
+                } */
             })
         });
     }
@@ -213,14 +204,36 @@ impl UrdState {
             ui.group(|ui: &mut Ui| {
                 ui.checkbox(&mut self.settings.font.monospace, "Monospace");
             });
-            let _ = ui.button("Save");
+            if ui.button("Save").clicked() {
+                self.save_journal_entry();
+            };
+            if ui.button("Delete entry").clicked() {
+                self.delete_journal_entry();
+            };
         });
     }
 
+    fn delete_journal_entry(&mut self) {
+        if let Some(index) = self.editing_index {
+            self.journal.entries.remove(index);
+            self.editing_index = None;
+        } else {
+            self.journal.current_entry = JournalEntry::new(&self.settings);
+        }
+    }
+
     fn save_journal_entry(&mut self) {
-        self.journal
+        if let Some(index) = self.editing_index {
+            self.journal.entries[index] = self.journal.current_entry.clone();
+            self.journal.current_entry = JournalEntry::new(&self.settings);
+            self.editing_index = None;
+        } else {
+            self.journal
             .entries
-            .push(self.journal.current_entry.clone());
+            .push_front(self.journal.current_entry.clone());
+            self.journal.current_entry = JournalEntry::new(&self.settings);
+        }
+        
     }
 }
 

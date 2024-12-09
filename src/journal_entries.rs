@@ -1,21 +1,23 @@
+use std::collections::VecDeque;
+
 use crate::settings::Settings;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Journal {
-    pub entries: Vec<JournalEntry>,
+    pub entries: VecDeque<JournalEntry>,
     pub current_entry: JournalEntry,
 }
 
 impl Journal {
     pub fn new(settings: &Settings) -> Self {
         Self {
-            entries: Vec::new(),
+            entries: VecDeque::new(),
             current_entry: JournalEntry::new(settings),
         }
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct JournalEntry {
     pub title: String,
     pub text: String,
@@ -24,20 +26,20 @@ pub struct JournalEntry {
 
 impl JournalEntry {
     pub fn new(settings: &Settings) -> Self {
-        let date_time = {
+        let (date_time, date) = {
             if let Some(timezone) = settings.timezone {
-                let date_time = {
+                let (date_time, date) = {
                     let mut date_time = horae::Utc::now();
                     date_time.with_timezone(timezone);
-                    date_time.to_string()
+                    (date_time.to_string(), date_time.date().to_string())
                 };
-                date_time
+                (date_time, date)
             } else {
-                horae::Utc::now().to_string()
+                (horae::Utc::now().to_string(), horae::Utc::now().date().to_string())
             }
         };
         Self {
-            title: String::new(),
+            title: date,
             text: String::new(),
             date_time,
         }
