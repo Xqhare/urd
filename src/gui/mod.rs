@@ -54,14 +54,14 @@ impl UrdState {
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
 
                 for n in 0..25 {
-                    ui.separator();
-                    let title = ui.label(format!("Entry {}", n));
-                    if title.clicked() {
-                        println!("{}", format!("Entry {}", n));
-                    }
-                    let body = ui.label("Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.");
-                    if body.clicked() {
-                        println!("{}", format!("lorem {}", n));
+
+                    let entry_reaction = ui.group(|ui| {
+                        ui.separator();
+                        let title = ui.label(format!("Entry {}", n));
+                        let body = ui.label("Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.");
+                    }).response;
+                    if entry_reaction.clicked() {
+                        println!("Entry {} clicked", n);
                     }
                 }
                 ui.separator();
