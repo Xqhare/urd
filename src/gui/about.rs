@@ -2,6 +2,8 @@ use eframe::egui::{CentralPanel, Context, Ui, ViewportBuilder, ViewportId};
 
 use super::UrdState;
 
+const ABOUT_WINDOW_SIZE: [f32; 2] = [200.0, 130.0];
+
 impl UrdState {
     pub fn about_viewport_startup(&mut self, ctx: &Context) {
         if self
@@ -13,7 +15,9 @@ impl UrdState {
                 ViewportId::from_hash_of("about_viewport"),
                 ViewportBuilder::default()
                     .with_title("About")
-                    .with_inner_size([200.0, 125.0]),
+                    .with_inner_size(ABOUT_WINDOW_SIZE)
+                    .with_min_inner_size(ABOUT_WINDOW_SIZE)
+                    .with_max_inner_size(ABOUT_WINDOW_SIZE),
                 move |ctx, class| {
                     // TODO: paint the settings in the main window if this fails instead of
                     // panicking
@@ -21,7 +25,6 @@ impl UrdState {
                     CentralPanel::default().show(ctx, |ui: &mut Ui| {
                         ui.horizontal_wrapped(|ui: &mut Ui| {
                             ui.vertical_centered_justified(|ui: &mut Ui| {
-                                ui.heading("Urd");
                                 ui.add_space(10.0);
                                 ui.label(format!(
                                     "Written by {}",
