@@ -2,6 +2,11 @@
 name = "urd"
 version = "0.2.0"
 edition = "2021"
+authors = ["Xqhare"]
+license = "EPL-2.0"
+
+[profile.release]
+lto = "fat"
 
 [dependencies]
 eframe = "0.29.1"
