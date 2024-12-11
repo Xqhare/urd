@@ -13,13 +13,29 @@ impl UrdState {
                 ViewportId::from_hash_of("about_viewport"),
                 ViewportBuilder::default()
                     .with_title("About")
-                    .with_inner_size([200.0, 400.0]),
+                    .with_inner_size([200.0, 125.0]),
                 move |ctx, class| {
                     // TODO: paint the settings in the main window if this fails instead of
                     // panicking
                     assert!(class == eframe::egui::ViewportClass::Deferred);
                     CentralPanel::default().show(ctx, |ui: &mut Ui| {
-                        ui.heading("About");
+                        ui.horizontal_wrapped(|ui: &mut Ui| {
+                            ui.vertical_centered_justified(|ui: &mut Ui| {
+                                ui.heading("Urd");
+                                ui.add_space(10.0);
+                                ui.label(format!(
+                                    "Written by {}",
+                                    env!("CARGO_PKG_AUTHORS")
+                                ));
+                                ui.label(format!(
+                                    "Version {}",
+                                    env!("CARGO_PKG_VERSION")
+                                ));
+                                ui.hyperlink_to("Urd on GitHub", "https://github.com/xqhare/urd");
+                                ui.separator();
+                                ui.label("In loving memory of my stepfather.");
+                            });
+                        });
                     });
                     // Close viewport
                     if ctx.input(|i| i.viewport().close_requested()) {
