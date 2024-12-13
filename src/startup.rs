@@ -1,15 +1,18 @@
 use std::path::Path;
 
-use crate::settings::Settings;
+use crate::{paths::{APP_DIR, SETTINGS_FILE}, settings::Settings};
 
-const APP_DIR: &str = "urd_data/";
 
 pub fn startup_appstate() -> Settings {
     if Path::new(APP_DIR).exists() {
-        println!("App state already exists");
+        if Path::new(SETTINGS_FILE).exists() {
+            Settings::deserialize(SETTINGS_FILE).unwrap()
+        } else {
+            Settings::default()
+        }
     } else {
+        // Assume first time startup
         std::fs::create_dir(APP_DIR).unwrap();
+        Settings::default()
     }
-    let settings = Settings::default();
-    settings
 }
