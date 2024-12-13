@@ -6,7 +6,13 @@ use crate::{paths::{APP_DIR, SETTINGS_FILE}, settings::Settings};
 pub fn startup_appstate() -> Settings {
     if Path::new(APP_DIR).exists() {
         if Path::new(SETTINGS_FILE).exists() {
-            Settings::deserialize(SETTINGS_FILE).unwrap()
+            let out = Settings::deserialize(SETTINGS_FILE);
+            match out {
+                Ok(s) => s,
+                Err(_) => {
+                    Settings::default()
+                }
+            }
         } else {
             Settings::default()
         }
