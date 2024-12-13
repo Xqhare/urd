@@ -36,31 +36,6 @@ impl UrdState {
                 }
             });
         });
-        if self
-            .settings
-            .show_settings_viewport
-            .load(std::sync::atomic::Ordering::Relaxed)
-        {
-            self.settings_viewport_startup(ctx);
-        }
-        if self
-            .show_about_viewport
-            .load(std::sync::atomic::Ordering::Relaxed)
-        {
-            self.about_viewport_startup(ctx);
-        }
-        if self
-            .show_licenses_viewport
-            .load(std::sync::atomic::Ordering::Relaxed)
-        {
-            self.licenses_viewport_startup(ctx);
-        }
-        if self
-            .show_help_viewport
-            .load(std::sync::atomic::Ordering::Relaxed)
-        {
-            self.help_viewport_startup(ctx);
-        }
     }
 
     fn main_side_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
@@ -107,14 +82,17 @@ impl UrdState {
             self.central_panel_menu(ui);
             ui.separator();
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                let _title = TextEdit::singleline(&mut self.journal.current_entry.title)
+                ui.add_enabled(false, |ui: &mut Ui| {
+                    TextEdit::singleline(&mut self.journal.current_entry.title)
                     .horizontal_align(Align::Center)
                     .frame(false)
                     .desired_width(f32::INFINITY)
                     .text_color(self.settings.font.text_colour)
                     .font(font.clone())
-                    .show(ui);
-                let _text_edit = ui.add_sized(
+                    .show(ui).response
+                });
+                ui.separator();
+                ui.add_sized(
                     ui.available_size(),
                     TextEdit::multiline(&mut self.journal.current_entry.text)
                         .horizontal_align(Align::Center)
@@ -148,7 +126,9 @@ impl UrdState {
                 ui.checkbox(&mut self.settings.font.monospace, "Monospace");
             });
             if ui.button("Save").clicked() {
-                self.save_journal_entry();
+                //self.save_journal_entry();
+                let t = self.settings.save();
+                println!("{:?}", t);
             };
             if ui.button("Delete entry").clicked() {
                 self.delete_journal_entry();
