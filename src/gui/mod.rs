@@ -25,6 +25,8 @@ pub struct UrdState {
     settings: Settings,
     editing_index: Option<usize>,
     search_mode: bool,
+    show_error: bool,
+    error_message: Option<String>,
     show_about_viewport: Arc<AtomicBool>,
     show_licenses_viewport: Arc<AtomicBool>,
     show_help_viewport: Arc<AtomicBool>,
@@ -37,11 +39,13 @@ impl Default for UrdState {
             journal: Journal::new(&settings),
             settings,
             editing_index: None,
+            error_message: None,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
             show_help_viewport: Arc::new(AtomicBool::new(false)),
             search_mode: false,
+            show_error: false,
         }
     }
 }
@@ -53,17 +57,20 @@ impl UrdState {
             journal: Journal::new(&settings),
             settings,
             editing_index: None,
+            error_message: None,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
             show_help_viewport: Arc::new(AtomicBool::new(false)),
             search_mode: false,
+            show_error: false,
         }
     }
 }
 
 impl App for UrdState {
     fn update(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+        self.main_top_panel(ctx, frame);
         if self.search_mode {
             self.search_page(ctx, frame);
         } else {
@@ -98,6 +105,48 @@ impl App for UrdState {
 }
 
 impl UrdState {
+    fn main_top_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+        TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
+            ui.horizontal(|ui: &mut Ui| {
+                ui.add(|ui: &mut Ui| {
+                    ui.horizontal(|ui: &mut Ui| {
+                        if ui.button("Settings").clicked() {
+                            self.settings
+                                .show_settings_viewport
+                                .store(true, std::sync::atomic::Ordering::Relaxed);
+                        }
+                        if ui.button("About").clicked() {
+                            self.show_about_viewport
+                                .store(true, std::sync::atomic::Ordering::Relaxed);
+                        }
+                        if ui.button("Licenses").clicked() {
+                            self.show_licenses_viewport
+                                .store(true, std::sync::atomic::Ordering::Relaxed);
+                        }
+                        if ui.button("Help").clicked() {
+                            self.show_help_viewport
+                                .store(true, std::sync::atomic::Ordering::Relaxed);
+                        }
+                    }).response
+                    
+                });
+                ui.add_space(self.settings.size.size[0] / 3.0);
+                if self.show_error {
+                    ui.add(|ui: &mut Ui| {
+                        ui.horizontal(|ui: &mut Ui| {
+                            ui.label("Error:");
+                            ui.label(self.error_message.as_ref().unwrap());
+                            if ui.button("Dismiss").clicked() {
+                                self.show_error = false;
+                                self.error_message = None;
+                            }
+                        }).response
+                    });
+                };
+                    
+            });
+        });
+    }
 
     fn delete_journal_entry(&mut self) {
         if let Some(index) = self.editing_index {
