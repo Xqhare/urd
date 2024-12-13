@@ -5,6 +5,7 @@ use super::UrdState;
 const LICENSES_WINDOW_SIZE: [f32; 2] = [300.0, 500.0];
 const EFRAME_LICENSE: &str = include_str!("../../licenses/MIT-Eframe");
 const HORAE_LICENSE: &str = include_str!("../../licenses/MIT-Horae");
+const NABU_LICENSE: &str = include_str!("../../licenses/MIT-Nabu");
 
 impl UrdState {
     pub fn licenses_viewport_startup(&mut self, ctx: &Context) {
@@ -36,6 +37,10 @@ impl UrdState {
                             ui.hyperlink_to("Horae", "https://github.com/xqhare/horae");
                             ui.label("MIT License");
                             ui.label(HORAE_LICENSE);
+                            ui.separator();
+                            ui.hyperlink_to("Nabu", "https://github.com/xqhare/nabu");
+                            ui.label("MIT License");
+                            ui.label(NABU_LICENSE);
                         });
                     });
                     // Close viewport

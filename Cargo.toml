@@ -3,7 +3,7 @@ name = "urd"
 version = "0.2.2"
 edition = "2021"
 authors = ["Xqhare"]
-license = "EPL-2.0" OR "MIT"
+license = "EPL-2.0 OR MIT"
 
 [profile.release]
 lto = "fat"
@@ -11,3 +11,4 @@ lto = "fat"
 [dependencies]
 eframe = "0.29.1"
 horae = { git = "https://github.com/xqhare/horae" }
+nabu = { git = "https://github.com/xqhare/nabu" }
