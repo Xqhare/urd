@@ -8,35 +8,11 @@ use super::UrdState;
 
 impl UrdState {
     pub fn main_page(&mut self, ctx: &egui::Context, frame: &mut Frame) {
-        self.main_top_panel(ctx, frame);
         self.main_side_panel(ctx, frame);
         // Remember, central panel last
         self.main_central_panel(ctx, frame);
     }
 
-    fn main_top_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
-        TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
-            ui.horizontal(|ui: &mut Ui| {
-                if ui.button("Settings").clicked() {
-                    self.settings
-                        .show_settings_viewport
-                        .store(true, std::sync::atomic::Ordering::Relaxed);
-                }
-                if ui.button("About").clicked() {
-                    self.show_about_viewport
-                        .store(true, std::sync::atomic::Ordering::Relaxed);
-                }
-                if ui.button("Licenses").clicked() {
-                    self.show_licenses_viewport
-                        .store(true, std::sync::atomic::Ordering::Relaxed);
-                }
-                if ui.button("Help").clicked() {
-                    self.show_help_viewport
-                        .store(true, std::sync::atomic::Ordering::Relaxed);
-                }
-            });
-        });
-    }
 
     fn main_side_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         let font = {
@@ -65,7 +41,6 @@ impl UrdState {
                         println!("Entry reaction! {:?} clicked", entry);
                     }
                 }
-                ui.separator();
             });
         });
     }
@@ -115,7 +90,9 @@ impl UrdState {
             ui.group(|ui: &mut Ui| {
                 ui.horizontal(|ui: &mut Ui| {
                     ui.label("Text Colour: ");
-                    ui.color_edit_button_srgba(&mut self.settings.font.text_colour);
+                    if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
+                        self.settings.save();
+                    };
                 })
             });
             ui.group(|ui: &mut Ui| {
