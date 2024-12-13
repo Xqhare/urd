@@ -69,6 +69,31 @@ impl App for UrdState {
         } else {
             self.main_page(ctx, frame);
         }
+        if self
+            .settings
+            .show_settings_viewport
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
+            self.settings_viewport_startup(ctx);
+        }
+        if self
+            .show_about_viewport
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
+            self.about_viewport_startup(ctx);
+        }
+        if self
+            .show_licenses_viewport
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
+            self.licenses_viewport_startup(ctx);
+        }
+        if self
+            .show_help_viewport
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
+            self.help_viewport_startup(ctx);
+        }
     }
 }
 
