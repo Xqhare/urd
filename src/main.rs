@@ -1,12 +1,11 @@
-use settings::Settings;
 
 mod gui;
 mod journal_entries;
 mod settings;
+mod paths;
 mod startup;
 
 fn main() {
-    let _ = startup::startup_appstate();
-    let settings = Settings::default();
+    let settings = startup::startup_appstate();
     gui::gui_startup(settings);
 }
