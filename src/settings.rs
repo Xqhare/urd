@@ -8,6 +8,7 @@ use crate::paths::SETTINGS_FILE;
 
 // TODO: get from config
 // TODO: save to config
+#[derive(Clone, Debug)]
 pub struct Settings {
     pub size: SizeSettings,
     pub font: FontSettings,
@@ -89,6 +90,7 @@ impl Settings {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct FontSettings {
     pub size: f32,
     pub text_colour: Color32,
@@ -130,7 +132,9 @@ impl FontSettings {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct SizeSettings {
+    /// First value is width, second is height
     pub size: [f32; 2],
     pub side_panel_width: f32,
 }

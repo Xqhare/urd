@@ -1,4 +1,6 @@
-use eframe::egui::{CentralPanel, Context, Ui, ViewportBuilder, ViewportId};
+use std::thread::sleep;
+
+use eframe::egui::{CentralPanel, Context, Slider, Ui, ViewportBuilder, ViewportId};
 
 use super::UrdState;
 
@@ -10,6 +12,7 @@ impl UrdState {
             .load(std::sync::atomic::Ordering::Relaxed)
         {
             let show_viewport_pointer = self.settings.show_settings_viewport.clone();
+            let mut tmp_settings = self.settings.clone();
             ctx.show_viewport_deferred(
                 ViewportId::from_hash_of("settings_viewport"),
                 ViewportBuilder::default()
@@ -20,7 +23,20 @@ impl UrdState {
                     // panicking
                     assert!(class == eframe::egui::ViewportClass::Deferred);
                     CentralPanel::default().show(ctx, |ui: &mut Ui| {
-                        ui.heading("Settings");
+                        ui.group(|ui: &mut Ui| {
+                            ui.vertical_centered_justified(|ui: &mut Ui| {
+                                ui.label("Window Settings")                               
+                            });
+                            ui.separator();
+                            ui.group(|ui: &mut Ui| {
+                                ui.horizontal(|ui: &mut Ui| {
+                                    ui.label("Side Panel Width: ");
+                                    ui.add(Slider::new(&mut tmp_settings.size.side_panel_width, 10.0..=tmp_settings.size.size[0] - 50.0));
+                                })
+                            });
+                            ui.separator();
+                            ui.separator();
+                        })
                     });
                     // Close viewport
                     if ctx.input(|i| i.viewport().close_requested()) {
