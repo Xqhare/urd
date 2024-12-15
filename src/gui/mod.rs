@@ -31,6 +31,7 @@ pub struct UrdState {
     show_licenses_viewport: Arc<AtomicBool>,
     show_help_viewport: Arc<AtomicBool>,
     settings_backup: Option<Settings>,
+    unlocked_with_password: bool,
 }
 
 impl Default for UrdState {
@@ -48,6 +49,7 @@ impl Default for UrdState {
             show_help_viewport: Arc::new(AtomicBool::new(false)),
             search_mode: false,
             show_error: false,
+            unlocked_with_password: false,
         }
     }
 }
@@ -67,12 +69,54 @@ impl UrdState {
             show_help_viewport: Arc::new(AtomicBool::new(false)),
             search_mode: false,
             show_error: false,
+            unlocked_with_password: false,
         }
     }
 }
 
 impl App for UrdState {
     fn update(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+        if self.settings.password != "" && !self.unlocked_with_password {
+            self.protected_mode(ctx, frame);
+        } else {
+            self.normal_mode(ctx, frame);
+        }
+    }
+}
+
+impl UrdState {
+
+    fn protected_mode(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+        CentralPanel::default().show(ctx, |ui: &mut Ui| {
+            ui.add_space(ui.available_height() / 3.0);
+            ui.vertical_centered(|ui: &mut Ui| {
+                ui.group(|ui: &mut Ui| {
+                ui.heading("Welcome to Urd");
+                    ui.vertical_centered(|ui: &mut Ui| {
+                        if ui.add(TextEdit::singleline(&mut self.settings.password_input).password(true).hint_text("Please enter your password here").horizontal_align(Align::Center)).lost_focus() {
+                            if self.settings.password == self.settings.password_input {
+                                self.unlocked_with_password = true;
+                                self.settings.password_input = "".to_string();
+                                self.show_error = false;
+                                self.error_message = None;
+                            } else {
+                                self.show_error = true;
+                                self.error_message = Some("Incorrect password".to_string());
+                            }
+                        }
+                        let _ = ui.button("Unlock");
+                        if self.show_error {
+                            ui.add(|ui: &mut Ui| {
+                                ui.label(self.error_message.as_ref().unwrap())
+                            });
+                        };
+                    });
+                });                
+            });
+        });
+    }
+
+    fn normal_mode(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         self.main_top_panel(ctx, frame);
         if self.search_mode {
             self.search_page(ctx, frame);
@@ -99,9 +143,7 @@ impl App for UrdState {
             self.help_viewport_startup(ctx);
         }
     }
-}
 
-impl UrdState {
     fn main_top_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
             ui.horizontal(|ui: &mut Ui| {
