@@ -1,4 +1,4 @@
-use std::{path::Path, sync::{atomic::AtomicBool, Arc}};
+use std::path::Path;
 
 use eframe::egui::Color32;
 use horae::TimeZone;
@@ -6,28 +6,50 @@ use nabu::XffValue;
 
 use crate::paths::SETTINGS_FILE;
 
+const MAIN_WINDOW_DEFAULT_SIZE: [f32; 2] = [1000.0, 600.0];
+const SIDE_PANEL_DEFAULT_WIDTH: f32 = 300.0;
+pub const MAX_FONT_SIZE: f32 = 100.0;
+pub const MIN_FONT_SIZE: f32 = 2.0;
+pub const MAX_WINDOW_SIZE: [f32; 2] = [3_000.0, 3_000.0];
+pub const MAX_SIDE_PANEL_WIDTH: f32 = 2_000.0;
+
 // TODO: get from config
 // TODO: save to config
 #[derive(Clone, Debug)]
 pub struct Settings {
     pub size: SizeSettings,
     pub font: FontSettings,
-    pub folder_structure: bool,
-    pub show_settings_viewport: Arc<AtomicBool>,
-    pub timezone: Option<TimeZone>,
+    pub password: String,
+    pub timezone: TimezoneStore,
+    // Not part of persistent state
+    pub password_input: String,
+    pub new_password_input: [String; 2],
+    pub show_settings_viewport: bool,
+    pub overwrite_window_size: bool,
+    pub overwrite_window_size_store: [String; 2],
+    pub overwrite_side_panel_width: bool,
+    pub overwrite_side_panel_width_store: String,
 }
 
 impl Default for Settings {
     // TODO: sensible defaults
     fn default() -> Self {
+        let size = SizeSettings::default();
         Self {
-            size: SizeSettings::default(),
+            overwrite_window_size_store: [size.size[0].to_string(), size.size[1].to_string()],
+            overwrite_side_panel_width_store: size.side_panel_width.to_string(),
+            size,
+            // default default/None
             font: FontSettings::default(),
-            timezone: None,
+            timezone: TimezoneStore::default(),
+            password: String::new(),
+            password_input: String::new(),
+            new_password_input: [String::new(), String::new()],
             // default true
-            folder_structure: true,
             // default false
-            show_settings_viewport: Arc::new(AtomicBool::new(false)),
+            show_settings_viewport: false,
+            overwrite_window_size: false,
+            overwrite_side_panel_width: false,
         }
     }
 }
@@ -42,14 +64,15 @@ impl Settings {
         serialized.insert("size", size);
         serialized.insert("font", font);
 
-        serialized.insert("continuous_saving", XffValue::from(self.folder_structure));
-        
-        let timezone = match &self.timezone {
+        let timezone = match &self.timezone.timezone {
             Some(tz) => XffValue::from(tz.to_string()),
             None => XffValue::Null,
         };
 
         serialized.insert("timezone", timezone);
+
+        let password = XffValue::from(self.password.clone());
+        serialized.insert("password", password);
 
         XffValue::from(serialized)
     }
@@ -75,18 +98,62 @@ impl Settings {
         };
         let size = SizeSettings::deserialize(&deserialized.get("size").unwrap());
         let font = FontSettings::deserialize(&deserialized.get("font").unwrap());
-        let continuous_saving = deserialized.get("continuous_saving").unwrap().into_boolean().unwrap();
-        let timezone = match deserialized.get("timezone").unwrap() {
+        let tz = match deserialized.get("timezone").unwrap() {
             XffValue::Null => None,
             _ => Some(TimeZone::from(deserialized.get("timezone").unwrap().into_string().unwrap())),
         };
+        let password = deserialized.get("password").unwrap().into_string().unwrap();
         Ok(Settings {
-            size,
             font,
-            timezone,
-            folder_structure: continuous_saving,
-            show_settings_viewport: Arc::new(AtomicBool::new(false)),
+            timezone: TimezoneStore::new(tz),
+            password,
+            show_settings_viewport: false,
+            overwrite_window_size: false,
+            overwrite_side_panel_width: false,
+            password_input: String::new(),
+            new_password_input: [String::new(), String::new()],
+            overwrite_side_panel_width_store: size.side_panel_width.to_string(),
+            overwrite_window_size_store: [size.size[0].to_string(), size.size[1].to_string()],
+            size,
         })
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct TimezoneStore {
+    pub timezone: Option<TimeZone>,
+    pub all_timezones_str: Vec<String>,
+}
+
+impl Default for TimezoneStore {
+    fn default() -> Self {
+        let all_timezones_str = {
+            let mut out: Vec<String> = Vec::new();
+            for tz in TimeZone::get_all() {
+                out.push(tz.to_string());
+            }
+            out
+        };
+        Self {
+            timezone: None,
+            all_timezones_str,
+        }
+    }
+}
+
+impl TimezoneStore {
+    pub fn new(timezone: Option<TimeZone>) -> Self {
+        let all_timezones_str = {
+            let mut out: Vec<String> = Vec::new();
+            for tz in TimeZone::get_all() {
+                out.push(tz.to_string());
+            }
+            out
+        };
+        Self {
+            timezone,
+            all_timezones_str,
+        }
     }
 }
 
@@ -142,8 +209,8 @@ pub struct SizeSettings {
 impl Default for SizeSettings {
     fn default() -> Self {
         Self {
-            size: [1000.0, 500.0],
-            side_panel_width: 300.0,
+            size: MAIN_WINDOW_DEFAULT_SIZE,
+            side_panel_width: SIDE_PANEL_DEFAULT_WIDTH,
         }
     }
 }
