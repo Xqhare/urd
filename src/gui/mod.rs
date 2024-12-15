@@ -89,30 +89,41 @@ impl UrdState {
     fn protected_mode(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             ui.add_space(ui.available_height() / 3.0);
-            ui.vertical_centered(|ui: &mut Ui| {
-                ui.group(|ui: &mut Ui| {
-                ui.heading("Welcome to Urd");
+
+            ui.add_sized([ui.available_width() / 1.33, 150.0], |ui: &mut Ui| {
+                ui.horizontal(|ui: &mut Ui| {
+                    ui.add_space(ui.available_width() / 3.0);
                     ui.vertical_centered(|ui: &mut Ui| {
-                        if ui.add(TextEdit::singleline(&mut self.settings.password_input).password(true).hint_text("Please enter your password here").horizontal_align(Align::Center)).lost_focus() {
-                            if self.settings.password == self.settings.password_input {
-                                self.unlocked_with_password = true;
-                                self.settings.password_input = "".to_string();
-                                self.show_error = false;
-                                self.error_message = None;
-                            } else {
-                                self.show_error = true;
-                                self.error_message = Some("Incorrect password".to_string());
-                            }
-                        }
-                        let _ = ui.button("Unlock");
-                        if self.show_error {
-                            ui.add(|ui: &mut Ui| {
-                                ui.label(self.error_message.as_ref().unwrap())
+                        ui.group(|ui: &mut Ui| {
+                            ui.heading("Welcome to Urd");
+                            ui.vertical_centered(|ui: &mut Ui| {
+                                if ui.add(TextEdit::singleline(&mut self.settings.password_input).password(true).hint_text("Please enter your password here").horizontal_align(Align::Center)).changed() {
+                                    if self.settings.password_input.len() >= self.settings.password.len() {
+                                        if self.settings.password == self.settings.password_input {
+                                            self.unlocked_with_password = true;
+                                            self.settings.password_input = "".to_string();
+                                            self.show_error = false;
+                                            self.error_message = None;
+                                        } else {
+                                            self.show_error = true;
+                                            self.error_message = Some("Incorrect password".to_string());
+                                        }
+                                    } else {
+                                        self.show_error = false;
+                                        self.error_message = None;
+                                    }
+                                }
+                                let _ = ui.button("Unlock");
+                                if self.show_error {
+                                    ui.add(|ui: &mut Ui| {
+                                        ui.label(self.error_message.as_ref().unwrap())
+                                    });
+                                };
                             });
-                        };
+                        });
                     });
-                });                
-            });
+                }).response
+            })
         });
     }
 
@@ -180,13 +191,17 @@ impl UrdState {
                                     self.search_mode = true;
                                 }
                             }
-                            if ui.button("").clicked() {
+                            if ui.button("Export").clicked() {
                             }
                             if ui.button("").clicked() {
                             }
                         });
+                        if self.settings.password != "" {
+                            if ui.button("Lock Urd").clicked() {
+                                self.unlocked_with_password = false;
+                            }
+                        }
                     }).response
-                    
                 });
                 ui.add_space(ui.available_width() / 2.5);
                 if self.show_error {
