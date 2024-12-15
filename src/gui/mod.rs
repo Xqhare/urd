@@ -30,6 +30,7 @@ pub struct UrdState {
     show_about_viewport: Arc<AtomicBool>,
     show_licenses_viewport: Arc<AtomicBool>,
     show_help_viewport: Arc<AtomicBool>,
+    settings_backup: Option<Settings>,
 }
 
 impl Default for UrdState {
@@ -40,6 +41,7 @@ impl Default for UrdState {
             settings,
             editing_index: None,
             error_message: None,
+            settings_backup: None,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
@@ -58,6 +60,7 @@ impl UrdState {
             settings,
             editing_index: None,
             error_message: None,
+            settings_backup: None,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
@@ -76,13 +79,7 @@ impl App for UrdState {
         } else {
             self.main_page(ctx, frame);
         }
-        if self
-            .settings
-            .show_settings_viewport
-            .load(std::sync::atomic::Ordering::Relaxed)
-        {
-            self.settings_viewport_startup(ctx);
-        }
+        
         if self
             .show_about_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
@@ -110,30 +107,49 @@ impl UrdState {
             ui.horizontal(|ui: &mut Ui| {
                 ui.add(|ui: &mut Ui| {
                     ui.horizontal(|ui: &mut Ui| {
-                        if ui.button("Settings").clicked() {
-                            self.settings
-                                .show_settings_viewport
-                                .store(true, std::sync::atomic::Ordering::Relaxed);
-                        }
-                        if ui.button("About").clicked() {
-                            self.show_about_viewport
-                                .store(true, std::sync::atomic::Ordering::Relaxed);
-                        }
-                        if ui.button("Licenses").clicked() {
-                            self.show_licenses_viewport
-                                .store(true, std::sync::atomic::Ordering::Relaxed);
-                        }
-                        if ui.button("Help").clicked() {
-                            self.show_help_viewport
-                                .store(true, std::sync::atomic::Ordering::Relaxed);
-                        }
+                        ui.menu_button("Urd", |ui: &mut Ui| {
+                            if ui.button("Settings").clicked() {
+                                if self.settings.show_settings_viewport {
+                                    self.settings.show_settings_viewport = false;
+                                    self.settings_backup = None;
+                                } else {
+                                    self.settings.show_settings_viewport = true;
+                                    self.settings_backup = Some(self.settings.clone());
+                                }
+                            }
+                            if ui.button("About").clicked() {
+                                self.show_about_viewport
+                                    .store(true, std::sync::atomic::Ordering::Relaxed);
+                            }
+                            if ui.button("Licenses").clicked() {
+                                self.show_licenses_viewport
+                                    .store(true, std::sync::atomic::Ordering::Relaxed);
+                            }
+                            if ui.button("Help").clicked() {
+                                self.show_help_viewport
+                                    .store(true, std::sync::atomic::Ordering::Relaxed);
+                            }
+                        });
+                        ui.menu_button("Journal", |ui: &mut Ui| {
+                            if ui.button("Search").clicked() {
+                                if self.search_mode {
+                                    self.search_mode = false;
+                                } else {
+                                    self.search_mode = true;
+                                }
+                            }
+                            if ui.button("").clicked() {
+                            }
+                            if ui.button("").clicked() {
+                            }
+                        });
                     }).response
                     
                 });
-                ui.add_space(self.settings.size.size[0] / 3.0);
+                ui.add_space(ui.available_width() / 2.5);
                 if self.show_error {
                     ui.add(|ui: &mut Ui| {
-                        ui.horizontal(|ui: &mut Ui| {
+                        ui.horizontal_wrapped(|ui: &mut Ui| {
                             ui.label("Error:");
                             ui.label(self.error_message.as_ref().unwrap());
                             if ui.button("Dismiss").clicked() {
