@@ -4,11 +4,20 @@ use eframe::{
 };
 use egui::{Align, FontId, ScrollArea, SidePanel, TextEdit, TopBottomPanel};
 
+use crate::settings::{MAX_FONT_SIZE, MIN_FONT_SIZE};
+
 use super::UrdState;
 
 impl UrdState {
     pub fn main_page(&mut self, ctx: &egui::Context, frame: &mut Frame) {
-        self.main_side_panel(ctx, frame);
+        if self
+            .settings
+            .show_settings_viewport
+        {
+            self.settings_viewport_startup(ctx);
+        } else {
+            self.main_side_panel(ctx, frame);
+        }
         // Remember, central panel last
         self.main_central_panel(ctx, frame);
     }
@@ -97,7 +106,7 @@ impl UrdState {
             });
             ui.group(|ui: &mut Ui| {
                 ui.label("Font Size: ");
-                ui.add(egui::Slider::new(&mut self.settings.font.size, 8.0..=48.0));
+                ui.add(egui::Slider::new(&mut self.settings.font.size, MIN_FONT_SIZE..=MAX_FONT_SIZE));
             });
             ui.group(|ui: &mut Ui| {
                 ui.checkbox(&mut self.settings.font.monospace, "Monospace");
