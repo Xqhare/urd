@@ -213,6 +213,19 @@ impl UrdState {
                                         }
                                     }
                                 };
+                                let remove_pw_allowed = if self.settings.password.password_input == self.settings.password.password && pw_set { true } else { false };
+                                ui.add_enabled(remove_pw_allowed, |ui: &mut Ui| {
+                                    let but = ui.button("Remove password");
+                                    if but.clicked() {
+                                        self.settings.password.password = "".to_string();
+                                        self.settings.password.password_input = "".to_string();
+                                        let save = self.settings.save();
+                                        if save.is_err() {
+                                            self.error = Error::new(save.unwrap_err().to_string());
+                                        }
+                                    }
+                                    but
+                                });
                             }).response
                         });
 
@@ -222,7 +235,8 @@ impl UrdState {
                                 Grid::new("date_settings").num_columns(2).show(ui, |ui: &mut Ui| {
                                     ui.scope(|ui: &mut Ui| {
                                         ui.label("Timezone: ");
-                                        ui.add_space(250.0 / 3.75);
+                                        // justified with security
+                                        ui.add_space(250.0 / 4.25);
                                     });
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
                                         ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
