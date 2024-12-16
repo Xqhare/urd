@@ -19,11 +19,9 @@ pub const MAX_SIDE_PANEL_WIDTH: f32 = 2_000.0;
 pub struct Settings {
     pub size: SizeSettings,
     pub font: FontSettings,
-    pub password: String,
+    pub password: Password,
     pub timezone: TimezoneStore,
     // Not part of persistent state
-    pub password_input: String,
-    pub new_password_input: [String; 2],
     pub show_settings_viewport: bool,
     pub overwrite_window_size: bool,
     pub overwrite_window_size_store: [String; 2],
@@ -42,9 +40,7 @@ impl Default for Settings {
             // default default/None
             font: FontSettings::default(),
             timezone: TimezoneStore::default(),
-            password: String::new(),
-            password_input: String::new(),
-            new_password_input: [String::new(), String::new()],
+            password: Password::default(),
             // default true
             // default false
             show_settings_viewport: false,
@@ -64,14 +60,11 @@ impl Settings {
         serialized.insert("size", size);
         serialized.insert("font", font);
 
-        let timezone = match &self.timezone.timezone {
-            Some(tz) => XffValue::from(tz.to_string()),
-            None => XffValue::Null,
-        };
+        let timezone = XffValue::from(self.timezone.timezone.to_string());
 
         serialized.insert("timezone", timezone);
 
-        let password = XffValue::from(self.password.clone());
+        let password = XffValue::from(self.password.password.clone());
         serialized.insert("password", password);
 
         XffValue::from(serialized)
@@ -79,7 +72,6 @@ impl Settings {
 
     pub fn save(&self) -> Result<(), std::io::Error> {
         let serialized = self.serialize();
-        println!("{:?}", serialized);
         let out = nabu::serde::write(SETTINGS_FILE, serialized);
         match out {
             Ok(_) => Ok(()),
@@ -98,20 +90,15 @@ impl Settings {
         };
         let size = SizeSettings::deserialize(&deserialized.get("size").unwrap());
         let font = FontSettings::deserialize(&deserialized.get("font").unwrap());
-        let tz = match deserialized.get("timezone").unwrap() {
-            XffValue::Null => None,
-            _ => Some(TimeZone::from(deserialized.get("timezone").unwrap().into_string().unwrap())),
-        };
+        let tz = TimeZone::from(deserialized.get("timezone").unwrap().into_string().unwrap());
         let password = deserialized.get("password").unwrap().into_string().unwrap();
         Ok(Settings {
             font,
             timezone: TimezoneStore::new(tz),
-            password,
+            password: Password::new(password),
             show_settings_viewport: false,
             overwrite_window_size: false,
             overwrite_side_panel_width: false,
-            password_input: String::new(),
-            new_password_input: [String::new(), String::new()],
             overwrite_side_panel_width_store: size.side_panel_width.to_string(),
             overwrite_window_size_store: [size.size[0].to_string(), size.size[1].to_string()],
             size,
@@ -119,9 +106,40 @@ impl Settings {
     }
 }
 
+
+#[derive(Clone, Debug)]
+pub struct Password {
+    pub password: String,
+    pub password_input: String,
+    pub new_password_input: [String; 2],
+    pub unlocked_with_password: bool,
+}
+
+impl Default for Password {
+    fn default() -> Self {
+        Self {
+            password: String::new(),
+            password_input: String::new(),
+            new_password_input: [String::new(), String::new()],
+            unlocked_with_password: false,
+        }
+    }
+}
+
+impl Password {
+    pub fn new(password: String) -> Self {
+        Self {
+            password,
+            password_input: String::new(),
+            new_password_input: [String::new(), String::new()],
+            unlocked_with_password: false,
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct TimezoneStore {
-    pub timezone: Option<TimeZone>,
+    pub timezone: TimeZone,
     pub all_timezones_str: Vec<String>,
 }
 
@@ -135,14 +153,14 @@ impl Default for TimezoneStore {
             out
         };
         Self {
-            timezone: None,
+            timezone: TimeZone::CoordinatedUniversalTime,
             all_timezones_str,
         }
     }
 }
 
 impl TimezoneStore {
-    pub fn new(timezone: Option<TimeZone>) -> Self {
+    pub fn new(timezone: TimeZone) -> Self {
         let all_timezones_str = {
             let mut out: Vec<String> = Vec::new();
             for tz in TimeZone::get_all() {
@@ -168,7 +186,7 @@ impl Default for FontSettings {
     fn default() -> Self {
         Self {
             size: 14.0,
-            text_colour: Color32::from_rgba_premultiplied(255, 255, 255, 255),
+            text_colour: Color32::from_rgba_premultiplied(127, 127, 127, 255),
             monospace: false,
         }
     }
