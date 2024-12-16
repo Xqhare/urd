@@ -3,6 +3,7 @@ mod gui;
 mod journal_entries;
 mod settings;
 mod paths;
+mod error;
 mod startup;
 
 fn main() {
