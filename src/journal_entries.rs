@@ -27,16 +27,12 @@ pub struct JournalEntry {
 impl JournalEntry {
     pub fn new(settings: &Settings) -> Self {
         let (date, title) = {
-            if let Some(timezone) = settings.timezone.timezone {
                 let (date_time, date) = {
                     let mut date_time = horae::Utc::now();
-                    date_time.with_timezone(timezone);
+                    date_time.with_timezone(settings.timezone.timezone);
                     (date_time, date_time.date().to_string())
                 };
                 (date_time, date)
-            } else {
-                (horae::Utc::now(), horae::Utc::now().date().to_string())
-            }
         };
         Self {
             title,
