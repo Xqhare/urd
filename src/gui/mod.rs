@@ -1,8 +1,7 @@
 use std::sync::{atomic::AtomicBool, Arc};
 
 use crate::{
-    journal_entries::{Journal, JournalEntry},
-    settings::Settings,
+    error::Error, journal_entries::{Journal, JournalEntry}, settings::Settings
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -23,15 +22,13 @@ const APP_NAME: &str = "Urd";
 pub struct UrdState {
     journal: Journal,
     settings: Settings,
+    error: Error,
     editing_index: Option<usize>,
     search_mode: bool,
-    show_error: bool,
-    error_message: Option<String>,
     show_about_viewport: Arc<AtomicBool>,
     show_licenses_viewport: Arc<AtomicBool>,
     show_help_viewport: Arc<AtomicBool>,
     settings_backup: Option<Settings>,
-    unlocked_with_password: bool,
 }
 
 impl Default for UrdState {
@@ -40,16 +37,14 @@ impl Default for UrdState {
         UrdState {
             journal: Journal::new(&settings),
             settings,
+            error: Error::default(),
             editing_index: None,
-            error_message: None,
             settings_backup: None,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
             show_help_viewport: Arc::new(AtomicBool::new(false)),
             search_mode: false,
-            show_error: false,
-            unlocked_with_password: false,
         }
     }
 }
@@ -61,22 +56,20 @@ impl UrdState {
             journal: Journal::new(&settings),
             settings,
             editing_index: None,
-            error_message: None,
             settings_backup: None,
             // default false
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
             show_help_viewport: Arc::new(AtomicBool::new(false)),
+            error: Error::default(),
             search_mode: false,
-            show_error: false,
-            unlocked_with_password: false,
         }
     }
 }
 
 impl App for UrdState {
     fn update(&mut self, ctx: &egui::Context, frame: &mut Frame) {
-        if self.settings.password != "" && !self.unlocked_with_password {
+        if self.settings.password.password != "" && !self.settings.password.unlocked_with_password {
             self.protected_mode(ctx, frame);
         } else {
             self.normal_mode(ctx, frame);
@@ -97,26 +90,23 @@ impl UrdState {
                         ui.group(|ui: &mut Ui| {
                             ui.heading("Welcome to Urd");
                             ui.vertical_centered(|ui: &mut Ui| {
-                                if ui.add(TextEdit::singleline(&mut self.settings.password_input).password(true).hint_text("Please enter your password here").horizontal_align(Align::Center)).changed() {
-                                    if self.settings.password_input.len() >= self.settings.password.len() {
-                                        if self.settings.password == self.settings.password_input {
-                                            self.unlocked_with_password = true;
-                                            self.settings.password_input = "".to_string();
-                                            self.show_error = false;
-                                            self.error_message = None;
+                                if ui.add(TextEdit::singleline(&mut self.settings.password.password_input).password(true).hint_text("Please enter your password here").horizontal_align(Align::Center)).changed() {
+                                    if self.settings.password.password_input.len() >= self.settings.password.password.len() {
+                                        if self.settings.password.password == self.settings.password.password_input {
+                                            self.settings.password.unlocked_with_password = true;
+                                            self.settings.password.password_input = "".to_string();
+                                            self.error = Error::default();
                                         } else {
-                                            self.show_error = true;
-                                            self.error_message = Some("Incorrect password".to_string());
+                                            self.error = Error::new("Incorrect password");
                                         }
                                     } else {
-                                        self.show_error = false;
-                                        self.error_message = None;
+                                        self.error = Error::default();
                                     }
                                 }
                                 let _ = ui.button("Unlock");
-                                if self.show_error {
+                                if self.error.show_error {
                                     ui.add(|ui: &mut Ui| {
-                                        ui.label(self.error_message.as_ref().unwrap())
+                                        ui.label(self.error.error_message.as_ref().unwrap())
                                     });
                                 };
                             });
@@ -196,22 +186,21 @@ impl UrdState {
                             if ui.button("").clicked() {
                             }
                         });
-                        if self.settings.password != "" {
+                        if self.settings.password.password != "" {
                             if ui.button("Lock Urd").clicked() {
-                                self.unlocked_with_password = false;
+                                self.settings.password.unlocked_with_password = false;
                             }
                         }
                     }).response
                 });
                 ui.add_space(ui.available_width() / 2.5);
-                if self.show_error {
+                if self.error.show_error {
                     ui.add(|ui: &mut Ui| {
                         ui.horizontal_wrapped(|ui: &mut Ui| {
                             ui.label("Error:");
-                            ui.label(self.error_message.as_ref().unwrap());
+                            ui.label(self.error.error_message.as_ref().unwrap());
                             if ui.button("Dismiss").clicked() {
-                                self.show_error = false;
-                                self.error_message = None;
+                                self.error = Error::default();
                             }
                         }).response
                     });
