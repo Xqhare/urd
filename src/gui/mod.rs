@@ -90,7 +90,9 @@ impl UrdState {
                         ui.group(|ui: &mut Ui| {
                             ui.heading("Welcome to Urd");
                             ui.vertical_centered(|ui: &mut Ui| {
-                                if ui.add(TextEdit::singleline(&mut self.settings.password.password_input).password(true).hint_text("Please enter your password here").horizontal_align(Align::Center)).changed() {
+                                let tmp = ui.add(TextEdit::singleline(&mut self.settings.password.password_input).password(true).hint_text("Please enter your password here").horizontal_align(Align::Center));
+                                tmp.request_focus();
+                                if tmp.changed() {
                                     if self.settings.password.password_input.len() >= self.settings.password.password.len() {
                                         if self.settings.password.password == self.settings.password.password_input {
                                             self.settings.password.unlocked_with_password = true;
@@ -103,7 +105,6 @@ impl UrdState {
                                         self.error = Error::default();
                                     }
                                 }
-                                let _ = ui.button("Unlock");
                                 if self.error.show_error {
                                     ui.add(|ui: &mut Ui| {
                                         ui.label(self.error.error_message.as_ref().unwrap())
