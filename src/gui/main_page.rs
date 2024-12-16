@@ -66,14 +66,8 @@ impl UrdState {
             self.central_panel_menu(ui);
             ui.separator();
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                ui.add_enabled(false, |ui: &mut Ui| {
-                    TextEdit::singleline(&mut self.journal.current_entry.title)
-                    .horizontal_align(Align::Center)
-                    .frame(false)
-                    .desired_width(f32::INFINITY)
-                    .text_color(self.settings.font.text_colour)
-                    .font(font.clone())
-                    .show(ui).response
+                ui.vertical_centered_justified(|ui: &mut Ui| {
+                    ui.heading(&self.journal.current_entry.title);
                 });
                 ui.separator();
                 ui.add_sized(
