@@ -222,7 +222,7 @@ impl UrdState {
                                 Grid::new("date_settings").num_columns(2).show(ui, |ui: &mut Ui| {
                                     ui.scope(|ui: &mut Ui| {
                                         ui.label("Timezone: ");
-                                        ui.add_space(250.0 / 2.75);
+                                        ui.add_space(250.0 / 3.75);
                                     });
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
                                         ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
