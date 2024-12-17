@@ -5,6 +5,7 @@ mod settings;
 mod paths;
 mod error;
 mod startup;
+mod render;
 
 fn main() {
     let settings = startup::startup_appstate();
