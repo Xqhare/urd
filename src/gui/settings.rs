@@ -231,7 +231,7 @@ impl UrdState {
 
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
-                                ui.label("Date Settings");
+                                ui.label("Date settings");
                                 Grid::new("date_settings").num_columns(2).show(ui, |ui: &mut Ui| {
                                     ui.scope(|ui: &mut Ui| {
                                         ui.label("Timezone: ");
@@ -251,6 +251,63 @@ impl UrdState {
                                         }).response
                                     });
                                     ui.end_row();
+                                });
+                            }).response
+                        });
+
+                        ui.add(|ui: &mut Ui| {
+                            ui.group(|ui: &mut Ui| {
+                                ui.label("File marker Settings");
+                                let year = horae::Utc::now().date().year.to_string();
+                                ui.separator();
+                                ui.label("Current file marker").on_hover_text("Used for the current day / month / year.");
+                                Grid::new("current_file_marker").num_columns(2).show(ui, |ui: &mut Ui| {
+                                    ui.label("Start: ");
+                                    ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_currently.start).horizontal_align(Align::Center));
+                                    ui.end_row();
+                                    ui.label("End: ");
+                                    ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_currently.end).horizontal_align(Align::Center));
+                                    ui.end_row();
+                                    
+                                });
+                                ui.vertical_centered_justified(|ui: &mut Ui| {
+                                    ui.group(|ui: &mut Ui| {
+                                        ui.label("Example: ");
+                                        let display_txt = format!("{} {} {}", self.settings.gui.file_marker_currently.start, year, self.settings.gui.file_marker_currently.end);
+                                        ui.label(display_txt);
+                                    });
+                                });
+                                ui.separator();
+                                ui.label("Completed normally file marker").on_hover_text("Used if a month / year has passed. Marks 'Completed' years or months.");
+                                Grid::new("completed_file_marker").num_columns(2).show(ui, |ui: &mut Ui| {
+                                    ui.label("Start: ");
+                                    ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_normally.start).horizontal_align(Align::Center));
+                                    ui.end_row();
+                                    ui.label("End: ");
+                                    ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_normally.end).horizontal_align(Align::Center));
+                                });
+                                ui.vertical_centered_justified(|ui: &mut Ui| {
+                                    ui.group(|ui: &mut Ui| {
+                                        ui.label("Example: ");
+                                        let display_txt = format!("{} {} {}", self.settings.gui.file_marker_normally.start, year, self.settings.gui.file_marker_normally.end);
+                                        ui.label(display_txt);
+                                    });
+                                });
+                                ui.separator();
+                                ui.label("Perfectly completed file marker").on_hover_text("Used if a journal entry was made on every day of the month or year.");
+                                Grid::new("perfectly_completed_file_marker").num_columns(2).show(ui, |ui: &mut Ui| {
+                                    ui.label("Start: ");
+                                    ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_perfectly.start).horizontal_align(Align::Center));
+                                    ui.end_row();
+                                    ui.label("End: ");
+                                    ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_perfectly.end).horizontal_align(Align::Center));
+                                });
+                                ui.vertical_centered_justified(|ui: &mut Ui| {
+                                    ui.group(|ui: &mut Ui| {
+                                        ui.label("Example: ");
+                                        let display_txt = format!("{} {} {}", self.settings.gui.file_marker_perfectly.start, year, self.settings.gui.file_marker_perfectly.end);
+                                        ui.label(display_txt);
+                                    });
                                 });
                             }).response
                         });
