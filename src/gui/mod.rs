@@ -211,29 +211,6 @@ impl UrdState {
             });
         });
     }
-
-    fn delete_journal_entry(&mut self) {
-        /* if let Some(index) = self.editing_index {
-            self.journal.entries.remove(index);
-            self.editing_index = None;
-        } else {
-            self.journal.current_entry = JournalEntry::new(&self.settings);
-        } */
-    }
-
-    fn save_journal_entry(&mut self) {
-        /* if let Some(index) = self.editing_index {
-            self.journal.entries[index] = self.journal.current_entry.clone();
-            self.journal.current_entry = JournalEntry::new(&self.settings);
-            self.editing_index = None;
-        } else {
-            self.journal
-            .entries
-            .push_front(self.journal.current_entry.clone());
-            self.journal.current_entry = JournalEntry::new(&self.settings);
-        } */
-        
-    }
 }
 
 pub fn gui_startup(startup_state: StartupState) {
