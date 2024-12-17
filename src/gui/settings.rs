@@ -1,8 +1,8 @@
 
-use eframe::egui::{Align, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider, TextEdit, Ui, Widget};
+use eframe::egui::{Align, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider, TextEdit, Ui};
 use horae::TimeZone;
 
-use crate::{error::Error, settings::{self, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE}};
+use crate::{error::Error, settings::{Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE}};
 
 use super::UrdState;
 
