@@ -7,10 +7,12 @@ const ABOUT_WINDOW_SIZE: [f32; 2] = [200.0, 130.0];
 impl UrdState {
     pub fn about_viewport_startup(&mut self, ctx: &Context) {
         if self
+            .render
+            .viewports
             .show_about_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
-            let show_viewport_pointer = self.show_about_viewport.clone();
+            let show_viewport_pointer = self.render.viewports.show_about_viewport.clone();
             ctx.show_viewport_deferred(
                 ViewportId::from_hash_of("about_viewport"),
                 ViewportBuilder::default()
