@@ -4,7 +4,7 @@ pub enum ShowFolder {
     All,
     Year(u16),
     /// year, month
-    Month(u16, u16),
+    Month(u16, u8),
 }
 
 pub struct Render {
