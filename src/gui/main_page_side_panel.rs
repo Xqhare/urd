@@ -1,6 +1,6 @@
-use eframe::{egui::{Context, FontId, Grid, ScrollArea, SidePanel, TextBuffer, TextEdit, Ui, Vec2}, Frame};
+use eframe::{egui::{Context, FontId, ScrollArea, SidePanel, TextBuffer, TextEdit, Ui, Vec2}, Frame};
 
-use crate::{journal_entries::{EntryType, Folder}, render::ShowFolder};
+use crate::{journal_entries::Folder, render::ShowFolder};
 
 use super::UrdState;
 
@@ -95,18 +95,6 @@ impl UrdState {
                         }
                     }
                     ShowFolder::Month(year, month) => {
-                        let font = {
-                            if self.settings.font.monospace {
-                                FontId::monospace(self.settings.font.size)
-                            } else {
-                                FontId::proportional(self.settings.font.size)
-                            }
-                        };
-                        ui.vertical_centered_justified(|ui: &mut Ui| {
-                            if ui.heading(format!("{} {}", month_num_to_name(month), year)).clicked() {
-                                self.go_back_one_level();
-                            }
-                        });
                         ui.separator();
                         let year_folder: &mut Folder = self.journal.entries.iter_mut().find(|entry| entry.get_folder().unwrap().name == year.to_string()).expect("Failed to find displayed folder").get_folder_mut().unwrap();
                         let month_folder: &mut Folder = year_folder.entries.iter_mut().find(|entry| entry.get_folder().unwrap().name == month.to_string()).expect("Failed to find displayed folder").get_folder_mut().unwrap();
@@ -115,14 +103,14 @@ impl UrdState {
                             let entry = n.get_journal_entry().unwrap();
                             let mut body = {
                                 let tmp = entry.text.clone();
-                                let word_store = tmp.split_whitespace().take(50).collect::<Vec<&str>>();
+                                let mut word_store = tmp.split_whitespace().take(50).collect::<Vec<&str>>();
+                                word_store.push("...");
                                 word_store.join(" ")
                             };
                             ui.vertical_centered_justified(|ui: &mut Ui| {
                                 if ui.group(|ui: &mut Ui| {
                                     ui.label(entry.title.as_str());
-                                    ui.add(TextEdit::multiline(&mut body).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()));
-                                    ui.label(entry.text.as_str());
+                                    ui.add_enabled(false, TextEdit::multiline(&mut body).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()));
                                 }).response.clicked() {
                                     self.journal.current_entry = n.get_journal_entry().unwrap().clone();
                                 };
