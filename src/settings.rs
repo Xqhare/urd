@@ -21,6 +21,7 @@ pub struct Settings {
     pub font: FontSettings,
     pub password: Password,
     pub timezone: TimezoneStore,
+    pub gui: Gui,
     // Not part of persistent state
     pub show_settings_viewport: bool,
     pub overwrite_window_size: bool,
@@ -41,6 +42,7 @@ impl Default for Settings {
             font: FontSettings::default(),
             timezone: TimezoneStore::default(),
             password: Password::default(),
+            gui: Gui::default(),
             // default true
             // default false
             show_settings_viewport: false,
@@ -67,6 +69,9 @@ impl Settings {
         let password = XffValue::from(self.password.password.clone());
         serialized.insert("password", password);
 
+        let gui = self.gui.serialize();
+        serialized.insert("gui", gui);
+
         XffValue::from(serialized)
     }
 
@@ -92,8 +97,10 @@ impl Settings {
         let font = FontSettings::deserialize(&deserialized.get("font").unwrap());
         let tz = TimeZone::from(deserialized.get("timezone").unwrap().into_string().unwrap());
         let password = deserialized.get("password").unwrap().into_string().unwrap();
+        let gui = Gui::deserialize(&deserialized.get("gui").unwrap());
         Ok(Settings {
             font,
+            gui,
             timezone: TimezoneStore::new(tz),
             password: Password::new(password),
             show_settings_viewport: false,
@@ -106,6 +113,68 @@ impl Settings {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct Gui {
+    pub file_marker_currently: FileMarker,
+    pub file_marker_perfectly: FileMarker,
+    pub file_marker_normally: FileMarker,
+}
+
+impl Default for Gui {
+    fn default() -> Self {
+        Self {
+            file_marker_currently: FileMarker::new("|".to_string(), "|".to_string()),
+            file_marker_perfectly: FileMarker::new("«".to_string(), "»".to_string()),
+            file_marker_normally: FileMarker::new("<".to_string(), ">".to_string()),
+        }
+    }
+}
+
+impl Gui {
+    pub fn serialize(&self) -> XffValue {
+        let mut serialized = nabu::Object::new();
+        serialized.insert("file_marker_currently", self.file_marker_currently.serialize());
+        serialized.insert("file_marker_perfectly", self.file_marker_perfectly.serialize());
+        serialized.insert("file_marker_normally", self.file_marker_normally.serialize());
+        XffValue::from(serialized)
+    }
+
+    pub fn deserialize(serialized: &XffValue) -> Self {
+        let file_marker_currently = FileMarker::deserialize(&serialized.into_object().unwrap().get("file_marker_currently").unwrap());
+        let file_marker_perfectly = FileMarker::deserialize(&serialized.into_object().unwrap().get("file_marker_perfectly").unwrap());
+        let file_marker_normally = FileMarker::deserialize(&serialized.into_object().unwrap().get("file_marker_normally").unwrap());
+        Self {
+            file_marker_currently,
+            file_marker_perfectly,
+            file_marker_normally,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct FileMarker {
+    pub start: String,
+    pub end: String,
+}
+
+impl FileMarker {
+    pub fn new(start: String, end: String) -> Self {
+        Self { start, end }
+    }
+
+    pub fn serialize(&self) -> XffValue {
+        let mut serialized = nabu::Object::new();
+        serialized.insert("start", XffValue::from(self.start.clone()));
+        serialized.insert("end", XffValue::from(self.end.clone()));
+        XffValue::from(serialized)
+    }
+
+    pub fn deserialize(serialized: &XffValue) -> Self {
+        let start = serialized.into_object().unwrap().get("start").unwrap().into_string().unwrap();
+        let end = serialized.into_object().unwrap().get("end").unwrap().into_string().unwrap();
+        Self { start, end }
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct Password {
