@@ -26,6 +26,20 @@ impl EntryType {
         }
     }
 
+    pub fn get_folder(&self) -> Option<&Folder> {
+        match self {
+            EntryType::JournalEntry(_) => None,
+            EntryType::Folder(f) => Some(f),
+        }
+    }
+
+    pub fn get_journal_entry(&self) -> Option<&JournalEntry> {
+        match self {
+            EntryType::JournalEntry(e) => Some(e),
+            EntryType::Folder(_) => None,
+        }
+    }
+
     pub fn get_folder_mut(&mut self) -> Option<&mut Folder> {
         match self {
             EntryType::JournalEntry(_) => None,
