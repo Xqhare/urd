@@ -1,20 +1,20 @@
-use std::sync::{atomic::AtomicBool, Arc};
 
 use crate::{
-    error::Error, journal_entries::{Journal, JournalEntry}, settings::Settings
+    error::Error, journal_entries::Journal, render::Render, settings::Settings, startup::StartupState
 };
 use eframe::{
     egui::{CentralPanel, Ui},
     epaint::Vec2,
     *,
 };
-use egui::{Align, FontId, ScrollArea, SidePanel, TextEdit, TopBottomPanel};
+use egui::{Align, TextEdit, TopBottomPanel};
 
 mod about;
 mod help;
 mod licenses;
 mod settings;
 mod main_page;
+mod main_page_side_panel;
 mod search_page;
 
 const APP_NAME: &str = "Urd";
@@ -23,11 +23,10 @@ pub struct UrdState {
     journal: Journal,
     settings: Settings,
     error: Error,
+    render: Render,
+    // misc
     editing_index: Option<usize>,
     search_mode: bool,
-    show_about_viewport: Arc<AtomicBool>,
-    show_licenses_viewport: Arc<AtomicBool>,
-    show_help_viewport: Arc<AtomicBool>,
     settings_backup: Option<Settings>,
 }
 
@@ -38,12 +37,10 @@ impl Default for UrdState {
             journal: Journal::new(&settings),
             settings,
             error: Error::default(),
+            render: Render::default(),
             editing_index: None,
             settings_backup: None,
             // default false
-            show_about_viewport: Arc::new(AtomicBool::new(false)),
-            show_licenses_viewport: Arc::new(AtomicBool::new(false)),
-            show_help_viewport: Arc::new(AtomicBool::new(false)),
             search_mode: false,
         }
     }
@@ -51,17 +48,15 @@ impl Default for UrdState {
 
 impl UrdState {
     // TODO: if settings have been found, there are probably journal entries to check for
-    pub fn new(settings: Settings) -> Self {
+    pub fn new(settings: Settings, journal: Journal) -> Self {
         UrdState {
-            journal: Journal::new(&settings),
+            journal,
             settings,
+            error: Error::default(),
+            render: Render::default(),
             editing_index: None,
             settings_backup: None,
             // default false
-            show_about_viewport: Arc::new(AtomicBool::new(false)),
-            show_licenses_viewport: Arc::new(AtomicBool::new(false)),
-            show_help_viewport: Arc::new(AtomicBool::new(false)),
-            error: Error::default(),
             search_mode: false,
         }
     }
@@ -127,18 +122,24 @@ impl UrdState {
         }
         
         if self
+            .render
+            .viewports
             .show_about_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
             self.about_viewport_startup(ctx);
         }
         if self
+            .render
+            .viewports
             .show_licenses_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
             self.licenses_viewport_startup(ctx);
         }
         if self
+            .render
+            .viewports
             .show_help_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
@@ -162,15 +163,15 @@ impl UrdState {
                                 }
                             }
                             if ui.button("About").clicked() {
-                                self.show_about_viewport
+                                self.render.viewports.show_about_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                             if ui.button("Licenses").clicked() {
-                                self.show_licenses_viewport
+                                self.render.viewports.show_licenses_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                             if ui.button("Help").clicked() {
-                                self.show_help_viewport
+                                self.render.viewports.show_help_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                         });
@@ -212,16 +213,16 @@ impl UrdState {
     }
 
     fn delete_journal_entry(&mut self) {
-        if let Some(index) = self.editing_index {
+        /* if let Some(index) = self.editing_index {
             self.journal.entries.remove(index);
             self.editing_index = None;
         } else {
             self.journal.current_entry = JournalEntry::new(&self.settings);
-        }
+        } */
     }
 
     fn save_journal_entry(&mut self) {
-        if let Some(index) = self.editing_index {
+        /* if let Some(index) = self.editing_index {
             self.journal.entries[index] = self.journal.current_entry.clone();
             self.journal.current_entry = JournalEntry::new(&self.settings);
             self.editing_index = None;
@@ -230,22 +231,22 @@ impl UrdState {
             .entries
             .push_front(self.journal.current_entry.clone());
             self.journal.current_entry = JournalEntry::new(&self.settings);
-        }
+        } */
         
     }
 }
 
-pub fn gui_startup(settings: Settings) {
+pub fn gui_startup(startup_state: StartupState) {
     let size: Vec2 = Vec2 {
-        x: settings.size.size[0],
-        y: settings.size.size[1],
+        x: startup_state.settings.size.size[0],
+        y: startup_state.settings.size.size[1],
     };
     let mut native_options = NativeOptions::default();
     native_options.viewport.inner_size = Option::from(size);
     run_native(
         APP_NAME,
         native_options,
-        Box::new(|_cc| Ok(Box::<UrdState>::new(UrdState::new(settings)))),
+        Box::new(|_cc| Ok(Box::<UrdState>::new(UrdState::new(startup_state.settings, startup_state.journal)))),
     )
     .expect("E 01");
 }
