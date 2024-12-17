@@ -11,6 +11,18 @@ pub enum EntryType {
     Folder(Folder),
 }
 
+impl From<Folder> for EntryType {
+    fn from(f: Folder) -> Self {
+        EntryType::Folder(f)
+    }
+}
+
+impl From<JournalEntry> for EntryType {
+    fn from(e: JournalEntry) -> Self {
+        EntryType::JournalEntry(e)
+    }
+}
+
 impl EntryType {
     pub fn is_folder(&self) -> bool {
         match self {
@@ -132,5 +144,11 @@ impl JournalEntry {
             text: String::new(),
             metadata,
         }
+    }
+
+    pub fn deserialize(serialized: String) -> Self {
+        let mut out = JournalEntry::new(&Settings::default());
+        out.text = serialized;
+        out
     }
 }
