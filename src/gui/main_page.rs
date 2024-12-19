@@ -124,8 +124,11 @@ impl UrdState {
                     month_folder.entries.push_front(EntryType::JournalEntry(journal_entry_serialized));
                 } else {
                     // TODO: Fix this
-                    let mut day_folder = day_search.unwrap().get_journal_entry_mut().unwrap();
-                    day_folder = &mut JournalEntry::deserialize(self.journal.current_entry.text.clone());
+                    println!("Day already exists");
+                    let day_folder = day_search.unwrap().get_journal_entry_mut();
+                    if day_folder.is_some() {
+                        day_folder.unwrap().overwrite(self.journal.current_entry.text.clone());
+                    }
                 }
             }
         }
@@ -146,7 +149,7 @@ impl UrdState {
                 let month_folder = tmp_month_folder.unwrap().get_folder_mut().unwrap();
                 let actual_entry = month_folder.entries.iter_mut().find(|entry| entry.get_journal_entry().unwrap().title == self.journal.current_entry.title);
                 if actual_entry.is_some() {
-                    actual_entry.unwrap().get_journal_entry_mut().unwrap().text = "".to_string();
+                    actual_entry.unwrap().get_journal_entry_mut().unwrap().reset();
                 }
             }
         }

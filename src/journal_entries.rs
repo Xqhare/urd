@@ -151,4 +151,22 @@ impl JournalEntry {
         out.text = serialized;
         out
     }
+
+    pub fn overwrite(&mut self, serialized: String) {
+        let tmp = JournalEntry::deserialize(serialized);
+        self.title = tmp.title;
+        self.text = tmp.text;
+        self.metadata = tmp.metadata;
+    }
+
+    pub fn reset(&mut self) {
+        let tmp_metadata_date = self.metadata.get("date").unwrap().into_object().unwrap();
+        // Title stays, text is reset, metadata is reset except date
+        self.text = String::new();
+        self.metadata = {
+            let mut out = BTreeMap::new();
+            out.insert("date".to_string(), XffValue::from(tmp_metadata_date));
+            out
+        };
+    }
 }
