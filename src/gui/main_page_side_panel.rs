@@ -104,7 +104,9 @@ impl UrdState {
                             let mut body = {
                                 let tmp = entry.text.clone();
                                 let mut word_store = tmp.split_whitespace().take(50).collect::<Vec<&str>>();
-                                word_store.push("...");
+                                if word_store.len() < tmp.split_whitespace().count() {
+                                    word_store.push("...");
+                                }
                                 word_store.join(" ")
                             };
                             ui.vertical_centered_justified(|ui: &mut Ui| {
