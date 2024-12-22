@@ -3,8 +3,9 @@ use eframe::{
     *,
 };
 use egui::{Align, FontId, ScrollArea, TextEdit};
+use nabu::Object;
 
-use crate::{error::Error, journal_entries::{EntryType, Folder, JournalEntry}, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}};
+use crate::{error::Error, journal_entries::{EntryType, Folder}, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}};
 
 use super::UrdState;
 
@@ -35,24 +36,58 @@ impl UrdState {
             ui.separator();
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
-                    ui.add(TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center).lock_focus(true));
                     ui.heading(&self.journal.current_entry.title);
                 });
                 ui.separator();
-                ui.add_sized(
-                    ui.available_size(),
-                    TextEdit::multiline(&mut self.journal.current_entry.text)
+                ui.add_sized(ui.available_size(), |ui: &mut Ui| {
+                    ui.add(TextEdit::multiline(&mut self.journal.current_entry.text)
                         .horizontal_align(Align::Center)
                         .lock_focus(true)
                         .text_color(self.settings.font.text_colour)
-                        .font(font.clone()),
-                );
-                /* if title.response.lost_focus() || text_edit.lost_focus() {
-                    // TODO: save journal entry
-                    // this saves only if the focus leaves the text box
-                    println!("testing lost focus");
-                    self.save_journal_entry();
-                } */
+                        .font(font.clone())
+                    );
+                    // TODO: tmp code below, add clicking on a tag to search for it in the journal
+                    // when search is done
+                    ui.group(|ui: &mut Ui| {
+                        let tmp_project_tags = {
+                            let bind = self.journal.current_entry.metadata.get("project_tags").unwrap().into_array();
+                            if bind.is_none() {
+                                vec![]
+                            } else {
+                                bind.unwrap().into_vec()
+                            }
+                        };
+                        let project_tags_as_txt = tmp_project_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>().join(", ");
+                        ui.horizontal(|ui: &mut Ui| {
+                            ui.group(|ui: &mut Ui| {
+                                ui.label("Project Tags: ");
+                                ui.label(project_tags_as_txt);
+                            })
+
+                        });
+                        let tmp_context_tags = {
+                            
+                            let bind = self.journal.current_entry.metadata.get("context_tags").unwrap().into_array();
+                            if bind.is_none() {
+                                vec![]
+                            } else {
+                                bind.unwrap().into_vec()
+                            }
+                        };
+                        let context_tags_as_txt = tmp_context_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>().join(", ");
+                        ui.label(format!("Context Tags: {}", context_tags_as_txt));
+                        let tmp_special_tags = {
+                            let bind = self.journal.current_entry.metadata.get("special_tags").unwrap().into_object();
+                            if bind.is_none() {
+                                Object::new()
+                            } else {
+                                bind.unwrap()
+                            }
+                        };
+                        let special_tags_as_txt = tmp_special_tags.iter().map(|(key, value)| format!("{}:{}", key, value.into_string().unwrap())).collect::<Vec<String>>().join(", ");
+                        ui.label(format!("Special Tags: {}", special_tags_as_txt));
+                    }).response
+                });
             })
         });
     }
