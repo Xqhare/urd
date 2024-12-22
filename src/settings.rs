@@ -85,7 +85,7 @@ impl Settings {
         
     }
 
-    pub fn deserialize<P: AsRef<Path>>(path: P) -> Result<Settings, std::io::Error> {
+    pub fn load<P: AsRef<Path>>(path: P) -> Result<Settings, std::io::Error> {
         let deserialized = {
             let out = nabu::serde::read(path);
             match out {
