@@ -1,5 +1,5 @@
 
-use eframe::{egui, Frame};
+use eframe::{egui::{self, CentralPanel, TopBottomPanel, Ui}, Frame};
 
 use super::UrdState;
 
@@ -10,8 +10,19 @@ impl UrdState {
     }
 
     fn search_top_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+        TopBottomPanel::top("search_panel").show(ctx, |ui: &mut Ui| {
+            ui.horizontal(|ui: &mut Ui| {
+                if ui.button("Back").clicked() {
+                    self.render.viewports.show_search_page = false;
+                };
+                ui.label("Search");
+            });
+        });
     }
 
     fn search_central_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+        CentralPanel::default().show(ctx, |ui: &mut Ui| {
+            ui.label("Search results");
+        });
     }
 }
