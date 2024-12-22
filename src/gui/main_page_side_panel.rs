@@ -115,12 +115,16 @@ impl UrdState {
                                 word_store.join(" ")
                             };
                             ui.vertical_centered_justified(|ui: &mut Ui| {
-                                if ui.group(|ui: &mut Ui| {
-                                    ui.label(entry.title.as_str());
-                                    ui.add_enabled(false, TextEdit::multiline(&mut body).desired_width(f32::INFINITY).text_color(self.settings.font.text_colour).font(font.clone()));
-                                }).response.clicked() {
-                                    self.journal.current_entry = n.get_journal_entry().unwrap().clone();
-                                };
+                                ui.group(|ui: &mut Ui| {
+                                    if ui.label(entry.title.as_str()).clicked() {
+                                        self.journal.current_entry = entry.clone();
+                                    };
+                                    ui.group(|ui: &mut Ui| {
+                                        if ui.label(body).clicked() {
+                                            self.journal.current_entry = entry.clone();
+                                        };
+                                    });
+                                });
                             });
                         }
                     }
