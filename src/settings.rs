@@ -23,7 +23,6 @@ pub struct Settings {
     pub timezone: TimezoneStore,
     pub gui: Gui,
     // Not part of persistent state
-    pub show_settings_viewport: bool,
     pub overwrite_window_size: bool,
     pub overwrite_window_size_store: [String; 2],
     pub overwrite_side_panel_width: bool,
@@ -45,7 +44,6 @@ impl Default for Settings {
             gui: Gui::default(),
             // default true
             // default false
-            show_settings_viewport: false,
             overwrite_window_size: false,
             overwrite_side_panel_width: false,
         }
@@ -103,7 +101,6 @@ impl Settings {
             gui,
             timezone: TimezoneStore::new(tz),
             password: Password::new(password),
-            show_settings_viewport: false,
             overwrite_window_size: false,
             overwrite_side_panel_width: false,
             overwrite_side_panel_width_store: size.side_panel_width.to_string(),

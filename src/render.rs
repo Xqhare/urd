@@ -25,6 +25,8 @@ pub struct Viewport {
     pub show_about_viewport: Arc<AtomicBool>,
     pub show_licenses_viewport: Arc<AtomicBool>,
     pub show_help_viewport: Arc<AtomicBool>,
+    pub show_settings_viewport: bool,
+    pub show_search_page: bool,
 }
 
 impl Default for Viewport {
@@ -33,6 +35,8 @@ impl Default for Viewport {
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
             show_help_viewport: Arc::new(AtomicBool::new(false)),
+            show_settings_viewport: false,
+            show_search_page: false,
         }
     }
 }

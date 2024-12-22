@@ -28,7 +28,7 @@ impl UrdState {
                                             self.settings = self.settings_backup.clone().unwrap();
                                             self.settings.overwrite_window_size = false;
                                             self.settings.overwrite_side_panel_width = false;
-                                            self.settings.show_settings_viewport = false;
+                                            self.render.viewports.show_settings_viewport = false;
                                         };
                                         but
                                     });
@@ -55,7 +55,7 @@ impl UrdState {
                                                 self.error = Error::new(save.unwrap_err().to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
-                                                self.settings.show_settings_viewport = false;
+                                                self.render.viewports.show_settings_viewport = false;
                                                 self.settings.overwrite_side_panel_width = false;
                                                 self.settings_backup = None;
                                             }

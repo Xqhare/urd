@@ -12,7 +12,8 @@ use super::UrdState;
 impl UrdState {
     pub fn main_page(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         if self
-            .settings
+            .render
+            .viewports
             .show_settings_viewport
         {
             self.settings_viewport_startup(ctx);
@@ -112,7 +113,7 @@ impl UrdState {
             ui.group(|ui: &mut Ui| {
                 ui.checkbox(&mut self.settings.font.monospace, "Monospace");
             });
-            if ui.button("Save").clicked() {
+            if ui.button("Save entry").clicked() {
                 self.save_entry_to_journal();
                 let save = self.journal.save();
                 if save.is_err() {
