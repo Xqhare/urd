@@ -1,4 +1,5 @@
 
+#[derive(Clone, Debug)]
 pub struct Error {
     pub show_error: bool,
     pub error_message: Option<String>,
