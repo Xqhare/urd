@@ -184,9 +184,21 @@ impl Journal {
         for entry in all_entries {
             entries.push_back(EntryType::deserialize(&entry));
         }
+        let last_entry = {
+            let last_year = entries.front().unwrap().get_folder().unwrap();
+            let last_month = last_year.entries.front().unwrap().get_folder().unwrap();
+            let last_entry = last_month.entries.front().unwrap().get_journal_entry().unwrap();
+            let mut current_date = horae::Utc::now();
+            current_date.with_timezone(settings.timezone.timezone);
+            if current_date.date().to_string() == last_entry.title {
+                last_entry.clone()
+            } else {
+                JournalEntry::new(settings)
+            }
+        };
         Self {
             entries,
-            current_entry: JournalEntry::new(settings),
+            current_entry: last_entry,
         }
     }
 }
