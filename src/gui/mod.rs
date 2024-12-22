@@ -24,9 +24,8 @@ pub struct UrdState {
     settings: Settings,
     error: Error,
     render: Render,
+    search: Search,
     // misc
-    editing_index: Option<usize>,
-    search_mode: bool,
     settings_backup: Option<Settings>,
 }
 
@@ -38,10 +37,8 @@ impl Default for UrdState {
             settings,
             error: Error::default(),
             render: Render::default(),
-            editing_index: None,
+            search: Search::default(),
             settings_backup: None,
-            // default false
-            search_mode: false,
         }
     }
 }
@@ -54,10 +51,8 @@ impl UrdState {
             settings,
             error,
             render: Render::default(),
-            editing_index: None,
+            search: Search::default(),
             settings_backup: None,
-            // default false
-            search_mode: false,
         }
     }
 }
@@ -115,7 +110,7 @@ impl UrdState {
 
     fn normal_mode(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         self.main_top_panel(ctx, frame);
-        if self.search_mode {
+        if self.render.viewports.show_search_page {
             self.search_page(ctx, frame);
         } else {
             self.main_page(ctx, frame);
@@ -154,11 +149,11 @@ impl UrdState {
                     ui.horizontal(|ui: &mut Ui| {
                         ui.menu_button("Urd", |ui: &mut Ui| {
                             if ui.button("Settings").clicked() {
-                                if self.settings.show_settings_viewport {
-                                    self.settings.show_settings_viewport = false;
+                                if self.render.viewports.show_settings_viewport {
+                                    self.render.viewports.show_settings_viewport = false;
                                     self.settings_backup = None;
                                 } else {
-                                    self.settings.show_settings_viewport = true;
+                                    self.render.viewports.show_settings_viewport = true;
                                     self.settings_backup = Some(self.settings.clone());
                                 }
                             }
@@ -177,10 +172,10 @@ impl UrdState {
                         });
                         ui.menu_button("Journal", |ui: &mut Ui| {
                             if ui.button("Search").clicked() {
-                                if self.search_mode {
-                                    self.search_mode = false;
+                                if self.render.viewports.show_search_page {
+                                    self.render.viewports.show_search_page = false;
                                 } else {
-                                    self.search_mode = true;
+                                    self.render.viewports.show_search_page = true;
                                 }
                             }
                             if ui.button("Export").clicked() {
