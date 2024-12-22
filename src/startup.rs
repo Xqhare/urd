@@ -1,39 +1,77 @@
 use std::path::Path;
 
-use crate::{journal_entries::Journal, paths::{APP_DIR, SETTINGS_FILE}, settings::Settings};
+use crate::{error::Error, journal_entries::Journal, paths::{APP_DIR, SETTINGS_FILE}, settings::Settings};
 
 pub struct StartupState {
     pub settings: Settings,
     pub journal: Journal,
+    pub error: Error,
 }
+
+// TODO: error handling - Silent failover is shit, at least let the user know
 
 pub fn startup_appstate() -> StartupState {
-    let mut settings = Settings::default();
-    let mut journal = Journal::new(&settings);
+    
     if Path::new(APP_DIR).exists() {
-        settings = startup_settings();
-        // TODO: load journal
-    } else {
-        // Assume first time startup
-        std::fs::create_dir(APP_DIR).unwrap();
-    };
-
-    StartupState {
-        settings,
-        journal,
-    }
-}
-
-fn startup_settings() -> Settings {
-    if Path::new(SETTINGS_FILE).exists() {
-        let out = Settings::deserialize(SETTINGS_FILE);
-        match out {
-            Ok(s) => s,
-            Err(_) => {
-                Settings::default()
+        let settings = startup_settings();
+        if settings.is_err() {
+            // first recoverable error; everything is fine
+            let fallback_settings = Settings::default();
+            let journal = Journal::load(&fallback_settings);
+            if journal.is_err() {
+                // second recoverable error; everything is fine - even though everything is on fire
+                let fallback_journal = Journal::new(&fallback_settings);
+                return StartupState {
+                    settings: fallback_settings,
+                    journal: fallback_journal,
+                    error: Error::new(journal.unwrap_err().to_string()),
+                };
+            }
+            StartupState {
+                settings: fallback_settings,
+                journal: journal.unwrap(),
+                error: settings.unwrap_err(),
+            }
+        } else {
+            let tmp_settings = settings.unwrap();
+            let journal = Journal::load(&tmp_settings);
+            if journal.is_err() {
+                // first recoverable error; everything is fine
+                let fallback_journal = Journal::new(&tmp_settings);
+                return StartupState {
+                    settings: tmp_settings,
+                    journal: fallback_journal,
+                    error: Error::new(journal.unwrap_err().to_string()),
+                };
+            } else {
+                StartupState {
+                    settings: tmp_settings,
+                    journal: journal.unwrap(),
+                    error: Error::default(),
+                }
             }
         }
     } else {
-        Settings::default()
+        // Assume first time startup
+        std::fs::create_dir(APP_DIR).unwrap();
+
+        let settings = Settings::default();
+        let journal = Journal::new(&settings);
+        StartupState {
+            settings,
+            journal,
+            error: Error::default(),
+        }
+    }
+}
+
+fn startup_settings() -> Result<Settings, Error> {
+    if Path::new(SETTINGS_FILE).exists() {
+        match Settings::load(SETTINGS_FILE) {
+            Ok(settings) => Ok(settings),
+            Err(e) => Err(Error::new(e.to_string())),
+        }
+    } else {
+        Ok(Settings::default())
     }
 }
