@@ -78,19 +78,28 @@ impl UrdState {
                 ui.checkbox(&mut self.settings.font.monospace, "Monospace");
             });
             if ui.button("Save").clicked() {
-                self.save_journal_entry();
+                self.save_entry_to_journal();
+                let save = self.journal.save();
+                if save.is_err() {
+                    self.error = Error::new(save.unwrap_err().to_string());
+                }
             };
             if ui.button("Delete entry").clicked() {
-                self.delete_journal_entry();
+                self.delete_entry_from_journal();
+                let save = self.journal.save();
+                if save.is_err() {
+                    self.error = Error::new(save.unwrap_err().to_string());
+                }
             };
         });
     }
 
-    fn save_journal_entry(&mut self) {
+    fn save_entry_to_journal(&mut self) {
         let save = self.settings.save();
         if save.is_err() {
             self.error = Error::new(save.unwrap_err().to_string());
         }
+        self.journal.current_entry.overwrite(self.journal.current_entry.text.clone());
         // TODO: save journal entry
         // First search for its position in journal
         // Then save / overwrite file with same name
@@ -104,8 +113,7 @@ impl UrdState {
         if tmp_year_folder.is_none() {
             let mut year_folder = Folder::new(year.to_string());
             let mut month_folder = Folder::new(month.to_string());
-            let journal_entry_serialized = JournalEntry::deserialize(self.journal.current_entry.text.clone());
-            month_folder.entries.push_front(EntryType::JournalEntry(journal_entry_serialized));
+            month_folder.entries.push_front(EntryType::JournalEntry(self.journal.current_entry.clone()));
             year_folder.entries.push_front(EntryType::Folder(month_folder));
             self.journal.entries.push_front(EntryType::Folder(year_folder));
         } else {
@@ -113,15 +121,13 @@ impl UrdState {
             let tmp_month_folder = year_folder.entries.iter_mut().find(|entry| entry.get_folder().unwrap().name == month.to_string());
             if tmp_month_folder.is_none() {
                 let mut month_folder = Folder::new(month.to_string());
-                let journal_entry_serialized = JournalEntry::deserialize(self.journal.current_entry.text.clone());
-                month_folder.entries.push_front(EntryType::JournalEntry(journal_entry_serialized));
+                month_folder.entries.push_front(EntryType::JournalEntry(self.journal.current_entry.clone()));
                 year_folder.entries.push_front(EntryType::Folder(month_folder));
             } else {
                 let month_folder = tmp_month_folder.unwrap().get_folder_mut().unwrap();
                 let day_search = month_folder.entries.iter_mut().find(|entry| entry.get_journal_entry().unwrap().title == self.journal.current_entry.title);
                 if day_search.is_none() {
-                    let journal_entry_serialized = JournalEntry::deserialize(self.journal.current_entry.text.clone());
-                    month_folder.entries.push_front(EntryType::JournalEntry(journal_entry_serialized));
+                    month_folder.entries.push_front(EntryType::JournalEntry(self.journal.current_entry.clone()));
                 } else {
                     // TODO: Fix this
                     println!("Day already exists");
@@ -134,7 +140,7 @@ impl UrdState {
         }
     }
 
-    fn delete_journal_entry(&mut self) {
+    fn delete_entry_from_journal(&mut self) {
         let (year, month) = {
             let date = self.journal.current_entry.metadata.get("date").unwrap().into_object().unwrap();
             let year = date.get("year").unwrap().into_number().unwrap().into_usize().unwrap();
