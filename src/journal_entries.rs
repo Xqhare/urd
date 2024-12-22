@@ -284,8 +284,8 @@ impl JournalEntry {
 fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
     // I know, unicode segmentation etc...
     // But splitting by unicode whitespace is enough for this
-    let project_tags: Vec<&str> = Vec::new();
-    let context_tags: Vec<&str> = Vec::new();
+    let mut project_tags: Vec<XffValue> = Vec::new();
+    let mut context_tags: Vec<XffValue> = Vec::new();
     let mut special_tags: Object = Object::new();
     let mut metadata: BTreeMap<String, XffValue> = BTreeMap::new();
     
@@ -293,10 +293,10 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
         // Check if a word starts with + or @, or has a : wrapped in it
         if word.starts_with("+") {
             // Project tag
-            metadata.insert(word.to_string(), XffValue::String(word.to_string()));
+            project_tags.push(XffValue::String(word.to_string()));
         } else if word.starts_with("@") {
             // Context tag
-            metadata.insert(word.to_string(), XffValue::String(word.to_string()));
+            context_tags.push(XffValue::String(word.to_string()));
         } else if word.contains(":") && !word.starts_with(":") && !word.ends_with(":") {
             // Special tag
             let (key, value) = word.split_once(":").unwrap();
@@ -307,4 +307,36 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
     metadata.insert("context_tags".to_string(), XffValue::Array(Array::from(context_tags)));
     metadata.insert("special_tags".to_string(), XffValue::from(special_tags));
     metadata
+}
+
+#[test]
+fn deserialize_metadata() {
+    let str0 = "+project1 +project2 @context1 @context2 key1:val1 key2:val2";
+    let metadata0 = deserialize_entry_metadata(str0.to_string());
+    assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().len(), 2);
+    assert_eq!(metadata0.get("context_tags").unwrap().into_array().unwrap().len(), 2);
+    assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().len(), 2);
+
+    assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "+project1");
+    assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().get(1).unwrap().into_string().unwrap(), "+project2");
+    assert_eq!(metadata0.get("context_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "@context1");
+    assert_eq!(metadata0.get("context_tags").unwrap().into_array().unwrap().get(1).unwrap().into_string().unwrap(), "@context2");
+    assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().get("key1").unwrap().into_string().unwrap(), "val1");
+    assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().get("key2").unwrap().into_string().unwrap(), "val2");
+
+    let str1 = "This may not crash if feed only text";
+    let metadata1 = deserialize_entry_metadata(str1.to_string());
+    assert_eq!(metadata1.get("project_tags").unwrap().into_array().unwrap().len(), 0);
+    assert_eq!(metadata1.get("context_tags").unwrap().into_array().unwrap().len(), 0);
+    assert_eq!(metadata1.get("special_tags").unwrap().into_object().unwrap().len(), 0);
+
+    let str2 = "This is @an +actual test:123";
+    let metadata2 = deserialize_entry_metadata(str2.to_string());
+    assert_eq!(metadata2.get("project_tags").unwrap().into_array().unwrap().len(), 1);
+    assert_eq!(metadata2.get("context_tags").unwrap().into_array().unwrap().len(), 1);
+    assert_eq!(metadata2.get("special_tags").unwrap().into_object().unwrap().len(), 1);
+
+    assert_eq!(metadata2.get("project_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "+actual");
+    assert_eq!(metadata2.get("context_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "@an");
+    assert_eq!(metadata2.get("special_tags").unwrap().into_object().unwrap().get("test").unwrap().into_string().unwrap(), "123");
 }
