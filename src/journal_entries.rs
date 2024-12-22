@@ -1,8 +1,8 @@
 use std::collections::{BTreeMap, VecDeque};
 
-use nabu::{Object, XffValue};
+use nabu::{Array, Object, XffValue};
 
-use crate::settings::Settings;
+use crate::{paths::JOURNAL_FILE, settings::Settings};
 
 
 #[derive(Clone, Debug)]
@@ -65,6 +65,25 @@ impl EntryType {
             EntryType::Folder(_) => None,
         }
     }
+
+    pub fn serialize(&self) -> XffValue {
+        match self {
+            EntryType::JournalEntry(e) => e.serialize(),
+            EntryType::Folder(f) => XffValue::from(f.serialize()),
+        }
+    }
+
+    pub fn deserialize(value: &XffValue) -> Self {
+        let bind = value.into_object().unwrap();
+        let tmp_check = bind.get("name");
+        if tmp_check.is_some() {
+            // Folder
+            Self::Folder(Folder::deserialize(value))
+        } else {
+            // JournalEntry
+            Self::JournalEntry(JournalEntry::deserialize(value))
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -78,6 +97,26 @@ impl Folder {
         Self {
             name: name.into(),
             entries: VecDeque::new(),
+        }
+    }
+
+    pub fn serialize(&self) -> Object {
+        let mut out = Object::new();
+        out.insert("name", XffValue::String(self.name.clone()));
+        out.insert("entries", XffValue::Array(self.entries.iter().map(|e| e.serialize()).collect()));
+        out
+    }
+
+    pub fn deserialize(value: &XffValue) -> Self {
+        let name = value.into_object().unwrap().get("name").unwrap().into_string().unwrap();
+        let entries = value.into_object().unwrap().get("entries").unwrap().into_array().unwrap();
+        let mut out = VecDeque::new();
+        for entry in entries {
+            out.push_back(EntryType::deserialize(&entry));
+        }
+        Self {
+            name,
+            entries: out,
         }
     }
 }
@@ -103,6 +142,51 @@ impl Journal {
         Self {
             entries,
             current_entry: JournalEntry::new(&Settings::default()),
+        }
+    }
+
+    pub fn save(&self) -> Result<(), String> {
+        let serialized = self.serialize();
+        let out = nabu::serde::write(JOURNAL_FILE, serialized);
+        match out {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.to_string()),
+        }
+    }
+
+    pub fn load(settings: &Settings) -> Result<Self, String> {
+        let data = nabu::serde::read(JOURNAL_FILE);
+        match data {
+            Ok(d) => {
+                Ok(Journal::deserialize(&d, settings))
+
+            }
+            Err(e) => Err(e.to_string()),
+        }
+    }
+
+    fn serialize(&self) -> XffValue {
+        let mut serialized = Object::new();
+        let entries = {
+            let mut out = Array::new();
+            for entry in self.entries.iter() {
+                out.push(entry.serialize());
+            }
+            out
+        };
+        serialized.insert("entries", XffValue::from(entries));
+        XffValue::from(serialized)
+    }
+
+    fn deserialize(read_value: &XffValue, settings: &Settings) -> Self {
+        let all_entries = read_value.into_object().unwrap().get("entries").unwrap().into_array().unwrap();
+        let mut entries = VecDeque::new();
+        for entry in all_entries {
+            entries.push_back(EntryType::deserialize(&entry));
+        }
+        Self {
+            entries,
+            current_entry: JournalEntry::new(settings),
         }
     }
 }
@@ -146,17 +230,31 @@ impl JournalEntry {
         }
     }
 
-    pub fn deserialize(serialized: String) -> Self {
-        let mut out = JournalEntry::new(&Settings::default());
-        out.text = serialized;
-        out
+    pub fn serialize(&self) -> XffValue {
+        let mut serialized = Object::new();
+        serialized.insert("title", XffValue::String(self.title.clone()));
+        serialized.insert("text", XffValue::String(self.text.clone()));
+        serialized.insert("metadata", XffValue::from(self.metadata.clone()));
+        XffValue::from(serialized)
+    }
+
+    pub fn deserialize(serialized: &XffValue) -> Self {
+        let title = serialized.into_object().unwrap().get("title").unwrap().into_string().unwrap();
+        let text = serialized.into_object().unwrap().get("text").unwrap().into_string().unwrap();
+        let metadata = serialized.into_object().unwrap().get("metadata").unwrap().into_object().unwrap().into_btree_map();
+        Self {
+            title,
+            text,
+            metadata,
+        }
     }
 
     pub fn overwrite(&mut self, serialized: String) {
-        let tmp = JournalEntry::deserialize(serialized);
-        self.title = tmp.title;
-        self.text = tmp.text;
-        self.metadata = tmp.metadata;
+        self.text = serialized.clone();
+        let new_metadata = deserialize_entry_metadata(serialized);
+        self.metadata.insert("project_tags".to_string(), new_metadata.get("project_tags").unwrap().clone());
+        self.metadata.insert("context_tags".to_string(), new_metadata.get("context_tags").unwrap().clone());
+        self.metadata.insert("special_tags".to_string(), new_metadata.get("special_tags").unwrap().clone());
     }
 
     pub fn reset(&mut self) {
@@ -169,4 +267,32 @@ impl JournalEntry {
             out
         };
     }
+}
+
+fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
+    // I know, unicode segmentation etc...
+    // But splitting by unicode whitespace is enough for this
+    let project_tags: Vec<&str> = Vec::new();
+    let context_tags: Vec<&str> = Vec::new();
+    let mut special_tags: Object = Object::new();
+    let mut metadata: BTreeMap<String, XffValue> = BTreeMap::new();
+    
+    for word in text.split_whitespace() {
+        // Check if a word starts with + or @, or has a : wrapped in it
+        if word.starts_with("+") {
+            // Project tag
+            metadata.insert(word.to_string(), XffValue::String(word.to_string()));
+        } else if word.starts_with("@") {
+            // Context tag
+            metadata.insert(word.to_string(), XffValue::String(word.to_string()));
+        } else if word.contains(":") && !word.starts_with(":") && !word.ends_with(":") {
+            // Special tag
+            let (key, value) = word.split_once(":").unwrap();
+            special_tags.insert(key.to_string(), XffValue::String(value.to_string()));
+        }
+    }
+    metadata.insert("project_tags".to_string(), XffValue::Array(Array::from(project_tags)));
+    metadata.insert("context_tags".to_string(), XffValue::Array(Array::from(context_tags)));
+    metadata.insert("special_tags".to_string(), XffValue::from(special_tags));
+    metadata
 }
