@@ -233,6 +233,9 @@ impl JournalEntry {
         let metadata = {
             let mut out = BTreeMap::new();
             out.insert("date".to_string(), XffValue::from(full_date_split));
+            out.insert("project_tags".to_string(), XffValue::Array(Array::new()));
+            out.insert("context_tags".to_string(), XffValue::Array(Array::new()));
+            out.insert("special_tags".to_string(), XffValue::from(Object::new()));
             out
         };
         Self {
