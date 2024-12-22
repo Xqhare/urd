@@ -15,6 +15,7 @@ Urd is named after one of the Norns from Norse mythology, responsible for shapin
 ## Issues preventing a stable release
 
 - Creating a new viewport will crash the app if it's not supported by the device
+- `eframe` version is locked, [see more below](#eframe)
 
 ## Password protection
 
@@ -39,3 +40,13 @@ Please note that you can not change the password inside the file, as it will bre
 ### Changing the password
 
 You can change the password inside Urd, inside the `Settings` menu.
+
+## Technical details
+
+### Dependencies
+
+#### `eframe`
+`eframe` is currently locked to version 0.28 because 0.29 broke text editing, all entries were doubled on entry.
+
+### All other dependencies
+Written by me, you can find them on my [GitHub](https://github.com/xqhare).
