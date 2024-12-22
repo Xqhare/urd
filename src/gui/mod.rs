@@ -48,11 +48,11 @@ impl Default for UrdState {
 
 impl UrdState {
     // TODO: if settings have been found, there are probably journal entries to check for
-    pub fn new(settings: Settings, journal: Journal) -> Self {
+    pub fn new(settings: Settings, journal: Journal, error: Error) -> Self {
         UrdState {
             journal,
             settings,
-            error: Error::default(),
+            error,
             render: Render::default(),
             editing_index: None,
             settings_backup: None,
@@ -223,7 +223,7 @@ pub fn gui_startup(startup_state: StartupState) {
     run_native(
         APP_NAME,
         native_options,
-        Box::new(|_cc| Ok(Box::<UrdState>::new(UrdState::new(startup_state.settings, startup_state.journal)))),
+        Box::new(|_cc| Ok(Box::<UrdState>::new(UrdState::new(startup_state.settings, startup_state.journal, startup_state.error)))),
     )
     .expect("E 01");
 }
