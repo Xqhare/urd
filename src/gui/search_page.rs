@@ -19,6 +19,7 @@ impl UrdState {
                     };
                     if ui.button("Clear").clicked() {
                         self.search.query = "".to_string();
+                        self.search.results = Vec::new();
                     }
                     if ui.button("Search").clicked() {
                         self.search_current_query();
