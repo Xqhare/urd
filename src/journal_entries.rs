@@ -201,6 +201,10 @@ impl Journal {
             current_entry: last_entry,
         }
     }
+
+    pub fn export(&self) -> Result<(), String> {
+        todo!("export journal into a directory with the same structure as journal, but with the journal entries as .txt / .md files")
+    }
 }
 
 #[derive(Clone, Debug)]
