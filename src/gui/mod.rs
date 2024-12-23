@@ -1,6 +1,6 @@
 
 use crate::{
-    error::Error, journal_entries::Journal, render::Render, settings::Settings, startup::StartupState
+    error::Error, journal_entries::Journal, render::Render, search::Search, settings::Settings, startup::StartupState
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -145,6 +145,7 @@ impl UrdState {
     fn main_top_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
             ui.horizontal(|ui: &mut Ui| {
+                ui.add_space(1.0);
                 ui.add(|ui: &mut Ui| {
                     ui.horizontal(|ui: &mut Ui| {
                         ui.menu_button("Urd", |ui: &mut Ui| {
@@ -202,8 +203,8 @@ impl UrdState {
                         }).response
                     });
                 };
-                    
             });
+            ui.add_space(1.0);
         });
     }
 }
