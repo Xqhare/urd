@@ -58,11 +58,15 @@ impl UrdState {
                                 bind.unwrap().into_vec()
                             }
                         };
-                        let project_tags_as_txt = tmp_project_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>().join(", ");
-                        ui.horizontal(|ui: &mut Ui| {
+                        let project_tags_as_txt = tmp_project_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>();
+                        ui.horizontal_top(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Project Tags: ");
-                                ui.label(project_tags_as_txt);
+                                for tag in project_tags_as_txt {
+                                    ui.group(|ui: &mut Ui| {
+                                        ui.label(tag);
+                                    });
+                                }
                             })
 
                         });
