@@ -80,7 +80,7 @@ impl UrdState {
                         ui.group(|ui: &mut Ui| {
                             ui.heading("Welcome to Urd");
                             ui.vertical_centered(|ui: &mut Ui| {
-                                let tmp = ui.add(TextEdit::singleline(&mut self.settings.password.password_input).password(true).hint_text("Please enter your password here").horizontal_align(Align::Center));
+                                let tmp = ui.add(TextEdit::singleline(&mut self.settings.password.password_input).password(true).hint_text("Please enter your password").horizontal_align(Align::Center));
                                 tmp.request_focus();
                                 if tmp.changed() {
                                     if self.settings.password.password_input.len() >= self.settings.password.password.len() {
