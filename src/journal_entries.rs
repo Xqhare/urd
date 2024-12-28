@@ -298,10 +298,10 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
     
     for word in text.split_whitespace() {
         // Check if a word starts with + or @, or has a : wrapped in it
-        if word.starts_with("+") {
+        if word.starts_with("+") && word.len() > 1 {
             // Project tag
             project_tags.push(XffValue::String(word.to_string()));
-        } else if word.starts_with("@") {
+        } else if word.starts_with("@") && word.len() > 1 {
             // Context tag
             context_tags.push(XffValue::String(word.to_string()));
         } else if word.contains(":") && !word.starts_with(":") && !word.ends_with(":") {
