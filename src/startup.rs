@@ -8,8 +8,6 @@ pub struct StartupState {
     pub error: Error,
 }
 
-// TODO: error handling - Silent failover is shit, at least let the user know
-
 pub fn startup_appstate() -> StartupState {
     
     if Path::new(APP_DIR).exists() {
