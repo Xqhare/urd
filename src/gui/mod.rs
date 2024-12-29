@@ -1,6 +1,6 @@
 
 use crate::{
-    error::Error, journal_entries::Journal, render::Render, search::Search, settings::Settings, startup::StartupState
+    error::Error, journal_entries::Journal, render::{Render, ShowFolder}, search::Search, settings::Settings, startup::StartupState
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -181,8 +181,22 @@ impl UrdState {
                             }
                             if ui.button("Export").clicked() {
                             }
-                            if ui.button("").clicked() {
-                            }
+                            ui.menu_button("Backup", |ui: &mut Ui| {
+                                if ui.button("Create").clicked() {
+
+                                }
+                                if ui.button("Restore").clicked() {
+
+                                }
+                            });
+                        });
+                        ui.menu_button("Navigation", |ui: &mut Ui| {
+                            if ui.button("Go to top level").clicked() {
+                                self.render.show_folder = ShowFolder::All
+                            };
+                            if ui.button("Go back one level").clicked() {
+                                self.go_back_one_level();
+                            };
                         });
                         if self.settings.password.password != "" {
                             if ui.button("Lock Urd").clicked() {
