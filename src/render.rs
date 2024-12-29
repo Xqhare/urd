@@ -1,10 +1,20 @@
 use std::sync::{atomic::AtomicBool, Arc};
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ShowFolder {
     All,
     Year(u16),
     /// year, month
     Month(u16, u8),
+}
+
+impl ShowFolder {
+    pub fn is_month(&self) -> bool {
+        match self {
+            ShowFolder::Month(_, _) => true,
+            _ => false,
+        }
+    }
 }
 
 pub struct Render {
