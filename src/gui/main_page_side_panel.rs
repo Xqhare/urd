@@ -6,39 +6,18 @@ use super::UrdState;
 
 impl UrdState {
     pub fn main_side_panel(&mut self, ctx: &Context, frame: &mut Frame) {
-        let font = {
-            if self.settings.font.monospace {
-                FontId::monospace(self.settings.font.size)
-            } else {
-                FontId::proportional(self.settings.font.size)
-            }
-        };
         SidePanel::left("entry_browser").min_width(self.settings.size.side_panel_width).show(ctx, |ui: &mut Ui| {
-            // add space to justify with main panel settings
-            ui.add_space(6.0);
-            ui.scope(|ui: &mut Ui| {
-                ui.style_mut().spacing.button_padding = Vec2::from([self.settings.size.side_panel_width / 14.0, 1.0]);
-                ui.group(|ui: &mut Ui| {
-                    ui.horizontal(|ui: &mut Ui| {
-                        if ui.button("Go back one level").clicked() {
-                            self.go_back_one_level();
-                        };
-                        if ui.button("Go to top level").clicked() {
-                            self.render.show_folder = ShowFolder::All
-                        };
+            // Note for future: I wanted to split this into more functions but I couldn't get it to work
+            // TLDR: Nested mutating ownership of self
+            match self.render.show_folder {
+                ShowFolder::All => {
+                    ui.vertical_centered_justified(|ui: &mut Ui| {
+                    ui.add_space(22.5);
+                        ui.heading("Years");
+                    ui.add_space(22.5);
                     });
-                }); 
-            });
-            ui.separator();
-            ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                // Note for future: I wanted to split this into more functions but I couldn't get it to work
-                // TLDR: Nested mutating ownership of self
-                match self.render.show_folder {
-                    ShowFolder::All => {
-                        ui.vertical_centered_justified(|ui: &mut Ui| {
-                            ui.heading("Years");
-                        });
-                        ui.separator();
+                    ui.separator();
+                    ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                         let current_year = horae::Utc::now().date().year;
                         for n in &self.journal.entries {
                             debug_assert!(n.is_folder());
@@ -61,14 +40,18 @@ impl UrdState {
                                 });
                             });
                         }
-                    }
-                    ShowFolder::Year(year) => {
-                        ui.vertical_centered_justified(|ui: &mut Ui| {
-                            if ui.heading(year.to_string()).clicked() {
-                                self.go_back_one_level();
-                            }
-                        });
-                        ui.separator();
+                    });
+                }
+                ShowFolder::Year(year) => {
+                    ui.vertical_centered_justified(|ui: &mut Ui| {
+                    ui.add_space(22.5);
+                        if ui.heading(year.to_string()).clicked() {
+                            self.go_back_one_level();
+                        }
+                    ui.add_space(22.5);
+                    });
+                    ui.separator();
+                    ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                         let year_folder = self.journal.entries.iter().find(|entry| entry.get_folder().unwrap().name == year.to_string()).expect("Failed to find displayed folder");
                         let months_folder = year_folder.get_folder().unwrap();
                         let current_month = horae::Utc::now().date().month;
@@ -93,22 +76,26 @@ impl UrdState {
                                 });
                             });
                         }
-                    }
-                    ShowFolder::Month(year, month) => {
-                        ui.vertical_centered_justified(|ui: &mut Ui| {
-                            if ui.heading(format!("{} {}", month_num_to_name(month), year.to_string())).clicked() {
-                                self.go_back_one_level();
-                            }
-                        });
-                        ui.separator();
+                    });
+                }
+                ShowFolder::Month(year, month) => {
+                    ui.vertical_centered_justified(|ui: &mut Ui| {
+                    ui.add_space(22.5);
+                        if ui.heading(format!("{} {}", month_num_to_name(month), year.to_string())).clicked() {
+                            self.go_back_one_level();
+                        }
+                    ui.add_space(22.5);
+                    });
+                    ui.separator();
+                    ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                         let year_folder: &mut Folder = self.journal.entries.iter_mut().find(|entry| entry.get_folder().unwrap().name == year.to_string()).expect("Failed to find displayed folder").get_folder_mut().unwrap();
                         let month_folder: &mut Folder = year_folder.entries.iter_mut().find(|entry| entry.get_folder().unwrap().name == month.to_string()).expect("Failed to find displayed folder").get_folder_mut().unwrap();
                         for n in &mut month_folder.entries {
                             debug_assert!(n.is_journal_entry());
                             let entry = n.get_journal_entry().unwrap();
-                            let mut body = {
+                            let body = {
                                 let tmp = entry.text.clone();
-                                let mut word_store = tmp.split_whitespace().take(50).collect::<Vec<&str>>();
+                                let mut word_store = tmp.split_whitespace().take(25).collect::<Vec<&str>>();
                                 if word_store.len() < tmp.split_whitespace().count() {
                                     word_store.push("...");
                                 }
@@ -126,14 +113,14 @@ impl UrdState {
                                     });
                                 });
                             });
-                        }
-                    }
+                        };
+                    });
                 }
-            });
+            };
         });
     }
 
-    fn go_back_one_level(&mut self) {
+    pub fn go_back_one_level(&mut self) {
         match &self.render.show_folder {
             ShowFolder::All => {},
             ShowFolder::Year(_) => {
