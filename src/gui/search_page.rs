@@ -35,7 +35,7 @@ impl UrdState {
         });
     }
 
-    fn search_current_query(&mut self) {
+    pub fn search_current_query(&mut self) {
         let tokens = tokenize_search_query(&self.search.query);
         self.search.results = Vec::new();
         self.search_loop(tokens);
@@ -122,7 +122,20 @@ impl UrdState {
                             out
                         };
                         if token_found {
-                            self.search.results.push(journal_entry.clone());
+                            let entry_already_in_results = {
+                                let mut out = false;
+                                for t in &self.search.results {
+                                    if token == &t.title {
+                                        out = true;
+                                    }
+                                }
+                                out
+                            };
+                            if entry_already_in_results {
+                                continue;
+                            } else {
+                                self.search.results.push(journal_entry.clone());
+                            }
                         }
                     }
                 }
@@ -133,8 +146,10 @@ impl UrdState {
 
 fn tokenize_search_query(query: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
-    for thing in query.split(",") {
-        out.push(thing.trim().to_string());
+    for thing in query.trim().split(",") {
+        if thing.len() != 0 {
+            out.push(thing.trim().to_string());
+        }
     }
     out
 }
