@@ -6,7 +6,7 @@ use nabu::XffValue;
 
 use crate::paths::SETTINGS_FILE;
 
-const MAIN_WINDOW_DEFAULT_SIZE: [f32; 2] = [1000.0, 600.0];
+const MAIN_WINDOW_DEFAULT_SIZE: [f32; 2] = [1175.0, 800.0];
 const SIDE_PANEL_DEFAULT_WIDTH: f32 = 300.0;
 pub const MAX_FONT_SIZE: f32 = 100.0;
 pub const MIN_FONT_SIZE: f32 = 2.0;
