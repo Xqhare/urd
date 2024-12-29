@@ -2,10 +2,10 @@ use eframe::{
     egui::{CentralPanel, Ui},
     *,
 };
-use egui::{Align, FontId, ScrollArea, TextEdit};
+use egui::{Align, FontId, Grid, Margin, ScrollArea, TextEdit};
 use nabu::Object;
 
-use crate::{error::Error, journal_entries::{EntryType, Folder}, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}};
+use crate::{error::Error, journal_entries::{EntryType, Folder, JournalEntry}, render::ShowFolder, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}};
 
 use super::UrdState;
 
@@ -42,58 +42,144 @@ impl UrdState {
                 ui.separator();
                 ui.add_sized(ui.available_size(), |ui: &mut Ui| {
                     ui.add(TextEdit::multiline(&mut self.journal.current_entry.text)
-                        .horizontal_align(Align::Center)
+                        .horizontal_align(Align::LEFT)
                         .lock_focus(true)
                         .text_color(self.settings.font.text_colour)
                         .font(font.clone())
-                    );
-                    // TODO: tmp code below, add clicking on a tag to search for it in the journal
-                    // when search is done
-                    ui.group(|ui: &mut Ui| {
-                        let tmp_project_tags = {
-                            let bind = self.journal.current_entry.metadata.get("project_tags").unwrap().into_array();
-                            if bind.is_none() {
-                                vec![]
-                            } else {
-                                bind.unwrap().into_vec()
-                            }
-                        };
-                        let project_tags_as_txt = tmp_project_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>();
-                        ui.horizontal_top(|ui: &mut Ui| {
-                            ui.group(|ui: &mut Ui| {
-                                ui.label("Project Tags: ");
-                                for tag in project_tags_as_txt {
-                                    ui.group(|ui: &mut Ui| {
-                                        ui.label(tag);
-                                    });
-                                }
-                            })
-
-                        });
-                        let tmp_context_tags = {
-                            
-                            let bind = self.journal.current_entry.metadata.get("context_tags").unwrap().into_array();
-                            if bind.is_none() {
-                                vec![]
-                            } else {
-                                bind.unwrap().into_vec()
-                            }
-                        };
-                        let context_tags_as_txt = tmp_context_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>().join(", ");
-                        ui.label(format!("Context Tags: {}", context_tags_as_txt));
-                        let tmp_special_tags = {
-                            let bind = self.journal.current_entry.metadata.get("special_tags").unwrap().into_object();
-                            if bind.is_none() {
-                                Object::new()
-                            } else {
-                                bind.unwrap()
-                            }
-                        };
-                        let special_tags_as_txt = tmp_special_tags.iter().map(|(key, value)| format!("{}:{}", key, value.into_string().unwrap())).collect::<Vec<String>>().join(", ");
-                        ui.label(format!("Special Tags: {}", special_tags_as_txt));
-                    }).response
+                        .margin(Margin::same(5.0))
+                    )
                 });
-            })
+                // TODO: tmp code below, add clicking on a tag to search for it in the journal
+                // when search is done
+                ui.group(|ui: &mut Ui| {
+                    ui.vertical_centered_justified(|ui: &mut Ui| {
+                        ui.heading("Metadata");
+                        ui.horizontal(|ui: &mut Ui| {
+                            
+                            let tmp_project_tags = {
+                                let bind = self.journal.current_entry.metadata.get("project_tags").unwrap().into_array();
+                                if bind.is_none() {
+                                    vec![]
+                                } else {
+                                    bind.unwrap().into_vec()
+                                }
+                            };
+                            let project_tags_as_txt = tmp_project_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>();
+                            ui.add_sized([ui.available_width(), ui.available_height()], |ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.vertical(|ui: &mut Ui| {
+                                        ui.heading("Project Tags");
+                                        if project_tags_as_txt.len() == 0 {
+                                            ui.label("Add with `+{tag}`");
+                                        } else {
+                                            for tag in project_tags_as_txt {
+                                                ui.group(|ui: &mut Ui| {
+                                                    if ui.label(&tag).clicked() {
+                                                        self.search.query = format!("{}, ", tag);
+                                                        self.search_current_query();
+                                                        self.render.viewports.show_search_page = true;
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    })
+                                }).response
+                            });
+
+                            let tmp_context_tags = {
+                                let bind = self.journal.current_entry.metadata.get("context_tags").unwrap().into_array();
+                                if bind.is_none() {
+                                    vec![]
+                                } else {
+                                    bind.unwrap().into_vec()
+                                }
+                            };
+                            let context_tags_as_txt = tmp_context_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>();
+                            ui.add_sized([ui.available_width() * 1.95, ui.available_height()], |ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.vertical(|ui: &mut Ui| {
+                                        ui.heading("Context Tags");
+                                        if context_tags_as_txt.len() == 0 {
+                                            ui.label("Add with `@{tag}`");
+                                        } else {
+                                            for tag in context_tags_as_txt {
+                                                ui.group(|ui: &mut Ui| {
+                                                    if ui.label(&tag).clicked() {
+                                                        self.search.query = format!("{}, ", tag);
+                                                        self.search_current_query();
+                                                        self.render.viewports.show_search_page = true;
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                }).response
+                            });
+                        });
+
+                        ui.horizontal(|ui: &mut Ui| {
+
+                            let tmp_special_tags = {
+                                let bind = self.journal.current_entry.metadata.get("special_tags").unwrap().into_object();
+                                if bind.is_none() {
+                                    Object::new()
+                                } else {
+                                    bind.unwrap()
+                                }
+                            };
+                            let special_tags_as_txt = tmp_special_tags.iter().map(|(key, value)| format!("{}:{}", key, value.into_string().unwrap())).collect::<Vec<String>>();
+                            ui.add_sized([ui.available_width(), ui.available_height()], |ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.vertical(|ui: &mut Ui| {
+                                        ui.heading("Special Tags");
+                                        if special_tags_as_txt.len() == 0 {
+                                            ui.label("Add with `{key}:{value}`");
+                                        } else {
+                                            for tag in special_tags_as_txt {
+                                                ui.group(|ui: &mut Ui| {
+                                                    if ui.label(&tag).clicked() {
+                                                        self.search.query = format!("{}, ", tag);
+                                                        self.search_current_query();
+                                                        self.render.viewports.show_search_page = true;
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                }).response
+                            });
+                            let tmp_bespoke_tags = {
+                                let bind = self.journal.current_entry.metadata.get("bespoke_tags").unwrap().into_array();
+                                if bind.is_none() {
+                                    vec![]
+                                } else {
+                                    bind.unwrap().into_vec()
+                                }
+                            };
+                            let bespoke_tags_as_txt = tmp_bespoke_tags.iter().map(|tag| tag.into_string().unwrap()).collect::<Vec<String>>();
+                            ui.add_sized([ui.available_width() * 1.95, ui.available_height()], |ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.vertical(|ui: &mut Ui| {
+                                        ui.heading("Bespoke Tags");
+                                        if bespoke_tags_as_txt.len() == 0 {
+                                            ui.label("Add with `#{value}`");
+                                        } else {
+                                            for tag in bespoke_tags_as_txt {
+                                                ui.group(|ui: &mut Ui| {
+                                                    if ui.label(&tag).clicked() {
+                                                        self.search.query = format!("{}, ", tag);
+                                                        self.search_current_query();
+                                                        self.render.viewports.show_search_page = true;
+                                                    }                                                });
+                                            }
+                                        }
+                                    });
+                                }).response
+                            });
+                        });
+                    });
+                });
+            });
         });
     }
 
@@ -124,11 +210,54 @@ impl UrdState {
                     self.error = Error::new(save.unwrap_err().to_string());
                 }
             };
-            if ui.button("Delete entry").clicked() {
+            if ui.button("Reset entry").clicked() {
                 self.delete_entry_from_journal();
                 let save = self.journal.save();
                 if save.is_err() {
                     self.error = Error::new(save.unwrap_err().to_string());
+                }
+            };
+            // Fallback option, if urd is kept open for a long time (the date has changed since
+            // startup) no new entry will be generated automatically - this will create such a new entry, but
+            // only if it does not already exist. This also loads that entry.
+            if ui.button("Todays entry").clicked() {
+                let date_today = {
+                    let mut tmp = horae::Utc::now();
+                    tmp.with_timezone(self.settings.timezone.timezone);
+                    tmp
+                };
+                let tmp_year_folder = self.journal.entries.front_mut().unwrap().get_folder_mut().unwrap();
+                if tmp_year_folder.name == date_today.date().year.to_string() {
+                    let tmp_month_folder = tmp_year_folder.entries.front_mut().unwrap().get_folder_mut().unwrap();
+                    if tmp_month_folder.name == date_today.date().month.to_string() {
+                        for entry in tmp_month_folder.entries.clone() {
+                            if entry.get_journal_entry().unwrap().title == date_today.date().to_string() {
+                                self.journal.current_entry = entry.get_journal_entry().unwrap().clone();
+                                break;
+                            } else {
+                                // Day not found, but month and year were found
+                                let new_journal_entry = JournalEntry::new(&self.settings);
+                                tmp_month_folder.entries.push_front(EntryType::JournalEntry(new_journal_entry.clone()));
+                                self.journal.current_entry = new_journal_entry;
+                            }
+                        }
+                    } else {
+                        // Month not found, but year was found
+                        let mut new_month_folder = Folder::new(date_today.date().month.to_string());
+                        let new_journal_entry = JournalEntry::new(&self.settings);
+                        new_month_folder.entries.push_front(EntryType::JournalEntry(new_journal_entry.clone()));
+                        tmp_year_folder.entries.push_front(EntryType::Folder(new_month_folder));
+                        self.journal.current_entry = new_journal_entry;
+                    }
+                } else {
+                    // Year not found
+                    let mut new_year_folder = Folder::new(date_today.date().year.to_string());
+                    let mut new_month_folder = Folder::new(date_today.date().month.to_string());
+                    let new_journal_entry = JournalEntry::new(&self.settings);
+                    new_month_folder.entries.push_front(EntryType::JournalEntry(new_journal_entry.clone()));
+                    new_year_folder.entries.push_front(EntryType::Folder(new_month_folder));
+                    self.journal.entries.push_front(EntryType::Folder(new_year_folder));
+                    self.journal.current_entry = new_journal_entry;
                 }
             };
         });
@@ -140,9 +269,6 @@ impl UrdState {
             self.error = Error::new(save.unwrap_err().to_string());
         }
         self.journal.current_entry.overwrite(self.journal.current_entry.text.clone());
-        // TODO: save journal entry
-        // First search for its position in journal
-        // Then save / overwrite file with same name
         let (year, month) = {
             let date = self.journal.current_entry.metadata.get("date").unwrap().into_object().unwrap();
             let year = date.get("year").unwrap().into_number().unwrap().into_usize().unwrap();
@@ -169,8 +295,6 @@ impl UrdState {
                 if day_search.is_none() {
                     month_folder.entries.push_front(EntryType::JournalEntry(self.journal.current_entry.clone()));
                 } else {
-                    // TODO: Fix this
-                    println!("Day already exists");
                     let day_folder = day_search.unwrap().get_journal_entry_mut();
                     if day_folder.is_some() {
                         day_folder.unwrap().overwrite(self.journal.current_entry.text.clone());
