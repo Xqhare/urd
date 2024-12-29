@@ -135,13 +135,15 @@ impl Journal {
             date_time.with_timezone(settings.timezone.timezone);
             (date_time.date().year, date_time.date().month)
         };
-        let month_folder = Folder::new(month.to_string());
+        let mut month_folder = Folder::new(month.to_string());
+        let current_entry = JournalEntry::new(settings);
+        month_folder.entries.push_back(EntryType::JournalEntry(current_entry.clone()));
         let mut year_folder = Folder::new(year.to_string());
         year_folder.entries.push_back(EntryType::Folder(month_folder));
         let entries = VecDeque::from([EntryType::Folder(year_folder)]);
         Self {
             entries,
-            current_entry: JournalEntry::new(&Settings::default()),
+            current_entry,
         }
     }
 
@@ -193,7 +195,9 @@ impl Journal {
             if current_date.date().to_string() == last_entry.title {
                 last_entry.clone()
             } else {
-                JournalEntry::new(settings)
+                let out = JournalEntry::new(settings);
+                entries.front_mut().unwrap().get_folder_mut().unwrap().entries.front_mut().unwrap().get_folder_mut().unwrap().entries.push_front(EntryType::JournalEntry(out.clone()));
+                out
             }
         };
         Self {
@@ -240,6 +244,7 @@ impl JournalEntry {
             out.insert("project_tags".to_string(), XffValue::Array(Array::new()));
             out.insert("context_tags".to_string(), XffValue::Array(Array::new()));
             out.insert("special_tags".to_string(), XffValue::from(Object::new()));
+            out.insert("bespoke_tags".to_string(), XffValue::Array(Array::new()));
             out
         };
         Self {
@@ -274,6 +279,7 @@ impl JournalEntry {
         self.metadata.insert("project_tags".to_string(), new_metadata.get("project_tags").unwrap().clone());
         self.metadata.insert("context_tags".to_string(), new_metadata.get("context_tags").unwrap().clone());
         self.metadata.insert("special_tags".to_string(), new_metadata.get("special_tags").unwrap().clone());
+        self.metadata.insert("bespoke_tags".to_string(), new_metadata.get("bespoke_tags").unwrap().clone());
     }
 
     pub fn reset(&mut self) {
@@ -283,6 +289,10 @@ impl JournalEntry {
         self.metadata = {
             let mut out = BTreeMap::new();
             out.insert("date".to_string(), XffValue::from(tmp_metadata_date));
+            out.insert("project_tags".to_string(), XffValue::Array(Array::new()));
+            out.insert("context_tags".to_string(), XffValue::Array(Array::new()));
+            out.insert("special_tags".to_string(), XffValue::from(Object::new()));
+            out.insert("bespoke_tags".to_string(), XffValue::Array(Array::new()));
             out
         };
     }
@@ -293,6 +303,7 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
     // But splitting by unicode whitespace is enough for this
     let mut project_tags: Vec<XffValue> = Vec::new();
     let mut context_tags: Vec<XffValue> = Vec::new();
+    let mut bespoke_tags: Vec<XffValue> = Vec::new();
     let mut special_tags: Object = Object::new();
     let mut metadata: BTreeMap<String, XffValue> = BTreeMap::new();
     
@@ -308,11 +319,15 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
             // Special tag
             let (key, value) = word.split_once(":").unwrap();
             special_tags.insert(key.to_string(), XffValue::String(value.to_string()));
+        } else if word.starts_with("#") && word.len() > 1 {
+            // User Tag
+            bespoke_tags.push(XffValue::String(word.to_string()));
         }
     }
     metadata.insert("project_tags".to_string(), XffValue::Array(Array::from(project_tags)));
     metadata.insert("context_tags".to_string(), XffValue::Array(Array::from(context_tags)));
     metadata.insert("special_tags".to_string(), XffValue::from(special_tags));
+    metadata.insert("bespoke_tags".to_string(), XffValue::Array(Array::from(bespoke_tags)));
     metadata
 }
 
