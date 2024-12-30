@@ -9,13 +9,12 @@ A journal App written in rust
 - Lockable screen
     - Password protection
 - If you write a journal entry every day, completed months or years will be marked
-    - This can be changed in the `Settings` menu
+    - This can be customised in the `Settings` menu
 - Simple text editor
 
 ## Issues preventing a stable release
 
 - Creating a new viewport will crash the app if it's not supported by the device
-- If current day entry was not saved, and is empty, and another entry is loaded, there is no way of getting the current day entry back
 - Display errors using a `modal` popup
 - Export entries to files
 - Backup (just use the journal file itself) and a way to restore from a backup
