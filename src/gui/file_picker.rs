@@ -45,7 +45,7 @@ impl UrdState {
                                     if pos_err.is_err() {
                                         self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                     }
-                                    let pos_err2 = self.journal.create_backup();
+                                    let pos_err2 = self.journal.create_backup(&self.settings, &self.settings.custom_paths.backup_directory);
                                     if pos_err2.is_err() {
                                         self.error = Error::new(pos_err2.unwrap_err().to_string(), "Creating backup failed.".to_string());
                                     }
@@ -80,7 +80,7 @@ impl UrdState {
                                     if pos_err.is_err() {
                                         self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                     }
-                                    let pos_err2 = self.journal.export();
+                                    let pos_err2 = self.journal.export(&self.settings.custom_paths.export_directory);
                                     if pos_err2.is_err() {
                                         self.error = Error::new(pos_err2.unwrap_err().to_string(), "Creating backup failed.".to_string());
                                     }
@@ -115,7 +115,7 @@ impl UrdState {
                                     if pos_err.is_err() {
                                         self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                     }
-                                    let pos_err2 = self.journal.restore_backup();
+                                    let pos_err2 = self.journal.restore_backup(&self.settings, &self.settings.custom_paths.restore_file);
                                     if pos_err2.is_err() {
                                         self.error = Error::new(pos_err2.unwrap_err().to_string(), "Restoring from backup failed.".to_string());
                                     }

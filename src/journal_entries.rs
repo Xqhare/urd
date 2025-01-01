@@ -1,4 +1,4 @@
-use std::{collections::{BTreeMap, VecDeque}, usize};
+use std::{collections::{BTreeMap, VecDeque}, path::Path, usize};
 
 use nabu::{Array, Object, XffValue};
 
@@ -193,11 +193,6 @@ impl Journal {
             let mut current_date = horae::Utc::now();
             current_date.with_timezone(settings.timezone.timezone);
 
-            /* let out = JournalEntry::new(settings);
-            // I cant naively assume that the new entry is part of the current month and year
-            entries.front_mut().unwrap().get_folder_mut().unwrap().entries.front_mut().unwrap().get_folder_mut().unwrap().entries.push_front(EntryType::JournalEntry(out.clone()));
-            out */
-
             if current_date.date().year as usize == last_entry.metadata.get("date").unwrap().into_object().unwrap().get("year").unwrap().into_number().unwrap().into_usize().unwrap() {
                 // Current year
                 if current_date.date().month as usize == last_entry.metadata.get("date").unwrap().into_object().unwrap().get("month").unwrap().into_number().unwrap().into_usize().unwrap() {
@@ -236,16 +231,79 @@ impl Journal {
         }
     }
 
-    pub fn export(&self) -> Result<(), String> {
-        todo!("export journal into a directory with the same structure as journal, but with the journal entries as .txt / .md files")
+    pub fn export(&self, export_dir: &str) -> Result<(), String> {
+        let this_dir = Path::new(export_dir);
+        let urd_dir = this_dir.with_file_name("Urd-Journal");
+        // Clean up of possible previous export
+        if urd_dir.exists() {
+            let pos_err0 = std::fs::remove_dir_all(urd_dir.clone());
+            if pos_err0.is_err() {
+                return Err(pos_err0.unwrap_err().to_string());
+            }
+        }
+
+        // Export
+        let pos_err1 = std::fs::create_dir(urd_dir.clone());
+        if pos_err1.is_err() {
+            return Err(pos_err1.unwrap_err().to_string());
+        }
+        for year in &self.entries {
+            let year_dir = urd_dir.with_file_name(year.get_folder().unwrap().name.clone());
+            let pos_err2 = std::fs::create_dir(year_dir.clone());
+            if pos_err2.is_err() {
+                return Err(pos_err2.unwrap_err().to_string());
+            }
+            let year_folder = year.get_folder().unwrap();
+            for month in &year_folder.entries {
+                let month_dir = year_dir.with_file_name(month.get_folder().unwrap().name.clone());
+                let pos_err3 = std::fs::create_dir(month_dir.clone());
+                if pos_err3.is_err() {
+                    return Err(pos_err3.unwrap_err().to_string());
+                }
+                let month_folder = month.get_folder().unwrap();
+                for entry in &month_folder.entries {
+                    let entry_file = month_dir.with_file_name(entry.get_journal_entry().unwrap().title.clone()).with_extension("txt");
+                    let pos_err4 = std::fs::write(entry_file.clone(), entry.get_journal_entry().unwrap().text.clone());
+                    if pos_err4.is_err() {
+                        return Err(pos_err4.unwrap_err().to_string());
+                    }
+                }
+            }
+        }
+
+        Ok(())
     }
 
-    pub fn create_backup(&self) -> Result<(), String> {
-        todo!("create a backup of the journal")
+    pub fn create_backup(&self, settings: &Settings, backup_dir: &str) -> Result<(), String> {
+        let serialized = self.serialize();
+        let file_name = {
+            let date = {
+                let mut date_time = horae::Utc::now();
+                date_time.with_timezone(settings.timezone.timezone);
+                date_time.date().to_string()
+            };
+            let tmp = format!("{date}-urd-journal-backup.xff");
+            let tmp_dir = Path::new(backup_dir);
+            let out = tmp_dir.with_file_name(tmp);
+            out
+        };
+        let out = nabu::serde::write(file_name, serialized);
+        match out {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.to_string()),
+        }
     }
 
-    pub fn restore_backup(&self) -> Result<(), String> {
-        todo!("restore a backup of the journal")
+    pub fn restore_backup(&mut self, settings: &Settings, file_name: &str) -> Result<(), String> {
+        let data = nabu::serde::read(file_name);
+        match data {
+            Ok(d) => {
+                *self = Journal::deserialize(&d, &settings);
+                Ok(())
+
+            }
+            Err(e) => Err(e.to_string()),
+        }
     }
 }
 

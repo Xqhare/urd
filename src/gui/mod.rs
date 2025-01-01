@@ -183,53 +183,32 @@ impl UrdState {
                             }
                             if ui.button("Export").clicked() {
                                 if self.settings.custom_paths.export_directory != "" {
-                                    let pos_err = self.journal.export();
+                                    let pos_err = self.journal.export(&self.settings.custom_paths.export_directory);
                                     if pos_err.is_err() {
                                         self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal export to disk failed.".to_string());
                                     }
                                 } else {
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Export);
                                     self.render.viewports.show_file_picker = true;
-                                    if !self.render.viewports.show_file_picker {
-                                        let pos_err = self.journal.export();
-                                        if pos_err.is_err() {
-                                            self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal export to disk failed.".to_string());
-                                        }
-                                    }
                                 }
                             }
                             ui.menu_button("Backup", |ui: &mut Ui| {
                                 if ui.button("Create").clicked() {
                                     if self.settings.custom_paths.backup_directory != "" {
                                         // Backup already set up
-                                        let pos_err = self.journal.create_backup();
+                                        let pos_err = self.journal.create_backup(&self.settings, &self.settings.custom_paths.backup_directory);
                                         if pos_err.is_err() {
                                             self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal backup to disk failed.".to_string());
                                         }
                                     } else {
                                         self.settings.custom_paths.needed_path = Some(NeededPath::Backup);
                                         self.render.viewports.show_file_picker = true;
-                                        if !self.render.viewports.show_file_picker {
-                                            let pos_err = self.journal.create_backup();
-                                            if pos_err.is_err() {
-                                                self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal backup to disk failed.".to_string());
-                                            }
-                                        }
                                     }
 
                                 }
                                 if ui.button("Restore").clicked() {
-                                    // Restore_file is always empthy, I need to call the file
-                                    // picker always
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Restore);
                                     self.render.viewports.show_file_picker = true;
-                                    if !self.render.viewports.show_file_picker {
-                                        let pos_err = self.journal.restore_backup();
-                                        if pos_err.is_err() {
-                                            self.error = Error::new(pos_err.unwrap_err().to_string(), "Restoring journal from disk failed.".to_string());
-                                        }
-                                    }
-
                                 }
                             });
                         });
