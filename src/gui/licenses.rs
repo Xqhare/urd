@@ -27,7 +27,7 @@ impl UrdState {
                     // TODO: paint the settings in the main window if this fails instead of
                     // panicking
                     assert!(class == eframe::egui::ViewportClass::Deferred);
-                    
+
                     CentralPanel::default().show(ctx, |ui: &mut Ui| {
                         ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                             ui.heading("Licenses");

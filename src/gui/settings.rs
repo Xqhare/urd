@@ -1,8 +1,12 @@
-
 use eframe::egui::{Align, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider, TextEdit, Ui};
 use horae::TimeZone;
 
-use crate::{error::Error, settings::{NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE}};
+use crate::{
+    error::Error,
+    settings::{
+        NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE,
+    },
+};
 
 use super::UrdState;
 
@@ -153,7 +157,6 @@ impl UrdState {
                                             }
                                         };
                                     });
-                                    
                                     ui.end_row();
 
                                     ui.label("Font size: ");
@@ -273,7 +276,6 @@ impl UrdState {
                                     ui.label("End: ");
                                     ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_currently.end).horizontal_align(Align::Center));
                                     ui.end_row();
-                                    
                                 });
                                 ui.vertical_centered_justified(|ui: &mut Ui| {
                                     ui.group(|ui: &mut Ui| {

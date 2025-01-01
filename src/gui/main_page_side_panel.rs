@@ -1,4 +1,7 @@
-use eframe::{egui::{Context, ScrollArea, SidePanel, TextBuffer, Ui}, Frame};
+use eframe::{
+    egui::{Context, ScrollArea, SidePanel, TextBuffer, Ui},
+    Frame,
+};
 
 use crate::{journal_entries::Folder, render::ShowFolder};
 
@@ -122,26 +125,37 @@ impl UrdState {
 
     pub fn go_back_one_level(&mut self) {
         match &self.render.show_folder {
-            ShowFolder::All => {},
-            ShowFolder::Year(_) => {
-                self.render.show_folder = ShowFolder::All
-            },
-            ShowFolder::Month(year, _) => {
-                self.render.show_folder = ShowFolder::Year(*year)
-            },
+            ShowFolder::All => {}
+            ShowFolder::Year(_) => self.render.show_folder = ShowFolder::All,
+            ShowFolder::Month(year, _) => self.render.show_folder = ShowFolder::Year(*year),
         }
     }
-    
+
     fn currently_selected(&self, name: &str) -> String {
-        format!("{} {} {}", self.settings.gui.file_marker_currently.start, name, self.settings.gui.file_marker_currently.end)
+        format!(
+            "{} {} {}",
+            self.settings.gui.file_marker_currently.start,
+            name,
+            self.settings.gui.file_marker_currently.end
+        )
     }
 
     fn perfectly_completed(&self, name: &str) -> String {
-        format!("{} {} {}", self.settings.gui.file_marker_perfectly.start, name, self.settings.gui.file_marker_perfectly.end)
+        format!(
+            "{} {} {}",
+            self.settings.gui.file_marker_perfectly.start,
+            name,
+            self.settings.gui.file_marker_perfectly.end
+        )
     }
 
     fn normally_completed(&self, name: &str) -> String {
-        format!("{} {} {}", self.settings.gui.file_marker_normally.start, name, self.settings.gui.file_marker_normally.end)
+        format!(
+            "{} {} {}",
+            self.settings.gui.file_marker_normally.start,
+            name,
+            self.settings.gui.file_marker_normally.end
+        )
     }
 }
 

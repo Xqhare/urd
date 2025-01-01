@@ -28,14 +28,8 @@ impl UrdState {
                         ui.horizontal_wrapped(|ui: &mut Ui| {
                             ui.vertical_centered_justified(|ui: &mut Ui| {
                                 ui.add_space(10.0);
-                                ui.label(format!(
-                                    "Written by {}",
-                                    env!("CARGO_PKG_AUTHORS")
-                                ));
-                                ui.label(format!(
-                                    "Version {}",
-                                    env!("CARGO_PKG_VERSION")
-                                ));
+                                ui.label(format!("Written by {}", env!("CARGO_PKG_AUTHORS")));
+                                ui.label(format!("Version {}", env!("CARGO_PKG_VERSION")));
                                 ui.hyperlink_to("Urd on GitHub", "https://github.com/xqhare/urd");
                                 ui.separator();
                                 ui.label("In loving memory of my stepfather.");

@@ -88,9 +88,11 @@ impl Settings {
         let out = nabu::serde::write(SETTINGS_FILE, serialized);
         match out {
             Ok(_) => Ok(()),
-            Err(e) => Err(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())),
+            Err(e) => Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                e.to_string(),
+            )),
         }
-        
     }
 
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Settings, std::io::Error> {
@@ -98,7 +100,12 @@ impl Settings {
             let out = nabu::serde::read(path);
             match out {
                 Ok(d) => d.into_object().unwrap(),
-                Err(e) => return Err(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())),
+                Err(e) => {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        e.to_string(),
+                    ))
+                }
             }
         };
         let size = SizeSettings::deserialize(&deserialized.get("size").unwrap());
@@ -107,7 +114,11 @@ impl Settings {
         let password = deserialized.get("password").unwrap().into_string().unwrap();
         let gui = Gui::deserialize(&deserialized.get("gui").unwrap());
         let custom_paths = CustomPaths::deserialize(&deserialized.get("custom_paths").unwrap());
-        let automatic_backups = deserialized.get("automatic_backups").unwrap().into_boolean().unwrap();
+        let automatic_backups = deserialized
+            .get("automatic_backups")
+            .unwrap()
+            .into_boolean()
+            .unwrap();
         Ok(Settings {
             font,
             gui,
@@ -148,20 +159,37 @@ impl Default for CustomPaths {
             needed_path: None,
         }
     }
-    
 }
 
 impl CustomPaths {
     pub fn serialize(&self) -> XffValue {
         let mut serialized = nabu::Object::new();
-        serialized.insert("backup_directory", XffValue::from(self.backup_directory.clone()));
-        serialized.insert("export_directory", XffValue::from(self.export_directory.clone()));
+        serialized.insert(
+            "backup_directory",
+            XffValue::from(self.backup_directory.clone()),
+        );
+        serialized.insert(
+            "export_directory",
+            XffValue::from(self.export_directory.clone()),
+        );
         XffValue::from(serialized)
     }
 
     pub fn deserialize(serialized: &XffValue) -> Self {
-        let backup_directory = serialized.into_object().unwrap().get("backup_directory").unwrap().into_string().unwrap();
-        let export_directory = serialized.into_object().unwrap().get("export_directory").unwrap().into_string().unwrap();
+        let backup_directory = serialized
+            .into_object()
+            .unwrap()
+            .get("backup_directory")
+            .unwrap()
+            .into_string()
+            .unwrap();
+        let export_directory = serialized
+            .into_object()
+            .unwrap()
+            .get("export_directory")
+            .unwrap()
+            .into_string()
+            .unwrap();
         Self {
             backup_directory,
             export_directory,
@@ -191,16 +219,43 @@ impl Default for Gui {
 impl Gui {
     pub fn serialize(&self) -> XffValue {
         let mut serialized = nabu::Object::new();
-        serialized.insert("file_marker_currently", self.file_marker_currently.serialize());
-        serialized.insert("file_marker_perfectly", self.file_marker_perfectly.serialize());
-        serialized.insert("file_marker_normally", self.file_marker_normally.serialize());
+        serialized.insert(
+            "file_marker_currently",
+            self.file_marker_currently.serialize(),
+        );
+        serialized.insert(
+            "file_marker_perfectly",
+            self.file_marker_perfectly.serialize(),
+        );
+        serialized.insert(
+            "file_marker_normally",
+            self.file_marker_normally.serialize(),
+        );
         XffValue::from(serialized)
     }
 
     pub fn deserialize(serialized: &XffValue) -> Self {
-        let file_marker_currently = FileMarker::deserialize(&serialized.into_object().unwrap().get("file_marker_currently").unwrap());
-        let file_marker_perfectly = FileMarker::deserialize(&serialized.into_object().unwrap().get("file_marker_perfectly").unwrap());
-        let file_marker_normally = FileMarker::deserialize(&serialized.into_object().unwrap().get("file_marker_normally").unwrap());
+        let file_marker_currently = FileMarker::deserialize(
+            &serialized
+                .into_object()
+                .unwrap()
+                .get("file_marker_currently")
+                .unwrap(),
+        );
+        let file_marker_perfectly = FileMarker::deserialize(
+            &serialized
+                .into_object()
+                .unwrap()
+                .get("file_marker_perfectly")
+                .unwrap(),
+        );
+        let file_marker_normally = FileMarker::deserialize(
+            &serialized
+                .into_object()
+                .unwrap()
+                .get("file_marker_normally")
+                .unwrap(),
+        );
         Self {
             file_marker_currently,
             file_marker_perfectly,
@@ -228,8 +283,20 @@ impl FileMarker {
     }
 
     pub fn deserialize(serialized: &XffValue) -> Self {
-        let start = serialized.into_object().unwrap().get("start").unwrap().into_string().unwrap();
-        let end = serialized.into_object().unwrap().get("end").unwrap().into_string().unwrap();
+        let start = serialized
+            .into_object()
+            .unwrap()
+            .get("start")
+            .unwrap()
+            .into_string()
+            .unwrap();
+        let end = serialized
+            .into_object()
+            .unwrap()
+            .get("end")
+            .unwrap()
+            .into_string()
+            .unwrap();
         Self { start, end }
     }
 }
@@ -323,22 +390,70 @@ impl FontSettings {
     pub fn deserialize(serialized: &XffValue) -> Self {
         let font = serialized.into_object().unwrap();
         // Unchecked conversion ok, because we know the value is derived from the smaller type
-        let size = font.get("size").unwrap().into_number().unwrap().into_usize().unwrap() as f32;
+        let size = font
+            .get("size")
+            .unwrap()
+            .into_number()
+            .unwrap()
+            .into_usize()
+            .unwrap() as f32;
         let text_colour = Color32::from_rgba_premultiplied(
-            font.get("text_colour").unwrap().into_array().unwrap().get(0).unwrap().into_number().unwrap().into_usize().unwrap() as u8,
-            font.get("text_colour").unwrap().into_array().unwrap().get(1).unwrap().into_number().unwrap().into_usize().unwrap() as u8,
-            font.get("text_colour").unwrap().into_array().unwrap().get(2).unwrap().into_number().unwrap().into_usize().unwrap() as u8,
-            font.get("text_colour").unwrap().into_array().unwrap().get(3).unwrap().into_number().unwrap().into_usize().unwrap() as u8,
+            font.get("text_colour")
+                .unwrap()
+                .into_array()
+                .unwrap()
+                .get(0)
+                .unwrap()
+                .into_number()
+                .unwrap()
+                .into_usize()
+                .unwrap() as u8,
+            font.get("text_colour")
+                .unwrap()
+                .into_array()
+                .unwrap()
+                .get(1)
+                .unwrap()
+                .into_number()
+                .unwrap()
+                .into_usize()
+                .unwrap() as u8,
+            font.get("text_colour")
+                .unwrap()
+                .into_array()
+                .unwrap()
+                .get(2)
+                .unwrap()
+                .into_number()
+                .unwrap()
+                .into_usize()
+                .unwrap() as u8,
+            font.get("text_colour")
+                .unwrap()
+                .into_array()
+                .unwrap()
+                .get(3)
+                .unwrap()
+                .into_number()
+                .unwrap()
+                .into_usize()
+                .unwrap() as u8,
         );
         let monospace = font.get("monospace").unwrap().into_boolean().unwrap();
-        Self { size, text_colour, monospace }
-
+        Self {
+            size,
+            text_colour,
+            monospace,
+        }
     }
 
     pub fn serialize(&self) -> XffValue {
         let mut serialized = nabu::Object::new();
         serialized.insert("size", XffValue::from(self.size));
-        serialized.insert("text_colour", XffValue::from(nabu::Array::from(self.text_colour.to_array().to_vec())));
+        serialized.insert(
+            "text_colour",
+            XffValue::from(nabu::Array::from(self.text_colour.to_array().to_vec())),
+        );
         serialized.insert("monospace", XffValue::from(self.monospace));
         XffValue::from(serialized)
     }
@@ -362,10 +477,39 @@ impl Default for SizeSettings {
 
 impl SizeSettings {
     pub fn deserialize(serialized: &XffValue) -> Self {
-        let size_array = serialized.into_object().unwrap().get("size").unwrap().into_array().unwrap();
+        let size_array = serialized
+            .into_object()
+            .unwrap()
+            .get("size")
+            .unwrap()
+            .into_array()
+            .unwrap();
         // the f64 can never be larger than f32, its derived from it!
-        let size = [size_array.get(0).unwrap().into_number().unwrap().into_usize().unwrap() as f32, size_array.get(1).unwrap().into_number().unwrap().into_usize().unwrap() as f32];
-        let side_panel_width = serialized.into_object().unwrap().get("side_panel_width").unwrap().into_number().unwrap().into_usize().unwrap() as f32;
+        let size = [
+            size_array
+                .get(0)
+                .unwrap()
+                .into_number()
+                .unwrap()
+                .into_usize()
+                .unwrap() as f32,
+            size_array
+                .get(1)
+                .unwrap()
+                .into_number()
+                .unwrap()
+                .into_usize()
+                .unwrap() as f32,
+        ];
+        let side_panel_width = serialized
+            .into_object()
+            .unwrap()
+            .get("side_panel_width")
+            .unwrap()
+            .into_number()
+            .unwrap()
+            .into_usize()
+            .unwrap() as f32;
         Self {
             size,
             side_panel_width,
@@ -374,7 +518,13 @@ impl SizeSettings {
 
     pub fn serialize(&self) -> XffValue {
         let mut serialized = nabu::Object::new();
-        serialized.insert("size", XffValue::from(vec![XffValue::from(self.size[0]), XffValue::from(self.size[1])]));
+        serialized.insert(
+            "size",
+            XffValue::from(vec![
+                XffValue::from(self.size[0]),
+                XffValue::from(self.size[1]),
+            ]),
+        );
         serialized.insert("side_panel_width", XffValue::from(self.side_panel_width));
         XffValue::from(serialized)
     }

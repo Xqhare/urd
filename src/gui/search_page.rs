@@ -1,5 +1,7 @@
-
-use eframe::{egui::{self, CentralPanel, ScrollArea, TextEdit, TopBottomPanel, Ui}, Frame};
+use eframe::{
+    egui::{self, CentralPanel, ScrollArea, TextEdit, TopBottomPanel, Ui},
+    Frame,
+};
 
 use super::UrdState;
 
@@ -24,7 +26,11 @@ impl UrdState {
                     if ui.button("Search").clicked() {
                         self.search_current_query();
                     }
-                    let t = ui.add(TextEdit::singleline(&mut self.search.query).hint_text("Enter search query, separated by commas").desired_width(f32::INFINITY));
+                    let t = ui.add(
+                        TextEdit::singleline(&mut self.search.query)
+                            .hint_text("Enter search query, separated by commas")
+                            .desired_width(f32::INFINITY),
+                    );
                     t.request_focus();
                     if t.changed() {
                         self.search_current_query();
@@ -105,19 +111,20 @@ impl UrdState {
                                         }
                                     }
                                 }
-                                
+
                                 let special = journal_entry.metadata.get("special_tags");
                                 if special.is_some() {
                                     let special_obj = special.unwrap().into_object();
                                     if special_obj.is_some() {
                                         for (key, value) in special_obj.unwrap().iter() {
-                                            if key.contains(token) || value.into_string().unwrap().contains(token) {
+                                            if key.contains(token)
+                                                || value.into_string().unwrap().contains(token)
+                                            {
                                                 out = true;
                                             }
                                         }
                                     }
                                 }
-                                
                             };
                             out
                         };

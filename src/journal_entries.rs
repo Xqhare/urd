@@ -1,9 +1,12 @@
-use std::{collections::{BTreeMap, VecDeque}, path::Path, usize};
+use std::{
+    collections::{BTreeMap, VecDeque},
+    path::Path,
+    usize,
+};
 
 use nabu::{Array, Object, XffValue};
 
 use crate::{paths::JOURNAL_FILE, settings::Settings};
-
 
 #[derive(Clone, Debug)]
 pub enum EntryType {
@@ -103,21 +106,33 @@ impl Folder {
     pub fn serialize(&self) -> Object {
         let mut out = Object::new();
         out.insert("name", XffValue::String(self.name.clone()));
-        out.insert("entries", XffValue::Array(self.entries.iter().map(|e| e.serialize()).collect()));
+        out.insert(
+            "entries",
+            XffValue::Array(self.entries.iter().map(|e| e.serialize()).collect()),
+        );
         out
     }
 
     pub fn deserialize(value: &XffValue) -> Self {
-        let name = value.into_object().unwrap().get("name").unwrap().into_string().unwrap();
-        let entries = value.into_object().unwrap().get("entries").unwrap().into_array().unwrap();
+        let name = value
+            .into_object()
+            .unwrap()
+            .get("name")
+            .unwrap()
+            .into_string()
+            .unwrap();
+        let entries = value
+            .into_object()
+            .unwrap()
+            .get("entries")
+            .unwrap()
+            .into_array()
+            .unwrap();
         let mut out = VecDeque::new();
         for entry in entries {
             out.push_back(EntryType::deserialize(&entry));
         }
-        Self {
-            name,
-            entries: out,
-        }
+        Self { name, entries: out }
     }
 }
 
@@ -137,9 +152,13 @@ impl Journal {
         };
         let mut month_folder = Folder::new(month.to_string());
         let current_entry = JournalEntry::new(settings);
-        month_folder.entries.push_back(EntryType::JournalEntry(current_entry.clone()));
+        month_folder
+            .entries
+            .push_back(EntryType::JournalEntry(current_entry.clone()));
         let mut year_folder = Folder::new(year.to_string());
-        year_folder.entries.push_back(EntryType::Folder(month_folder));
+        year_folder
+            .entries
+            .push_back(EntryType::Folder(month_folder));
         let entries = VecDeque::from([EntryType::Folder(year_folder)]);
         Self {
             entries,
@@ -159,10 +178,7 @@ impl Journal {
     pub fn load(settings: &Settings) -> Result<Self, String> {
         let data = nabu::serde::read(JOURNAL_FILE);
         match data {
-            Ok(d) => {
-                Ok(Journal::deserialize(&d, settings))
-
-            }
+            Ok(d) => Ok(Journal::deserialize(&d, settings)),
             Err(e) => Err(e.to_string()),
         }
     }
@@ -181,7 +197,13 @@ impl Journal {
     }
 
     fn deserialize(read_value: &XffValue, settings: &Settings) -> Self {
-        let all_entries = read_value.into_object().unwrap().get("entries").unwrap().into_array().unwrap();
+        let all_entries = read_value
+            .into_object()
+            .unwrap()
+            .get("entries")
+            .unwrap()
+            .into_array()
+            .unwrap();
         let mut entries = VecDeque::new();
         for entry in all_entries {
             entries.push_back(EntryType::deserialize(&entry));
@@ -189,29 +211,92 @@ impl Journal {
         let last_entry = {
             let last_year = entries.front().unwrap().get_folder().unwrap();
             let last_month = last_year.entries.front().unwrap().get_folder().unwrap();
-            let last_entry = last_month.entries.front().unwrap().get_journal_entry().unwrap();
+            let last_entry = last_month
+                .entries
+                .front()
+                .unwrap()
+                .get_journal_entry()
+                .unwrap();
             let mut current_date = horae::Utc::now();
             current_date.with_timezone(settings.timezone.timezone);
 
-            if current_date.date().year as usize == last_entry.metadata.get("date").unwrap().into_object().unwrap().get("year").unwrap().into_number().unwrap().into_usize().unwrap() {
+            if current_date.date().year as usize
+                == last_entry
+                    .metadata
+                    .get("date")
+                    .unwrap()
+                    .into_object()
+                    .unwrap()
+                    .get("year")
+                    .unwrap()
+                    .into_number()
+                    .unwrap()
+                    .into_usize()
+                    .unwrap()
+            {
                 // Current year
-                if current_date.date().month as usize == last_entry.metadata.get("date").unwrap().into_object().unwrap().get("month").unwrap().into_number().unwrap().into_usize().unwrap() {
+                if current_date.date().month as usize
+                    == last_entry
+                        .metadata
+                        .get("date")
+                        .unwrap()
+                        .into_object()
+                        .unwrap()
+                        .get("month")
+                        .unwrap()
+                        .into_number()
+                        .unwrap()
+                        .into_usize()
+                        .unwrap()
+                {
                     // Current month
-                    if current_date.date().day as usize == last_entry.metadata.get("date").unwrap().into_object().unwrap().get("day").unwrap().into_number().unwrap().into_usize().unwrap() {
+                    if current_date.date().day as usize
+                        == last_entry
+                            .metadata
+                            .get("date")
+                            .unwrap()
+                            .into_object()
+                            .unwrap()
+                            .get("day")
+                            .unwrap()
+                            .into_number()
+                            .unwrap()
+                            .into_usize()
+                            .unwrap()
+                    {
                         // Current day
                         last_entry.clone()
                     } else {
                         // New day
                         let out = JournalEntry::new(settings);
-                        entries.front_mut().unwrap().get_folder_mut().unwrap().entries.front_mut().unwrap().get_folder_mut().unwrap().entries.push_front(EntryType::JournalEntry(out.clone()));
+                        entries
+                            .front_mut()
+                            .unwrap()
+                            .get_folder_mut()
+                            .unwrap()
+                            .entries
+                            .front_mut()
+                            .unwrap()
+                            .get_folder_mut()
+                            .unwrap()
+                            .entries
+                            .push_front(EntryType::JournalEntry(out.clone()));
                         out
                     }
                 } else {
                     // New month
                     let mut new_month_folder = Folder::new(current_date.date().month.to_string());
                     let out = JournalEntry::new(settings);
-                    new_month_folder.entries.push_front(EntryType::JournalEntry(out.clone()));
-                    entries.front_mut().unwrap().get_folder_mut().unwrap().entries.push_front(EntryType::Folder(new_month_folder));
+                    new_month_folder
+                        .entries
+                        .push_front(EntryType::JournalEntry(out.clone()));
+                    entries
+                        .front_mut()
+                        .unwrap()
+                        .get_folder_mut()
+                        .unwrap()
+                        .entries
+                        .push_front(EntryType::Folder(new_month_folder));
                     out
                 }
             } else {
@@ -219,8 +304,12 @@ impl Journal {
                 let mut new_month_folder = Folder::new(current_date.date().month.to_string());
                 let mut new_year_folder = Folder::new(current_date.date().year.to_string());
                 let out = JournalEntry::new(settings);
-                new_month_folder.entries.push_front(EntryType::JournalEntry(out.clone()));
-                new_year_folder.entries.push_front(EntryType::Folder(new_month_folder));
+                new_month_folder
+                    .entries
+                    .push_front(EntryType::JournalEntry(out.clone()));
+                new_year_folder
+                    .entries
+                    .push_front(EntryType::Folder(new_month_folder));
                 entries.push_front(EntryType::Folder(new_year_folder));
                 out
             }
@@ -262,8 +351,13 @@ impl Journal {
                 }
                 let month_folder = month.get_folder().unwrap();
                 for entry in &month_folder.entries {
-                    let entry_file = month_dir.with_file_name(entry.get_journal_entry().unwrap().title.clone()).with_extension("txt");
-                    let pos_err4 = std::fs::write(entry_file.clone(), entry.get_journal_entry().unwrap().text.clone());
+                    let entry_file = month_dir
+                        .with_file_name(entry.get_journal_entry().unwrap().title.clone())
+                        .with_extension("txt");
+                    let pos_err4 = std::fs::write(
+                        entry_file.clone(),
+                        entry.get_journal_entry().unwrap().text.clone(),
+                    );
                     if pos_err4.is_err() {
                         return Err(pos_err4.unwrap_err().to_string());
                     }
@@ -300,7 +394,6 @@ impl Journal {
             Ok(d) => {
                 *self = Journal::deserialize(&d, &settings);
                 Ok(())
-
             }
             Err(e) => Err(e.to_string()),
         }
@@ -359,9 +452,28 @@ impl JournalEntry {
     }
 
     pub fn deserialize(serialized: &XffValue) -> Self {
-        let title = serialized.into_object().unwrap().get("title").unwrap().into_string().unwrap();
-        let text = serialized.into_object().unwrap().get("text").unwrap().into_string().unwrap();
-        let metadata = serialized.into_object().unwrap().get("metadata").unwrap().into_object().unwrap().into_btree_map();
+        let title = serialized
+            .into_object()
+            .unwrap()
+            .get("title")
+            .unwrap()
+            .into_string()
+            .unwrap();
+        let text = serialized
+            .into_object()
+            .unwrap()
+            .get("text")
+            .unwrap()
+            .into_string()
+            .unwrap();
+        let metadata = serialized
+            .into_object()
+            .unwrap()
+            .get("metadata")
+            .unwrap()
+            .into_object()
+            .unwrap()
+            .into_btree_map();
         Self {
             title,
             text,
@@ -372,10 +484,22 @@ impl JournalEntry {
     pub fn overwrite(&mut self, serialized: String) {
         self.text = serialized.clone();
         let new_metadata = deserialize_entry_metadata(serialized);
-        self.metadata.insert("project_tags".to_string(), new_metadata.get("project_tags").unwrap().clone());
-        self.metadata.insert("context_tags".to_string(), new_metadata.get("context_tags").unwrap().clone());
-        self.metadata.insert("special_tags".to_string(), new_metadata.get("special_tags").unwrap().clone());
-        self.metadata.insert("bespoke_tags".to_string(), new_metadata.get("bespoke_tags").unwrap().clone());
+        self.metadata.insert(
+            "project_tags".to_string(),
+            new_metadata.get("project_tags").unwrap().clone(),
+        );
+        self.metadata.insert(
+            "context_tags".to_string(),
+            new_metadata.get("context_tags").unwrap().clone(),
+        );
+        self.metadata.insert(
+            "special_tags".to_string(),
+            new_metadata.get("special_tags").unwrap().clone(),
+        );
+        self.metadata.insert(
+            "bespoke_tags".to_string(),
+            new_metadata.get("bespoke_tags").unwrap().clone(),
+        );
     }
 
     pub fn reset(&mut self) {
@@ -402,7 +526,7 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
     let mut bespoke_tags: Vec<XffValue> = Vec::new();
     let mut special_tags: Object = Object::new();
     let mut metadata: BTreeMap<String, XffValue> = BTreeMap::new();
-    
+
     for word in text.split_whitespace() {
         // Check if a word starts with + or @, or has a : wrapped in it
         if word.starts_with("+") && word.len() > 1 {
@@ -420,10 +544,19 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
             bespoke_tags.push(XffValue::String(word.to_string()));
         }
     }
-    metadata.insert("project_tags".to_string(), XffValue::Array(Array::from(project_tags)));
-    metadata.insert("context_tags".to_string(), XffValue::Array(Array::from(context_tags)));
+    metadata.insert(
+        "project_tags".to_string(),
+        XffValue::Array(Array::from(project_tags)),
+    );
+    metadata.insert(
+        "context_tags".to_string(),
+        XffValue::Array(Array::from(context_tags)),
+    );
     metadata.insert("special_tags".to_string(), XffValue::from(special_tags));
-    metadata.insert("bespoke_tags".to_string(), XffValue::Array(Array::from(bespoke_tags)));
+    metadata.insert(
+        "bespoke_tags".to_string(),
+        XffValue::Array(Array::from(bespoke_tags)),
+    );
     metadata
 }
 
@@ -431,43 +564,303 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
 fn deserialize_metadata() {
     let str0 = "+project1 +project2 @context1 @context2 key1:val1 key2:val2 #tag1 #tag2";
     let metadata0 = deserialize_entry_metadata(str0.to_string());
-    assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().len(), 2);
-    assert_eq!(metadata0.get("context_tags").unwrap().into_array().unwrap().len(), 2);
-    assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().len(), 2);
-    assert_eq!(metadata0.get("bespoke_tags").unwrap().into_array().unwrap().len(), 2);
+    assert_eq!(
+        metadata0
+            .get("project_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        2
+    );
+    assert_eq!(
+        metadata0
+            .get("context_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        2
+    );
+    assert_eq!(
+        metadata0
+            .get("special_tags")
+            .unwrap()
+            .into_object()
+            .unwrap()
+            .len(),
+        2
+    );
+    assert_eq!(
+        metadata0
+            .get("bespoke_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        2
+    );
 
-    assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "+project1");
-    assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().get(1).unwrap().into_string().unwrap(), "+project2");
-    assert_eq!(metadata0.get("context_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "@context1");
-    assert_eq!(metadata0.get("context_tags").unwrap().into_array().unwrap().get(1).unwrap().into_string().unwrap(), "@context2");
-    assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().get("key1").unwrap().into_string().unwrap(), "val1");
-    assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().get("key2").unwrap().into_string().unwrap(), "val2");
-    assert_eq!(metadata0.get("bespoke_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "#tag1");
-    assert_eq!(metadata0.get("bespoke_tags").unwrap().into_array().unwrap().get(1).unwrap().into_string().unwrap(), "#tag2");
+    assert_eq!(
+        metadata0
+            .get("project_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(0)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "+project1"
+    );
+    assert_eq!(
+        metadata0
+            .get("project_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(1)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "+project2"
+    );
+    assert_eq!(
+        metadata0
+            .get("context_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(0)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "@context1"
+    );
+    assert_eq!(
+        metadata0
+            .get("context_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(1)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "@context2"
+    );
+    assert_eq!(
+        metadata0
+            .get("special_tags")
+            .unwrap()
+            .into_object()
+            .unwrap()
+            .get("key1")
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "val1"
+    );
+    assert_eq!(
+        metadata0
+            .get("special_tags")
+            .unwrap()
+            .into_object()
+            .unwrap()
+            .get("key2")
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "val2"
+    );
+    assert_eq!(
+        metadata0
+            .get("bespoke_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(0)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "#tag1"
+    );
+    assert_eq!(
+        metadata0
+            .get("bespoke_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(1)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "#tag2"
+    );
 
     let str1 = "This may not crash if feed only text";
     let metadata1 = deserialize_entry_metadata(str1.to_string());
-    assert_eq!(metadata1.get("project_tags").unwrap().into_array().unwrap().len(), 0);
-    assert_eq!(metadata1.get("context_tags").unwrap().into_array().unwrap().len(), 0);
-    assert_eq!(metadata1.get("special_tags").unwrap().into_object().unwrap().len(), 0);
-    assert_eq!(metadata1.get("bespoke_tags").unwrap().into_array().unwrap().len(), 0);
+    assert_eq!(
+        metadata1
+            .get("project_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        0
+    );
+    assert_eq!(
+        metadata1
+            .get("context_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        0
+    );
+    assert_eq!(
+        metadata1
+            .get("special_tags")
+            .unwrap()
+            .into_object()
+            .unwrap()
+            .len(),
+        0
+    );
+    assert_eq!(
+        metadata1
+            .get("bespoke_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        0
+    );
 
     let str2 = "This is @an +actual test:123 #124";
     let metadata2 = deserialize_entry_metadata(str2.to_string());
-    assert_eq!(metadata2.get("project_tags").unwrap().into_array().unwrap().len(), 1);
-    assert_eq!(metadata2.get("context_tags").unwrap().into_array().unwrap().len(), 1);
-    assert_eq!(metadata2.get("special_tags").unwrap().into_object().unwrap().len(), 1);
-    assert_eq!(metadata2.get("bespoke_tags").unwrap().into_array().unwrap().len(), 1);
+    assert_eq!(
+        metadata2
+            .get("project_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        metadata2
+            .get("context_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        metadata2
+            .get("special_tags")
+            .unwrap()
+            .into_object()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        metadata2
+            .get("bespoke_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        1
+    );
 
-    assert_eq!(metadata2.get("project_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "+actual");
-    assert_eq!(metadata2.get("context_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "@an");
-    assert_eq!(metadata2.get("special_tags").unwrap().into_object().unwrap().get("test").unwrap().into_string().unwrap(), "123");
-    assert_eq!(metadata2.get("bespoke_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "#124");
+    assert_eq!(
+        metadata2
+            .get("project_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(0)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "+actual"
+    );
+    assert_eq!(
+        metadata2
+            .get("context_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(0)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "@an"
+    );
+    assert_eq!(
+        metadata2
+            .get("special_tags")
+            .unwrap()
+            .into_object()
+            .unwrap()
+            .get("test")
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "123"
+    );
+    assert_eq!(
+        metadata2
+            .get("bespoke_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .get(0)
+            .unwrap()
+            .into_string()
+            .unwrap(),
+        "#124"
+    );
 
     let str3 = "This may not result in any tags: 15 + 5 = 20, test@mail.com #";
     let metadata3 = deserialize_entry_metadata(str3.to_string());
-    assert_eq!(metadata3.get("project_tags").unwrap().into_array().unwrap().len(), 0);
-    assert_eq!(metadata3.get("context_tags").unwrap().into_array().unwrap().len(), 0);
-    assert_eq!(metadata3.get("special_tags").unwrap().into_object().unwrap().len(), 0);
-    assert_eq!(metadata3.get("bespoke_tags").unwrap().into_array().unwrap().len(), 0);
+    assert_eq!(
+        metadata3
+            .get("project_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        0
+    );
+    assert_eq!(
+        metadata3
+            .get("context_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        0
+    );
+    assert_eq!(
+        metadata3
+            .get("special_tags")
+            .unwrap()
+            .into_object()
+            .unwrap()
+            .len(),
+        0
+    );
+    assert_eq!(
+        metadata3
+            .get("bespoke_tags")
+            .unwrap()
+            .into_array()
+            .unwrap()
+            .len(),
+        0
+    );
 }

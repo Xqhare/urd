@@ -1,6 +1,5 @@
 use crate::journal_entries::JournalEntry;
 
-
 pub struct Search {
     pub query: String,
     pub results: Vec<JournalEntry>,

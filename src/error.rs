@@ -1,4 +1,3 @@
-
 #[derive(Clone, Debug)]
 pub struct Error {
     pub show_error: bool,

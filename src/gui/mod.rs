@@ -1,6 +1,10 @@
-
 use crate::{
-    error::Error, journal_entries::Journal, render::{Render, ShowFolder}, search::Search, settings::{NeededPath, Settings}, startup::StartupState
+    error::Error,
+    journal_entries::Journal,
+    render::{Render, ShowFolder},
+    search::Search,
+    settings::{NeededPath, Settings},
+    startup::StartupState,
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -10,13 +14,13 @@ use eframe::{
 use egui::{Align, Id, Modal, TextEdit, TopBottomPanel};
 
 mod about;
+mod file_picker;
 mod help;
 mod licenses;
-mod settings;
 mod main_page;
 mod main_page_side_panel;
 mod search_page;
-mod file_picker;
+mod settings;
 
 const APP_NAME: &str = "Urd";
 
@@ -69,7 +73,6 @@ impl App for UrdState {
 }
 
 impl UrdState {
-
     fn protected_mode(&mut self, ctx: &egui::Context, frame: &mut Frame) {
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             ui.add_space(ui.available_height() / 3.0);
@@ -81,16 +84,30 @@ impl UrdState {
                         ui.group(|ui: &mut Ui| {
                             ui.heading("Welcome to Urd");
                             ui.vertical_centered(|ui: &mut Ui| {
-                                let tmp = ui.add(TextEdit::singleline(&mut self.settings.password.password_input).password(true).hint_text("Please enter your password").horizontal_align(Align::Center));
+                                let tmp = ui.add(
+                                    TextEdit::singleline(
+                                        &mut self.settings.password.password_input,
+                                    )
+                                    .password(true)
+                                    .hint_text("Please enter your password")
+                                    .horizontal_align(Align::Center),
+                                );
                                 tmp.request_focus();
                                 if tmp.changed() {
-                                    if self.settings.password.password_input.len() >= self.settings.password.password.len() {
-                                        if self.settings.password.password == self.settings.password.password_input {
+                                    if self.settings.password.password_input.len()
+                                        >= self.settings.password.password.len()
+                                    {
+                                        if self.settings.password.password
+                                            == self.settings.password.password_input
+                                        {
                                             self.settings.password.unlocked_with_password = true;
                                             self.settings.password.password_input = "".to_string();
                                             self.error = Error::default();
                                         } else {
-                                            self.error = Error::new("Incorrect password".to_string(), "Unlocking Urd failed.".to_string());
+                                            self.error = Error::new(
+                                                "Incorrect password".to_string(),
+                                                "Unlocking Urd failed.".to_string(),
+                                            );
                                             self.settings.password.password_input = "".to_string();
                                         }
                                     } else {
@@ -103,7 +120,8 @@ impl UrdState {
                             });
                         });
                     });
-                }).response
+                })
+                .response
             })
         });
     }
@@ -117,7 +135,7 @@ impl UrdState {
         } else {
             self.main_page(ctx, frame);
         }
-        
+
         if self
             .render
             .viewports
@@ -161,15 +179,21 @@ impl UrdState {
                                 }
                             }
                             if ui.button("About").clicked() {
-                                self.render.viewports.show_about_viewport
+                                self.render
+                                    .viewports
+                                    .show_about_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                             if ui.button("Licenses").clicked() {
-                                self.render.viewports.show_licenses_viewport
+                                self.render
+                                    .viewports
+                                    .show_licenses_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                             if ui.button("Help").clicked() {
-                                self.render.viewports.show_help_viewport
+                                self.render
+                                    .viewports
+                                    .show_help_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                         });
@@ -183,12 +207,18 @@ impl UrdState {
                             }
                             if ui.button("Export").clicked() {
                                 if self.settings.custom_paths.export_directory != "" {
-                                    let pos_err = self.journal.export(&self.settings.custom_paths.export_directory);
+                                    let pos_err = self
+                                        .journal
+                                        .export(&self.settings.custom_paths.export_directory);
                                     if pos_err.is_err() {
-                                        self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal export to disk failed.".to_string());
+                                        self.error = Error::new(
+                                            pos_err.unwrap_err().to_string(),
+                                            "Writing journal export to disk failed.".to_string(),
+                                        );
                                     }
                                 } else {
-                                    self.settings.custom_paths.needed_path = Some(NeededPath::Export);
+                                    self.settings.custom_paths.needed_path =
+                                        Some(NeededPath::Export);
                                     self.render.viewports.show_file_picker = true;
                                 }
                             }
@@ -196,18 +226,26 @@ impl UrdState {
                                 if ui.button("Create").clicked() {
                                     if self.settings.custom_paths.backup_directory != "" {
                                         // Backup already set up
-                                        let pos_err = self.journal.create_backup(&self.settings, &self.settings.custom_paths.backup_directory);
+                                        let pos_err = self.journal.create_backup(
+                                            &self.settings,
+                                            &self.settings.custom_paths.backup_directory,
+                                        );
                                         if pos_err.is_err() {
-                                            self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal backup to disk failed.".to_string());
+                                            self.error = Error::new(
+                                                pos_err.unwrap_err().to_string(),
+                                                "Writing journal backup to disk failed."
+                                                    .to_string(),
+                                            );
                                         }
                                     } else {
-                                        self.settings.custom_paths.needed_path = Some(NeededPath::Backup);
+                                        self.settings.custom_paths.needed_path =
+                                            Some(NeededPath::Backup);
                                         self.render.viewports.show_file_picker = true;
                                     }
-
                                 }
                                 if ui.button("Restore").clicked() {
-                                    self.settings.custom_paths.needed_path = Some(NeededPath::Restore);
+                                    self.settings.custom_paths.needed_path =
+                                        Some(NeededPath::Restore);
                                     self.render.viewports.show_file_picker = true;
                                 }
                             });
@@ -230,7 +268,8 @@ impl UrdState {
                                 self.render.viewports.show_file_picker = false;
                             };
                         }
-                    }).response
+                    })
+                    .response
                 });
                 ui.add_space(ui.available_width() / 2.5);
                 if self.error.show_error {
@@ -277,7 +316,13 @@ pub fn gui_startup(startup_state: StartupState) {
     run_native(
         APP_NAME,
         native_options,
-        Box::new(|_cc| Ok(Box::<UrdState>::new(UrdState::new(startup_state.settings, startup_state.journal, startup_state.error)))),
+        Box::new(|_cc| {
+            Ok(Box::<UrdState>::new(UrdState::new(
+                startup_state.settings,
+                startup_state.journal,
+                startup_state.error,
+            )))
+        }),
     )
     .expect("E 01");
 }
