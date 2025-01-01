@@ -1,6 +1,6 @@
 
 use crate::{
-    error::Error, journal_entries::Journal, render::{Render, ShowFolder}, search::Search, settings::Settings, startup::StartupState
+    error::Error, journal_entries::Journal, render::{Render, ShowFolder}, search::Search, settings::{NeededPath, Settings}, startup::StartupState
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -16,6 +16,7 @@ mod settings;
 mod main_page;
 mod main_page_side_panel;
 mod search_page;
+mod file_picker;
 
 const APP_NAME: &str = "Urd";
 
@@ -111,6 +112,8 @@ impl UrdState {
         self.main_top_panel(ctx, frame);
         if self.render.viewports.show_search_page {
             self.search_page(ctx, frame);
+        } else if self.render.viewports.show_file_picker {
+            self.file_picker(ctx, frame);
         } else {
             self.main_page(ctx, frame);
         }
@@ -179,12 +182,53 @@ impl UrdState {
                                 }
                             }
                             if ui.button("Export").clicked() {
+                                if self.settings.custom_paths.export_directory != "" {
+                                    let pos_err = self.journal.export();
+                                    if pos_err.is_err() {
+                                        self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal export to disk failed.".to_string());
+                                    }
+                                } else {
+                                    self.settings.custom_paths.needed_path = Some(NeededPath::Export);
+                                    self.render.viewports.show_file_picker = true;
+                                    if !self.render.viewports.show_file_picker {
+                                        let pos_err = self.journal.export();
+                                        if pos_err.is_err() {
+                                            self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal export to disk failed.".to_string());
+                                        }
+                                    }
+                                }
                             }
                             ui.menu_button("Backup", |ui: &mut Ui| {
                                 if ui.button("Create").clicked() {
+                                    if self.settings.custom_paths.backup_directory != "" {
+                                        // Backup already set up
+                                        let pos_err = self.journal.create_backup();
+                                        if pos_err.is_err() {
+                                            self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal backup to disk failed.".to_string());
+                                        }
+                                    } else {
+                                        self.settings.custom_paths.needed_path = Some(NeededPath::Backup);
+                                        self.render.viewports.show_file_picker = true;
+                                        if !self.render.viewports.show_file_picker {
+                                            let pos_err = self.journal.create_backup();
+                                            if pos_err.is_err() {
+                                                self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing journal backup to disk failed.".to_string());
+                                            }
+                                        }
+                                    }
 
                                 }
                                 if ui.button("Restore").clicked() {
+                                    // Restore_file is always empthy, I need to call the file
+                                    // picker always
+                                    self.settings.custom_paths.needed_path = Some(NeededPath::Restore);
+                                    self.render.viewports.show_file_picker = true;
+                                    if !self.render.viewports.show_file_picker {
+                                        let pos_err = self.journal.restore_backup();
+                                        if pos_err.is_err() {
+                                            self.error = Error::new(pos_err.unwrap_err().to_string(), "Restoring journal from disk failed.".to_string());
+                                        }
+                                    }
 
                                 }
                             });
@@ -201,6 +245,11 @@ impl UrdState {
                             if ui.button("Lock Urd").clicked() {
                                 self.settings.password.unlocked_with_password = false;
                             }
+                        }
+                        if self.render.viewports.show_file_picker {
+                            if ui.button("Exit file picker").clicked() {
+                                self.render.viewports.show_file_picker = false;
+                            };
                         }
                     }).response
                 });

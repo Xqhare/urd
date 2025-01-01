@@ -23,6 +23,7 @@ pub struct Settings {
     pub timezone: TimezoneStore,
     pub gui: Gui,
     pub custom_paths: CustomPaths,
+    pub automatic_backups: bool,
     // Not part of persistent state
     pub overwrite_window_size: bool,
     pub overwrite_window_size_store: [String; 2],
@@ -46,6 +47,7 @@ impl Default for Settings {
             custom_paths: CustomPaths::default(),
             // default true
             // default false
+            automatic_backups: false,
             overwrite_window_size: false,
             overwrite_side_panel_width: false,
         }
@@ -75,6 +77,9 @@ impl Settings {
         let custom_paths = self.custom_paths.serialize();
         serialized.insert("custom_paths", custom_paths);
 
+        let automatic_backups = XffValue::from(self.automatic_backups);
+        serialized.insert("automatic_backups", automatic_backups);
+
         XffValue::from(serialized)
     }
 
@@ -102,10 +107,12 @@ impl Settings {
         let password = deserialized.get("password").unwrap().into_string().unwrap();
         let gui = Gui::deserialize(&deserialized.get("gui").unwrap());
         let custom_paths = CustomPaths::deserialize(&deserialized.get("custom_paths").unwrap());
+        let automatic_backups = deserialized.get("automatic_backups").unwrap().into_boolean().unwrap();
         Ok(Settings {
             font,
             gui,
             custom_paths,
+            automatic_backups,
             timezone: TimezoneStore::new(tz),
             password: Password::new(password),
             overwrite_window_size: false,
@@ -117,11 +124,19 @@ impl Settings {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum NeededPath {
+    Backup,
+    Export,
+    Restore,
+}
+
 #[derive(Clone, Debug)]
 pub struct CustomPaths {
     pub backup_directory: String,
     pub export_directory: String,
-    pub import_directory: String,
+    pub restore_file: String,
+    pub needed_path: Option<NeededPath>,
 }
 
 impl Default for CustomPaths {
@@ -129,7 +144,8 @@ impl Default for CustomPaths {
         Self {
             backup_directory: "".to_string(),
             export_directory: "".to_string(),
-            import_directory: "".to_string(),
+            restore_file: "".to_string(),
+            needed_path: None,
         }
     }
     
@@ -140,18 +156,17 @@ impl CustomPaths {
         let mut serialized = nabu::Object::new();
         serialized.insert("backup_directory", XffValue::from(self.backup_directory.clone()));
         serialized.insert("export_directory", XffValue::from(self.export_directory.clone()));
-        serialized.insert("import_directory", XffValue::from(self.import_directory.clone()));
         XffValue::from(serialized)
     }
 
     pub fn deserialize(serialized: &XffValue) -> Self {
         let backup_directory = serialized.into_object().unwrap().get("backup_directory").unwrap().into_string().unwrap();
         let export_directory = serialized.into_object().unwrap().get("export_directory").unwrap().into_string().unwrap();
-        let import_directory = serialized.into_object().unwrap().get("import_directory").unwrap().into_string().unwrap();
         Self {
             backup_directory,
             export_directory,
-            import_directory,
+            restore_file: "".to_string(),
+            needed_path: None,
         }
     }
 }

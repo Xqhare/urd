@@ -239,6 +239,14 @@ impl Journal {
     pub fn export(&self) -> Result<(), String> {
         todo!("export journal into a directory with the same structure as journal, but with the journal entries as .txt / .md files")
     }
+
+    pub fn create_backup(&self) -> Result<(), String> {
+        todo!("create a backup of the journal")
+    }
+
+    pub fn restore_backup(&self) -> Result<(), String> {
+        todo!("restore a backup of the journal")
+    }
 }
 
 #[derive(Clone, Debug)]

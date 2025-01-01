@@ -2,7 +2,7 @@
 use eframe::egui::{Align, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider, TextEdit, Ui};
 use horae::TimeZone;
 
-use crate::{error::Error, settings::{Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE}};
+use crate::{error::Error, settings::{self, NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE}};
 
 use super::UrdState;
 
@@ -265,7 +265,6 @@ impl UrdState {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("File marker Settings");
                                 let year = horae::Utc::now().date().year.to_string();
-                                ui.separator();
                                 ui.label("Current file marker").on_hover_text("Used for the current day / month / year.");
                                 Grid::new("current_file_marker").num_columns(2).show(ui, |ui: &mut Ui| {
                                     ui.label("Start: ");
@@ -317,6 +316,45 @@ impl UrdState {
                                 });
                             }).response
                         });
+
+                        if self.settings.custom_paths.backup_directory != "" {
+                            ui.add(|ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.label("Backup settings");
+                                    Grid::new("backup_settings").num_columns(2).show(ui, |ui: &mut Ui| {
+                                        ui.label("Path: ");
+                                        ui.add(TextEdit::singleline(&mut self.settings.custom_paths.backup_directory).horizontal_align(Align::Center));
+                                        ui.end_row();
+                                        ui.label("Automatic backup");
+                                        ui.checkbox(&mut self.settings.automatic_backups, "Every launch");
+                                        ui.end_row();
+                                    });
+                                    if ui.button("Launch backup wizard").clicked() {
+                                        self.render.viewports.show_file_picker = true;
+                                        self.settings.custom_paths.needed_path = Some(NeededPath::Backup);
+                                        self.render.viewports.show_settings_viewport = false;
+                                    }
+                                }).response
+                            });
+                        }
+
+                        if self.settings.custom_paths.export_directory != "" {
+                            ui.add(|ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.label("Export settings");
+                                    Grid::new("export_settings").num_columns(2).show(ui, |ui: &mut Ui| {
+                                        ui.label("Path: ");
+                                        ui.add(TextEdit::singleline(&mut self.settings.custom_paths.export_directory).horizontal_align(Align::Center));
+                                        ui.end_row();
+                                    });
+                                    if ui.button("Launch export wizard").clicked() {
+                                        self.render.viewports.show_file_picker = true;
+                                        self.settings.custom_paths.needed_path = Some(NeededPath::Export);
+                                        self.render.viewports.show_settings_viewport = false;
+                                    }
+                                }).response
+                            });
+                        }
 
                     });
                 })
