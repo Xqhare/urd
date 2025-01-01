@@ -38,7 +38,7 @@ impl UrdState {
                                         if but.clicked() {
                                             let save = self.settings.save();
                                             if save.is_err() {
-                                                self.error = Error::new(save.unwrap_err().to_string());
+                                                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
                                                 self.settings.overwrite_side_panel_width = false;
@@ -52,7 +52,7 @@ impl UrdState {
                                         if but.clicked() {
                                             let save = self.settings.save();
                                             if save.is_err() {
-                                                self.error = Error::new(save.unwrap_err().to_string());
+                                                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
                                                 self.render.viewports.show_settings_viewport = false;
@@ -68,7 +68,7 @@ impl UrdState {
                                     self.settings_backup = Some(self.settings.clone());
                                     let save = self.settings.save();
                                     if save.is_err() {
-                                        self.error = Error::new(save.unwrap_err().to_string());
+                                        self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                     }
                                 };
                             }).response
@@ -97,10 +97,15 @@ impl UrdState {
                                         }).response
                                     });
                                     if self.settings.overwrite_window_size {
-                                        let overwrite_width = self.settings.overwrite_window_size_store[0].parse();
-                                        let overwrite_height = self.settings.overwrite_window_size_store[1].parse();
-                                        if overwrite_width.is_err() || overwrite_height.is_err() {
-                                            self.error = Error::new("Invalid window size - Not a number".to_string());
+                                        let overwrite_width = self.settings.overwrite_window_size_store[0].parse::<f32>();
+                                        let overwrite_height = self.settings.overwrite_window_size_store[1].parse::<f32>();
+                                        if overwrite_height.is_err() {
+                                            self.error = Error::new(format!("{} = {}", self.settings.overwrite_window_size_store[1], overwrite_height.unwrap_err()), "Invalid window size height input".to_string());
+                                            self.settings.overwrite_window_size_store[1] = self.settings.overwrite_window_size_store[0].clone();
+                                            return;
+                                        } else if overwrite_width.is_err() {
+                                            self.error = Error::new(format!("{} = {}", self.settings.overwrite_window_size_store[0], overwrite_width.unwrap_err()), "Invalid window size width input".to_string());
+                                            self.settings.overwrite_window_size_store[0] = self.settings.overwrite_window_size_store[1].clone();
                                             return;
                                         } else {
                                             self.settings.size.size[0] = overwrite_width.unwrap();
@@ -120,9 +125,10 @@ impl UrdState {
                                         }).response
                                     });
                                     if self.settings.overwrite_side_panel_width {
-                                        let overwrite_panel_width = self.settings.overwrite_side_panel_width_store.parse();
+                                        let overwrite_panel_width = self.settings.overwrite_side_panel_width_store.parse::<f32>();
                                         if overwrite_panel_width.is_err() {
-                                            self.error = Error::new("Invalid side panel size - Not a number".to_string());
+                                            self.error = Error::new(format!("{} = {}", self.settings.overwrite_side_panel_width_store, overwrite_panel_width.unwrap_err()), "Invalid side panel width input".to_string());
+                                            self.settings.overwrite_side_panel_width_store = self.settings.size.side_panel_width.to_string();
                                             return;
                                         } else {
                                             self.settings.size.side_panel_width = overwrite_panel_width.unwrap();
@@ -141,11 +147,11 @@ impl UrdState {
                                     ui.scope(|ui: &mut Ui| {
                                         ui.add_space(250.0 / 1.2);
                                         if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
-                                        let save = self.settings.save();
-                                        if save.is_err() {
-                                            self.error = Error::new(save.unwrap_err().to_string());
-                                        }
-                                    };
+                                            let save = self.settings.save();
+                                            if save.is_err() {
+                                                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                            }
+                                        };
                                     });
                                     
                                     ui.end_row();
@@ -192,14 +198,14 @@ impl UrdState {
                                                 self.settings.password.password = self.settings.password.new_password_input[0].to_string();
                                                 set_pw_is_okay = true;
                                             } else {
-                                                self.error = Error::new("Incorrect old password".to_string());
+                                                self.error = Error::new("Incorrect old password".to_string(), "Setting new password failed.".to_string());
                                             }
                                         } else {
                                             self.settings.password.password = self.settings.password.new_password_input[0].to_string();
                                             set_pw_is_okay = true;
                                         }
                                     } else {
-                                        self.error = Error::new("New password entries do not match".to_string());
+                                        self.error = Error::new("New password entries do not match".to_string(), "Setting new password failed.".to_string());
                                     }
 
                                     if set_pw_is_okay {
@@ -209,7 +215,7 @@ impl UrdState {
 
                                         let save = self.settings.save();
                                         if save.is_err() {
-                                            self.error = Error::new(save.unwrap_err().to_string());
+                                            self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                         }
                                     }
                                 };
@@ -221,7 +227,7 @@ impl UrdState {
                                         self.settings.password.password_input = "".to_string();
                                         let save = self.settings.save();
                                         if save.is_err() {
-                                            self.error = Error::new(save.unwrap_err().to_string());
+                                            self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                         }
                                     }
                                     but
@@ -244,7 +250,7 @@ impl UrdState {
                                                 if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.to_string()).clicked() {
                                                     let save = self.settings.save();
                                                     if save.is_err() {
-                                                        self.error = Error::new(save.unwrap_err().to_string());
+                                                        self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                                     }
                                                 }
                                             }

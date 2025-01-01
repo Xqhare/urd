@@ -191,7 +191,7 @@ impl UrdState {
                     if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
                         let save = self.settings.save();
                         if save.is_err() {
-                            self.error = Error::new(save.unwrap_err().to_string());
+                            self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                         }
                     };
                 })
@@ -207,14 +207,14 @@ impl UrdState {
                 self.save_entry_to_journal();
                 let save = self.journal.save();
                 if save.is_err() {
-                    self.error = Error::new(save.unwrap_err().to_string());
+                    self.error = Error::new(save.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
                 }
             };
             if ui.button("Reset entry").clicked() {
                 self.delete_entry_from_journal();
                 let save = self.journal.save();
                 if save.is_err() {
-                    self.error = Error::new(save.unwrap_err().to_string());
+                    self.error = Error::new(save.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
                 }
             };
             // Fallback option, if urd is kept open for a long time (the date has changed since
@@ -264,10 +264,6 @@ impl UrdState {
     }
 
     fn save_entry_to_journal(&mut self) {
-        let save = self.settings.save();
-        if save.is_err() {
-            self.error = Error::new(save.unwrap_err().to_string());
-        }
         self.journal.current_entry.overwrite(self.journal.current_entry.text.clone());
         let (year, month) = {
             let date = self.journal.current_entry.metadata.get("date").unwrap().into_object().unwrap();
@@ -301,6 +297,10 @@ impl UrdState {
                     }
                 }
             }
+        }
+        let save = self.journal.save();
+        if save.is_err() {
+            self.error = Error::new(save.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
         }
     }
 

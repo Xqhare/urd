@@ -7,7 +7,7 @@ use eframe::{
     epaint::Vec2,
     *,
 };
-use egui::{Align, TextEdit, TopBottomPanel};
+use egui::{panel::Side, Align, Id, Modal, Sides, TextEdit, TopBottomPanel};
 
 mod about;
 mod help;
@@ -89,16 +89,15 @@ impl UrdState {
                                             self.settings.password.password_input = "".to_string();
                                             self.error = Error::default();
                                         } else {
-                                            self.error = Error::new("Incorrect password");
+                                            self.error = Error::new("Incorrect password".to_string(), "Unlocking Urd failed.".to_string());
+                                            self.settings.password.password_input = "".to_string();
                                         }
                                     } else {
                                         self.error = Error::default();
                                     }
                                 }
                                 if self.error.show_error {
-                                    ui.add(|ui: &mut Ui| {
-                                        ui.label(self.error.error_message.as_ref().unwrap())
-                                    });
+                                    self.error_modal(ui);
                                 };
                             });
                         });
@@ -207,19 +206,36 @@ impl UrdState {
                 });
                 ui.add_space(ui.available_width() / 2.5);
                 if self.error.show_error {
-                    ui.add(|ui: &mut Ui| {
-                        ui.horizontal_wrapped(|ui: &mut Ui| {
-                            ui.label("Error:");
-                            ui.label(self.error.error_message.as_ref().unwrap());
-                            if ui.button("Dismiss").clicked() {
-                                self.error = Error::default();
-                            }
-                        }).response
-                    });
+                    self.error_modal(ui);
                 };
             });
             ui.add_space(1.0);
         });
+    }
+
+    fn error_modal(&mut self, ui: &mut Ui) {
+        let error_modal = Modal::new(Id::new("Error Modal")).show(ui.ctx(), |ui: &mut Ui| {
+            ui.vertical_centered_justified(|ui: &mut Ui| {
+                ui.heading("Error");
+            });
+            ui.separator();
+            ui.vertical_centered_justified(|ui: &mut Ui| {
+                ui.label(self.error.error_context.as_ref().unwrap());
+                ui.label("Reason: ");
+                ui.label(self.error.error_message.as_ref().unwrap());
+            });
+            ui.separator();
+            ui.scope(|ui: &mut Ui| {
+                ui.vertical_centered_justified(|ui: &mut Ui| {
+                    if ui.button("Dismiss").clicked() {
+                        self.error.show_error = false;
+                    }
+                });
+            });
+        });
+        if error_modal.should_close() {
+            self.error.show_error = false;
+        }
     }
 }
 

@@ -22,7 +22,7 @@ pub fn startup_appstate() -> StartupState {
                 return StartupState {
                     settings: fallback_settings,
                     journal: fallback_journal,
-                    error: Error::new(journal.unwrap_err().to_string()),
+                    error: Error::new(journal.unwrap_err().to_string(), "Loading journal failed.".to_string()),
                 };
             }
             StartupState {
@@ -39,7 +39,7 @@ pub fn startup_appstate() -> StartupState {
                 return StartupState {
                     settings: tmp_settings,
                     journal: fallback_journal,
-                    error: Error::new(journal.unwrap_err().to_string()),
+                    error: Error::new(journal.unwrap_err().to_string(), "Loading journal failed.".to_string()),
                 };
             } else {
                 StartupState {
@@ -67,7 +67,7 @@ fn startup_settings() -> Result<Settings, Error> {
     if Path::new(SETTINGS_FILE).exists() {
         match Settings::load(SETTINGS_FILE) {
             Ok(settings) => Ok(settings),
-            Err(e) => Err(Error::new(e.to_string())),
+            Err(e) => Err(Error::new(e.to_string(), "Loading settings failed.".to_string())),
         }
     } else {
         Ok(Settings::default())
