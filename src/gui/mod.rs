@@ -7,7 +7,7 @@ use eframe::{
     epaint::Vec2,
     *,
 };
-use egui::{panel::Side, Align, Id, Modal, Sides, TextEdit, TopBottomPanel};
+use egui::{Align, Id, Modal, TextEdit, TopBottomPanel};
 
 mod about;
 mod help;

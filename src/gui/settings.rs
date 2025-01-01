@@ -2,7 +2,7 @@
 use eframe::egui::{Align, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider, TextEdit, Ui};
 use horae::TimeZone;
 
-use crate::{error::Error, settings::{self, NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE}};
+use crate::{error::Error, settings::{NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE}};
 
 use super::UrdState;
 

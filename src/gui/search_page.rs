@@ -1,5 +1,5 @@
 
-use eframe::{egui::{self, CentralPanel, Grid, ScrollArea, TextEdit, TopBottomPanel, Ui}, Frame};
+use eframe::{egui::{self, CentralPanel, ScrollArea, TextEdit, TopBottomPanel, Ui}, Frame};
 
 use super::UrdState;
 

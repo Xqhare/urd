@@ -1,4 +1,4 @@
-use eframe::{egui::{Context, FontId, ScrollArea, SidePanel, TextBuffer, TextEdit, Ui, Vec2}, Frame};
+use eframe::{egui::{Context, ScrollArea, SidePanel, TextBuffer, Ui}, Frame};
 
 use crate::{journal_entries::Folder, render::ShowFolder};
 
