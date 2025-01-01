@@ -2,7 +2,7 @@ use eframe::{
     egui::{CentralPanel, Ui},
     *,
 };
-use egui::{Align, FontId, Grid, Margin, ScrollArea, TextEdit};
+use egui::{Align, FontId, Grid, Key, Margin, ScrollArea, TextEdit};
 use nabu::Object;
 
 use crate::{error::Error, journal_entries::{EntryType, Folder, JournalEntry}, render::ShowFolder, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}};
