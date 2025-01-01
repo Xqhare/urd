@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, VecDeque};
+use std::{collections::{BTreeMap, VecDeque}, usize};
 
 use nabu::{Array, Object, XffValue};
 
@@ -192,11 +192,41 @@ impl Journal {
             let last_entry = last_month.entries.front().unwrap().get_journal_entry().unwrap();
             let mut current_date = horae::Utc::now();
             current_date.with_timezone(settings.timezone.timezone);
-            if current_date.date().to_string() == last_entry.title {
-                last_entry.clone()
+
+            /* let out = JournalEntry::new(settings);
+            // I cant naively assume that the new entry is part of the current month and year
+            entries.front_mut().unwrap().get_folder_mut().unwrap().entries.front_mut().unwrap().get_folder_mut().unwrap().entries.push_front(EntryType::JournalEntry(out.clone()));
+            out */
+
+            if current_date.date().year as usize == last_entry.metadata.get("date").unwrap().into_object().unwrap().get("year").unwrap().into_number().unwrap().into_usize().unwrap() {
+                // Current year
+                if current_date.date().month as usize == last_entry.metadata.get("date").unwrap().into_object().unwrap().get("month").unwrap().into_number().unwrap().into_usize().unwrap() {
+                    // Current month
+                    if current_date.date().day as usize == last_entry.metadata.get("date").unwrap().into_object().unwrap().get("day").unwrap().into_number().unwrap().into_usize().unwrap() {
+                        // Current day
+                        last_entry.clone()
+                    } else {
+                        // New day
+                        let out = JournalEntry::new(settings);
+                        entries.front_mut().unwrap().get_folder_mut().unwrap().entries.front_mut().unwrap().get_folder_mut().unwrap().entries.push_front(EntryType::JournalEntry(out.clone()));
+                        out
+                    }
+                } else {
+                    // New month
+                    let mut new_month_folder = Folder::new(current_date.date().month.to_string());
+                    let out = JournalEntry::new(settings);
+                    new_month_folder.entries.push_front(EntryType::JournalEntry(out.clone()));
+                    entries.front_mut().unwrap().get_folder_mut().unwrap().entries.push_front(EntryType::Folder(new_month_folder));
+                    out
+                }
             } else {
+                // New year
+                let mut new_month_folder = Folder::new(current_date.date().month.to_string());
+                let mut new_year_folder = Folder::new(current_date.date().year.to_string());
                 let out = JournalEntry::new(settings);
-                entries.front_mut().unwrap().get_folder_mut().unwrap().entries.front_mut().unwrap().get_folder_mut().unwrap().entries.push_front(EntryType::JournalEntry(out.clone()));
+                new_month_folder.entries.push_front(EntryType::JournalEntry(out.clone()));
+                new_year_folder.entries.push_front(EntryType::Folder(new_month_folder));
+                entries.push_front(EntryType::Folder(new_year_folder));
                 out
             }
         };
@@ -333,11 +363,12 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
 
 #[test]
 fn deserialize_metadata() {
-    let str0 = "+project1 +project2 @context1 @context2 key1:val1 key2:val2";
+    let str0 = "+project1 +project2 @context1 @context2 key1:val1 key2:val2 #tag1 #tag2";
     let metadata0 = deserialize_entry_metadata(str0.to_string());
     assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().len(), 2);
     assert_eq!(metadata0.get("context_tags").unwrap().into_array().unwrap().len(), 2);
     assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().len(), 2);
+    assert_eq!(metadata0.get("bespoke_tags").unwrap().into_array().unwrap().len(), 2);
 
     assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "+project1");
     assert_eq!(metadata0.get("project_tags").unwrap().into_array().unwrap().get(1).unwrap().into_string().unwrap(), "+project2");
@@ -345,20 +376,32 @@ fn deserialize_metadata() {
     assert_eq!(metadata0.get("context_tags").unwrap().into_array().unwrap().get(1).unwrap().into_string().unwrap(), "@context2");
     assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().get("key1").unwrap().into_string().unwrap(), "val1");
     assert_eq!(metadata0.get("special_tags").unwrap().into_object().unwrap().get("key2").unwrap().into_string().unwrap(), "val2");
+    assert_eq!(metadata0.get("bespoke_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "#tag1");
+    assert_eq!(metadata0.get("bespoke_tags").unwrap().into_array().unwrap().get(1).unwrap().into_string().unwrap(), "#tag2");
 
     let str1 = "This may not crash if feed only text";
     let metadata1 = deserialize_entry_metadata(str1.to_string());
     assert_eq!(metadata1.get("project_tags").unwrap().into_array().unwrap().len(), 0);
     assert_eq!(metadata1.get("context_tags").unwrap().into_array().unwrap().len(), 0);
     assert_eq!(metadata1.get("special_tags").unwrap().into_object().unwrap().len(), 0);
+    assert_eq!(metadata1.get("bespoke_tags").unwrap().into_array().unwrap().len(), 0);
 
-    let str2 = "This is @an +actual test:123";
+    let str2 = "This is @an +actual test:123 #124";
     let metadata2 = deserialize_entry_metadata(str2.to_string());
     assert_eq!(metadata2.get("project_tags").unwrap().into_array().unwrap().len(), 1);
     assert_eq!(metadata2.get("context_tags").unwrap().into_array().unwrap().len(), 1);
     assert_eq!(metadata2.get("special_tags").unwrap().into_object().unwrap().len(), 1);
+    assert_eq!(metadata2.get("bespoke_tags").unwrap().into_array().unwrap().len(), 1);
 
     assert_eq!(metadata2.get("project_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "+actual");
     assert_eq!(metadata2.get("context_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "@an");
     assert_eq!(metadata2.get("special_tags").unwrap().into_object().unwrap().get("test").unwrap().into_string().unwrap(), "123");
+    assert_eq!(metadata2.get("bespoke_tags").unwrap().into_array().unwrap().get(0).unwrap().into_string().unwrap(), "#124");
+
+    let str3 = "This may not result in any tags: 15 + 5 = 20, test@mail.com #";
+    let metadata3 = deserialize_entry_metadata(str3.to_string());
+    assert_eq!(metadata3.get("project_tags").unwrap().into_array().unwrap().len(), 0);
+    assert_eq!(metadata3.get("context_tags").unwrap().into_array().unwrap().len(), 0);
+    assert_eq!(metadata3.get("special_tags").unwrap().into_object().unwrap().len(), 0);
+    assert_eq!(metadata3.get("bespoke_tags").unwrap().into_array().unwrap().len(), 0);
 }
