@@ -15,11 +15,11 @@ A journal App written in rust
 ## Issues preventing a stable release
 
 - Creating a new viewport will crash the app if it's not supported by the device
-- Display errors using a `modal` popup
 - Export entries to files
 - Backup (just use the journal file itself) and a way to restore from a backup
     - If a user copies the journal file, and puts it back in the future, the same functionality has already been implemented, but it would be nice to at least drag and drop the file to load
     - In the same way, a file dialog would be nice for exporting and saving a backup
+    - Option to back up every launch
 - max tag length is 46 characters, more starts to break the Metadata UI, below the entry text field
 
 ## Password protection
