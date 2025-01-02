@@ -13,8 +13,6 @@ pub const MIN_FONT_SIZE: f32 = 2.0;
 pub const MAX_WINDOW_SIZE: [f32; 2] = [3_000.0, 3_000.0];
 pub const MAX_SIDE_PANEL_WIDTH: f32 = 2_000.0;
 
-// TODO: get from config
-// TODO: save to config
 #[derive(Clone, Debug)]
 pub struct Settings {
     pub size: SizeSettings,
@@ -32,7 +30,6 @@ pub struct Settings {
 }
 
 impl Default for Settings {
-    // TODO: sensible defaults
     fn default() -> Self {
         let size = SizeSettings::default();
         Self {
