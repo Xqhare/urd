@@ -1,17 +1,14 @@
-use eframe::{
-    egui::{self, CentralPanel, ScrollArea, TextEdit, TopBottomPanel, Ui},
-    Frame,
-};
+use eframe::egui::{self, CentralPanel, ScrollArea, TextEdit, TopBottomPanel, Ui};
 
 use super::UrdState;
 
 impl UrdState {
-    pub fn search_page(&mut self, ctx: &egui::Context, frame: &mut Frame) {
-        self.search_top_panel(ctx, frame);
-        self.search_central_panel(ctx, frame);
+    pub fn search_page(&mut self, ctx: &egui::Context) {
+        self.search_top_panel(ctx);
+        self.search_central_panel(ctx);
     }
 
-    fn search_top_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+    fn search_top_panel(&mut self, ctx: &egui::Context) {
         TopBottomPanel::top("search_panel").show(ctx, |ui: &mut Ui| {
             ui.vertical_centered_justified(|ui: &mut Ui| {
                 ui.add_space(1.0);
@@ -47,7 +44,7 @@ impl UrdState {
         self.search_loop(tokens);
     }
 
-    fn search_central_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+    fn search_central_panel(&mut self, ctx: &egui::Context) {
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                 for result in &self.search.results {
