@@ -80,10 +80,8 @@ impl EntryType {
         let bind = value.into_object().unwrap();
         let tmp_check = bind.get("name");
         if tmp_check.is_some() {
-            // Folder
             Self::Folder(Folder::deserialize(value))
         } else {
-            // JournalEntry
             Self::JournalEntry(JournalEntry::deserialize(value))
         }
     }
@@ -408,7 +406,7 @@ pub struct JournalEntry {
     /// - Context tags
     /// - Project tags
     /// - Special tags
-    /// - Bespoke tags / User defined tags
+    /// - Bespoke tags  
     /// - Full date split up [year, month, day]
     pub metadata: BTreeMap<String, XffValue>,
 }
