@@ -30,7 +30,6 @@ pub struct UrdState {
     error: Error,
     render: Render,
     search: Search,
-    // misc
     settings_backup: Option<Settings>,
 }
 
@@ -49,31 +48,42 @@ impl Default for UrdState {
 }
 
 impl UrdState {
-    // TODO: if settings have been found, there are probably journal entries to check for
-    pub fn new(settings: Settings, journal: Journal, error: Error) -> Self {
-        UrdState {
-            journal,
-            settings,
-            error,
-            render: Render::default(),
-            search: Search::default(),
-            settings_backup: None,
+    pub fn new(settings: Settings, journal: Journal, error: Error, first_run: bool) -> Self {
+        if first_run {
+            let settings = Settings::default();
+            UrdState {
+                journal: Journal::new(&settings),
+                settings,
+                error: Error::default(),
+                render: Render::startup_default(),
+                search: Search::default(),
+                settings_backup: None,
+            }
+        } else {
+            UrdState {
+                journal,
+                settings,
+                error,
+                render: Render::default(),
+                search: Search::default(),
+                settings_backup: None,
+            }
         }
     }
 }
 
 impl App for UrdState {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         if self.settings.password.password != "" && !self.settings.password.unlocked_with_password {
-            self.protected_mode(ctx, frame);
+            self.protected_mode(ctx);
         } else {
-            self.normal_mode(ctx, frame);
+            self.normal_mode(ctx);
         }
     }
 }
 
 impl UrdState {
-    fn protected_mode(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+    fn protected_mode(&mut self, ctx: &egui::Context) {
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             ui.add_space(ui.available_height() / 3.0);
 
@@ -126,14 +136,14 @@ impl UrdState {
         });
     }
 
-    fn normal_mode(&mut self, ctx: &egui::Context, frame: &mut Frame) {
-        self.main_top_panel(ctx, frame);
+    fn normal_mode(&mut self, ctx: &egui::Context) {
+        self.main_top_panel(ctx);
         if self.render.viewports.show_search_page {
-            self.search_page(ctx, frame);
+            self.search_page(ctx);
         } else if self.render.viewports.show_file_picker {
-            self.file_picker(ctx, frame);
+            self.file_picker(ctx);
         } else {
-            self.main_page(ctx, frame);
+            self.main_page(ctx);
         }
 
         if self
@@ -162,7 +172,7 @@ impl UrdState {
         }
     }
 
-    fn main_top_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+    fn main_top_panel(&mut self, ctx: &egui::Context) {
         TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
             ui.horizontal(|ui: &mut Ui| {
                 ui.add_space(1.0);
@@ -321,6 +331,7 @@ pub fn gui_startup(startup_state: StartupState) {
                 startup_state.settings,
                 startup_state.journal,
                 startup_state.error,
+                startup_state.first_run,
             )))
         }),
     )
