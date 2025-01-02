@@ -8,7 +8,7 @@ use crate::{error::Error, settings::NeededPath};
 use super::UrdState;
 
 impl UrdState {
-    pub fn file_picker(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+    pub fn file_picker(&mut self, ctx: &egui::Context) {
         debug_assert!(self.settings.custom_paths.needed_path.is_some());
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             ui.vertical_centered_justified(|ui: &mut Ui| {
@@ -24,7 +24,7 @@ impl UrdState {
                             if !ctx.input(|i| i.raw.dropped_files.is_empty()) {
                                 let dropped_file = ctx.input(|i| {
                                     // The array of files is only larger than 1 if several files are
-                                    // dropped at once.
+                                    // dropped in at once.
                                     i.raw.dropped_files[0].path.clone().expect("File without path").clone()
                                 });
                                 if dropped_file.is_dir() {
@@ -59,7 +59,7 @@ impl UrdState {
                             if !ctx.input(|i| i.raw.dropped_files.is_empty()) {
                                 let dropped_file = ctx.input(|i| {
                                     // The array of files is only larger than 1 if several files are
-                                    // dropped at once.
+                                    // dropped in at once.
                                     i.raw.dropped_files[0].path.clone().expect("File without path").clone()
                                 });
                                 if dropped_file.is_dir() {
@@ -94,7 +94,7 @@ impl UrdState {
                             if !ctx.input(|i| i.raw.dropped_files.is_empty()) {
                                 let dropped_file = ctx.input(|i| {
                                     // The array of files is only larger than 1 if several files are
-                                    // dropped at once.
+                                    // dropped in at once.
                                     i.raw.dropped_files[0].path.clone().expect("File without path").clone()
                                 });
                                 if dropped_file.is_file() {
