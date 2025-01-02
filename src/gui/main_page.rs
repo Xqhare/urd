@@ -14,17 +14,17 @@ use crate::{
 use super::UrdState;
 
 impl UrdState {
-    pub fn main_page(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+    pub fn main_page(&mut self, ctx: &egui::Context) {
         if self.render.viewports.show_settings_viewport {
             self.settings_viewport_startup(ctx);
         } else {
-            self.main_side_panel(ctx, frame);
+            self.main_side_panel(ctx);
         }
         // Remember, central panel last
-        self.main_central_panel(ctx, frame);
+        self.main_central_panel(ctx);
     }
 
-    fn main_central_panel(&mut self, ctx: &egui::Context, frame: &mut Frame) {
+    fn main_central_panel(&mut self, ctx: &egui::Context) {
         let font = {
             if self.settings.font.monospace {
                 FontId::monospace(self.settings.font.size)
@@ -50,8 +50,6 @@ impl UrdState {
                             .margin(Margin::same(5.0)),
                     )
                 });
-                // TODO: tmp code below, add clicking on a tag to search for it in the journal
-                // when search is done
                 ui.group(|ui: &mut Ui| {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
                         ui.heading("Metadata");
