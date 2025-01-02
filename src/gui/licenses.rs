@@ -24,8 +24,6 @@ impl UrdState {
                     .with_min_inner_size(LICENSES_WINDOW_SIZE)
                     .with_max_inner_size(LICENSES_WINDOW_SIZE),
                 move |ctx, class| {
-                    // TODO: paint the settings in the main window if this fails instead of
-                    // panicking
                     assert!(class == eframe::egui::ViewportClass::Deferred);
 
                     CentralPanel::default().show(ctx, |ui: &mut Ui| {
