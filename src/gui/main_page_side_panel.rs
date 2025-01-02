@@ -1,23 +1,20 @@
-use eframe::{
-    egui::{Context, ScrollArea, SidePanel, TextBuffer, Ui},
-    Frame,
-};
+use eframe::egui::{Context, ScrollArea, SidePanel, Ui};
 
 use crate::{journal_entries::Folder, render::ShowFolder};
 
 use super::UrdState;
 
 impl UrdState {
-    pub fn main_side_panel(&mut self, ctx: &Context, frame: &mut Frame) {
+    pub fn main_side_panel(&mut self, ctx: &Context) {
         SidePanel::left("entry_browser").min_width(self.settings.size.side_panel_width).show(ctx, |ui: &mut Ui| {
             // Note for future: I wanted to split this into more functions but I couldn't get it to work
             // TLDR: Nested mutating ownership of self
             match self.render.show_folder {
                 ShowFolder::All => {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
-                    ui.add_space(22.5);
-                        ui.heading("Years");
-                    ui.add_space(22.5);
+                        ui.add_space(22.5);
+                            ui.heading("Years");
+                        ui.add_space(22.5);
                     });
                     ui.separator();
                     ScrollArea::vertical().show(ui, |ui: &mut Ui| {
@@ -47,11 +44,11 @@ impl UrdState {
                 }
                 ShowFolder::Year(year) => {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
-                    ui.add_space(22.5);
-                        if ui.heading(year.to_string()).clicked() {
-                            self.go_back_one_level();
-                        }
-                    ui.add_space(22.5);
+                        ui.add_space(22.5);
+                            if ui.heading(year.to_string()).clicked() {
+                                self.go_back_one_level();
+                            }
+                        ui.add_space(22.5);
                     });
                     ui.separator();
                     ScrollArea::vertical().show(ui, |ui: &mut Ui| {
@@ -61,11 +58,11 @@ impl UrdState {
                         for n in &months_folder.entries {
                             debug_assert!(n.is_folder());
                             let folder = n.get_folder().unwrap();
-                            let name = folder.name.as_str();
+                            let name = month_num_to_name(folder.name.trim().parse().expect("Failed to parse month, month is not a number (u8)"));
                             let display_txt = {
-                                if month_num_to_days(name.parse().expect("Failed to parse month, month is not a number (u8)")) == folder.entries.len() as u8 {
+                                if month_num_to_days(folder.name.parse().expect("Failed to parse month, month is not a number (u8)")) == folder.entries.len() as u8 {
                                     self.perfectly_completed(name)
-                                } else if name == current_month.to_string() {
+                                } else if folder.name == current_month.to_string() {
                                     self.currently_selected(name)
                                 } else {
                                     self.normally_completed(name)
@@ -74,7 +71,7 @@ impl UrdState {
                             ui.vertical_centered_justified(|ui: &mut Ui| {
                                 ui.group(|ui: &mut Ui| {
                                     if ui.label(display_txt).clicked() {
-                                        self.render.show_folder = ShowFolder::Month(year, name.parse().expect("Failed to parse month, month is not a number (u8)"));
+                                        self.render.show_folder = ShowFolder::Month(year, folder.name.parse().expect("Failed to parse month, month is not a number (u8)"));
                                     }
                                 });
                             });
@@ -83,11 +80,11 @@ impl UrdState {
                 }
                 ShowFolder::Month(year, month) => {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
-                    ui.add_space(22.5);
-                        if ui.heading(format!("{} {}", month_num_to_name(month), year.to_string())).clicked() {
-                            self.go_back_one_level();
-                        }
-                    ui.add_space(22.5);
+                        ui.add_space(22.5);
+                            if ui.heading(format!("{} {}", month_num_to_name(month), year.to_string())).clicked() {
+                                self.go_back_one_level();
+                            }
+                        ui.add_space(22.5);
                     });
                     ui.separator();
                     ScrollArea::vertical().show(ui, |ui: &mut Ui| {
