@@ -8,15 +8,6 @@ pub enum ShowFolder {
     Month(u16, u8),
 }
 
-impl ShowFolder {
-    pub fn is_month(&self) -> bool {
-        match self {
-            ShowFolder::Month(_, _) => true,
-            _ => false,
-        }
-    }
-}
-
 pub struct Render {
     pub viewports: Viewport,
     pub show_folder: ShowFolder,
@@ -26,6 +17,15 @@ impl Default for Render {
     fn default() -> Self {
         Render {
             viewports: Viewport::default(),
+            show_folder: ShowFolder::All,
+        }
+    }
+}
+
+impl Render {
+    pub fn startup_default() -> Self {
+        Render {
+            viewports: Viewport::startup_default(),
             show_folder: ShowFolder::All,
         }
     }
@@ -46,6 +46,21 @@ impl Default for Viewport {
             show_about_viewport: Arc::new(AtomicBool::new(false)),
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
             show_help_viewport: Arc::new(AtomicBool::new(false)),
+            show_settings_viewport: false,
+            show_search_page: false,
+            show_file_picker: false,
+        }
+    }
+}
+
+impl Viewport {
+    pub fn startup_default() -> Self {
+        Viewport {
+            // ONLY DIFFERENCE
+            show_help_viewport: Arc::new(AtomicBool::new(true)),
+            // Same
+            show_about_viewport: Arc::new(AtomicBool::new(false)),
+            show_licenses_viewport: Arc::new(AtomicBool::new(false)),
             show_settings_viewport: false,
             show_search_page: false,
             show_file_picker: false,
