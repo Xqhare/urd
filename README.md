@@ -1,5 +1,5 @@
 # `Urd`
-A journal App written in rust
+A journaling app written in rust.
 
 ## Name
 `Urd` is named after one of the Norns from Norse mythology, responsible for shaping destiny and is responsible for the past.
@@ -10,16 +10,12 @@ A journal App written in rust
     - Password protection
 - If you write a journal entry every day, completed months or years will be marked
     - This can be customised in the `Settings` menu
-- Simple text editor
+- Backups
+- Export your journal
 
 ## Issues preventing a stable release
 
 - Creating a new viewport will crash the app if it's not supported by the device
-- Export entries to files
-- Backup (just use the journal file itself) and a way to restore from a backup
-    - If a user copies the journal file, and puts it back in the future, the same functionality has already been implemented, but it would be nice to at least drag and drop the file to load
-    - In the same way, a file dialog would be nice for exporting and saving a backup
-    - Option to back up every launch
 - max tag length is 46 characters, more starts to break the Metadata UI, below the entry text field
 
 ## Password protection
@@ -45,7 +41,6 @@ No Journal data will be lost.
 1. You simply delete the `settings.xff` file from the `urd_state` directory in the same directory as the `Urd` executable.
 2. Start `Urd`
 
-
 #### Recovery of the password
 This is the only 'non-destructive' way to recover the password. Please read [Removing the password protection](#removing-the-password-protection) first, and use this method only if you are sure about it.
 
@@ -56,7 +51,6 @@ The password is stored inside the `settings.xff` file, located in the `urd_state
 3. Look for the `password` key, and the following clear text value is the password.
 
 Please note that you can not change the password inside the file, as it will break the file.
-
 
 ### Changing the password
 
@@ -71,3 +65,4 @@ The only outside dependency of `Urd` is `eframe`, which can be found [here](http
 
 ### All other dependencies
 Written by me, you can find them on my [GitHub](https://github.com/xqhare).
+
