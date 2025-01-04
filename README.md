@@ -13,6 +13,12 @@ A journaling app written in rust.
 - Backups
 - Export your journal
 
+## Roadmap
+
+- Year of X (e.g. Progress) / pledge for the year / new years resolution
+- Daily mood tracker
+- Important day marker
+
 ## Issues preventing a stable release
 
 - Creating a new viewport will crash the app if it's not supported by the device
