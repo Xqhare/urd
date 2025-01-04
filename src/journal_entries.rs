@@ -6,7 +6,7 @@ use std::{
 
 use nabu::{Array, Object, XffValue};
 
-use crate::{paths::JOURNAL_FILE, settings::Settings};
+use crate::{moods::default_moods, paths::JOURNAL_FILE, settings::Settings};
 
 #[derive(Clone, Debug)]
 pub enum EntryType {
@@ -137,6 +137,7 @@ impl Folder {
 #[derive(Clone, Debug)]
 pub struct Journal {
     pub entries: VecDeque<EntryType>,
+    pub moods: Object,
     pub current_entry: JournalEntry,
 }
 
@@ -161,6 +162,7 @@ impl Journal {
         Self {
             entries,
             current_entry,
+            moods: default_moods(),
         }
     }
 
@@ -191,10 +193,18 @@ impl Journal {
             out
         };
         serialized.insert("entries", XffValue::from(entries));
+        serialized.insert("moods", XffValue::from(self.moods.clone()));
         XffValue::from(serialized)
     }
 
     fn deserialize(read_value: &XffValue, settings: &Settings) -> Self {
+        let moods = read_value
+            .into_object()
+            .unwrap()
+            .get("moods")
+            .unwrap()
+            .into_object()
+            .unwrap();
         let all_entries = read_value
             .into_object()
             .unwrap()
@@ -315,6 +325,7 @@ impl Journal {
         Self {
             entries,
             current_entry: last_entry,
+            moods,
         }
     }
 
@@ -352,9 +363,16 @@ impl Journal {
                     let entry_file = month_dir
                         .with_file_name(entry.get_journal_entry().unwrap().title.clone())
                         .with_extension("txt");
+                    let text = format!(
+                        "Mood: {} - Important Day: {}\n\n{}",
+                        entry.get_journal_entry().unwrap().metadata.get("mood").unwrap().into_string().unwrap(),
+                        // TODO: make this nicerererer
+                        entry.get_journal_entry().unwrap().metadata.get("important_day").unwrap().into_boolean().unwrap().to_string(),
+                        entry.get_journal_entry().unwrap().text
+                    );
                     let pos_err4 = std::fs::write(
                         entry_file.clone(),
-                        entry.get_journal_entry().unwrap().text.clone(),
+                        text
                     );
                     if pos_err4.is_err() {
                         return Err(pos_err4.unwrap_err().to_string());
@@ -408,6 +426,8 @@ pub struct JournalEntry {
     /// - Special tags
     /// - Bespoke tags  
     /// - Full date split up [year, month, day]
+    /// - Mood
+    /// - Important day
     pub metadata: BTreeMap<String, XffValue>,
 }
 
@@ -432,6 +452,8 @@ impl JournalEntry {
             out.insert("context_tags".to_string(), XffValue::Array(Array::new()));
             out.insert("special_tags".to_string(), XffValue::from(Object::new()));
             out.insert("bespoke_tags".to_string(), XffValue::Array(Array::new()));
+            out.insert("mood".to_string(), XffValue::String("".to_string()));
+            out.insert("important_day".to_string(), XffValue::Boolean(false));
             out
         };
         Self {

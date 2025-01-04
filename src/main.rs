@@ -8,6 +8,7 @@ mod render;
 mod search;
 mod settings;
 mod startup;
+mod moods;
 
 fn main() {
     let mut settings = startup::startup_appstate();
