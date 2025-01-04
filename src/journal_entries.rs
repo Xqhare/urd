@@ -90,6 +90,7 @@ impl EntryType {
 #[derive(Clone, Debug)]
 pub struct Folder {
     pub name: String,
+    pub aspirations: XffValue,
     pub entries: VecDeque<EntryType>,
 }
 
@@ -97,6 +98,7 @@ impl Folder {
     pub fn new<S: Into<String>>(name: S) -> Self {
         Self {
             name: name.into(),
+            aspirations: XffValue::Null,
             entries: VecDeque::new(),
         }
     }
@@ -104,6 +106,7 @@ impl Folder {
     pub fn serialize(&self) -> Object {
         let mut out = Object::new();
         out.insert("name", XffValue::String(self.name.clone()));
+        out.insert("aspirations", self.aspirations.clone());
         out.insert(
             "entries",
             XffValue::Array(self.entries.iter().map(|e| e.serialize()).collect()),
@@ -130,7 +133,12 @@ impl Folder {
         for entry in entries {
             out.push_back(EntryType::deserialize(&entry));
         }
-        Self { name, entries: out }
+        Self { name, entries: out, aspirations: value
+            .into_object()
+            .unwrap()
+            .get("aspirations")
+            .unwrap()
+            .clone() }
     }
 }
 
