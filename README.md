@@ -16,7 +16,7 @@ A journaling app written in rust.
 ## Roadmap
 
 - Year of X (e.g. Progress) / pledge for the year / new year's resolution
-    - All three of these can be set in the `Settings` menu
+    - All three of these can be set in the `side_bar` at the top
         - They are non-exclusive - None, one, all or any combination are possible
         - They are stored in the `journal.xff` file, inside their respective `year` folders
     1. Year Theme
