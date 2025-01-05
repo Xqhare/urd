@@ -1,5 +1,7 @@
 use std::sync::{atomic::AtomicBool, Arc};
 
+use crate::journal_entries::JournalEntry;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ShowFolder {
     All,
@@ -12,6 +14,8 @@ pub struct Render {
     pub view: View,
     pub show_folder: ShowFolder,
     pub show_add_mood_field: bool,
+    pub important_day_entries: Vec<JournalEntry>,
+    pub mood_entries: Vec<JournalEntry>,
 }
 
 impl Default for Render {
@@ -20,6 +24,8 @@ impl Default for Render {
             view: View::default(),
             show_folder: ShowFolder::All,
             show_add_mood_field: false,
+            important_day_entries: Vec::new(),
+            mood_entries: Vec::new(),
         }
     }
 }
@@ -30,6 +36,8 @@ impl Render {
             view: View::startup_default(),
             show_folder: ShowFolder::All,
             show_add_mood_field: false,
+            important_day_entries: Vec::new(),
+            mood_entries: Vec::new(),
         }
     }
 }
