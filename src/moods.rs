@@ -1,15 +1,9 @@
 use eframe::egui::Color32;
-use nabu::{Array, Object, XffValue};
+use nabu::{Object, XffValue, tvec_to_xff_value};
 
 pub struct Mood {
     pub name: String,
     pub colour: Color32,
-}
-
-impl Mood {
-    pub fn new(name: String, colour: Color32) -> Self {
-        Self { name, colour }
-    }
 }
 
 impl Default for Mood {
@@ -39,37 +33,38 @@ impl From<(String, XffValue)> for Mood {
 pub fn default_moods() -> Object {
     let mut out = Object::new();
     // Only one with opacity set to 0
-    out.insert("", XffValue::from(Array::from(vec![0, 0, 0, 0])));
-    out.insert("Alert", XffValue::from(Array::from(vec![0, 100, 150, 255])));
-    out.insert("Angry", XffValue::from(Array::from(vec![120, 0, 0, 255])));
-    out.insert("Blank", XffValue::from(Array::from(vec![132, 132, 132, 255])));
-    out.insert("Bored", XffValue::from(Array::from(vec![50, 50, 66, 255])));
-    out.insert("Calm", XffValue::from(Array::from(vec![50, 75, 100, 255])));
-    out.insert("Confident", XffValue::from(Array::from(vec![160, 130, 0, 255])));
-    out.insert("Confused", XffValue::from(Array::from(vec![255, 175, 0, 255])));
-    out.insert("Depressed", XffValue::from(Array::from(vec![45, 30, 15, 255])));
-    out.insert("Embarrassed", XffValue::from(Array::from(vec![175, 0, 150, 255])));
-    out.insert("Energetic", XffValue::from(Array::from(vec![0, 155, 55, 255])));
-    out.insert("Excited", XffValue::from(Array::from(vec![0, 200, 75, 255])));
-    out.insert("Happy", XffValue::from(Array::from(vec![127, 255, 127, 255])));
-    out.insert("Hollow", XffValue::from(Array::from(vec![200, 200, 200, 255])));
-    out.insert("Hopeful", XffValue::from(Array::from(vec![125, 125, 0, 255])));
-    out.insert("Ill", XffValue::from(Array::from(vec![80, 180, 0, 255])));
-    out.insert("Intense", XffValue::from(Array::from(vec![88, 88, 0 , 255])));
-    out.insert("Nervous", XffValue::from(Array::from(vec![40, 80, 120, 255])));
-    out.insert("Overwhelmed", XffValue::from(Array::from(vec![125, 150, 175, 255])));
-    out.insert("Playful", XffValue::from(Array::from(vec![75, 50, 190, 255])));
-    out.insert("Relaxed", XffValue::from(Array::from(vec![0, 125, 200, 255])));
-    out.insert("Restless", XffValue::from(Array::from(vec![75, 85, 105, 255])));
-    out.insert("Sad", XffValue::from(Array::from(vec![20, 30, 45, 255])));
-    out.insert("Scared", XffValue::from(Array::from(vec![69, 69, 0, 255])));
-    out.insert("Serious", XffValue::from(Array::from(vec![42, 69, 138, 255])));
-    out.insert("Shocked", XffValue::from(Array::from(vec![50, 150, 100, 255])));
-    out.insert("Silly", XffValue::from(Array::from(vec![145, 100, 175, 255])));
-    out.insert("Sleepy", XffValue::from(Array::from(vec![69, 69, 196, 255])));
-    out.insert("Stressed", XffValue::from(Array::from(vec![200, 80, 0, 255])));
-    out.insert("Surprised", XffValue::from(Array::from(vec![0, 222, 111, 255])));
-    out.insert("Troubled", XffValue::from(Array::from(vec![60, 15, 0, 255])));
-    out.insert("Worried", XffValue::from(Array::from(vec![45, 30, 30, 255])));
+    out.insert("", tvec_to_xff_value![u8; 0, 0, 0, 0]);
+    out.insert("Alert", tvec_to_xff_value![u8; 0, 100, 150, 255]);
+    out.insert("Angry", tvec_to_xff_value![u8; 120, 0, 0, 255]);
+    out.insert("Blank", tvec_to_xff_value![u8; 132, 132, 132, 255]);
+    out.insert("Bored", tvec_to_xff_value![u8; 50, 50, 66, 255]);
+    out.insert("Calm", tvec_to_xff_value![u8; 50, 75, 100, 255]);
+    out.insert("Confident", tvec_to_xff_value![u8; 160, 130, 0, 255]);
+    out.insert("Confused", tvec_to_xff_value![u8; 255, 175, 0, 255]);
+    out.insert("Depressed", tvec_to_xff_value![u8; 45, 30, 15, 255]);
+    out.insert("Embarrassed", tvec_to_xff_value![u8; 175, 0, 150, 255]);
+    out.insert("Energetic", tvec_to_xff_value![u8; 0, 155, 55, 255]);
+    out.insert("Excited", tvec_to_xff_value![u8; 0, 200, 75, 255]);
+    out.insert("Happy", tvec_to_xff_value![u8; 127, 255, 127, 255]);
+    out.insert("Hollow", tvec_to_xff_value![u8; 200, 200, 200, 255]);
+    out.insert("Hopeful", tvec_to_xff_value![u8; 125, 125, 0, 255]);
+    out.insert("Ill", tvec_to_xff_value![u8; 80, 180, 0, 255]);
+    out.insert("Intense", tvec_to_xff_value![u8; 88, 88, 0 , 255]);
+    out.insert("Nervous", tvec_to_xff_value![u8; 40, 80, 120, 255]);
+    out.insert("Overwhelmed", tvec_to_xff_value![u8; 125, 150, 175, 255]);
+    out.insert("Playful", tvec_to_xff_value![u8; 75, 50, 190, 255]);
+    out.insert("Relaxed", tvec_to_xff_value![u8; 0, 125, 200, 255]);
+    out.insert("Restless", tvec_to_xff_value![u8; 75, 85, 105, 255]);
+    out.insert("Sad", tvec_to_xff_value![u8; 20, 30, 45, 255]);
+    out.insert("Scared", tvec_to_xff_value![u8; 69, 69, 0, 255]);
+    out.insert("Serious", tvec_to_xff_value![u8; 42, 69, 138, 255]);
+    out.insert("Shocked", tvec_to_xff_value![u8; 50, 150, 100, 255]);
+    out.insert("Silly", tvec_to_xff_value![u8; 145, 100, 175, 255]);
+    out.insert("Sleepy", tvec_to_xff_value![u8; 69, 69, 196, 255]);
+    out.insert("Stressed", tvec_to_xff_value![u8; 200, 80, 0, 255]);
+    out.insert("Surprised", tvec_to_xff_value![u8; 0, 222, 111, 255]);
+    out.insert("Troubled", tvec_to_xff_value![u8; 60, 15, 0, 255]);
+    out.insert("Worried", tvec_to_xff_value![u8; 45, 30, 30, 255]);
     out
 }
+
