@@ -31,7 +31,7 @@ impl UrdState {
                                             self.settings = self.settings_backup.clone().unwrap();
                                             self.settings.overwrite_window_size = false;
                                             self.settings.overwrite_side_panel_width = false;
-                                            self.render.viewports.show_settings_viewport = false;
+                                            self.render.view.show_settings_viewport = false;
                                         };
                                         but
                                     });
@@ -58,7 +58,7 @@ impl UrdState {
                                                 self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
-                                                self.render.viewports.show_settings_viewport = false;
+                                                self.render.view.show_settings_viewport = false;
                                                 self.settings.overwrite_side_panel_width = false;
                                                 self.settings_backup = None;
                                             }
@@ -330,9 +330,9 @@ impl UrdState {
                                     ui.end_row();
                                 });
                                 if ui.button("Launch backup wizard").clicked() {
-                                    self.render.viewports.show_file_picker = true;
+                                    self.render.view.show_file_picker = true;
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Backup);
-                                    self.render.viewports.show_settings_viewport = false;
+                                    self.render.view.show_settings_viewport = false;
                                 }
                             }).response
                         });
@@ -346,9 +346,9 @@ impl UrdState {
                                     ui.end_row();
                                 });
                                 if ui.button("Launch export wizard").clicked() {
-                                    self.render.viewports.show_file_picker = true;
+                                    self.render.view.show_file_picker = true;
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Export);
-                                    self.render.viewports.show_settings_viewport = false;
+                                    self.render.view.show_settings_viewport = false;
                                 }
                             }).response
                         });
@@ -384,7 +384,7 @@ impl UrdState {
                                         }
                                         // Reset
                                         self.state_store.new_mood = Mood::default();
-                                        self.render.show_add_mood_ui = false;
+                                        self.render.show_add_mood_field = false;
                                     }
                                 };
                             }).response

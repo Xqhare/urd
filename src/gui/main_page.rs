@@ -13,7 +13,7 @@ use super::UrdState;
 
 impl UrdState {
     pub fn main_page(&mut self, ctx: &egui::Context) {
-        if self.render.viewports.show_settings_viewport {
+        if self.render.view.show_settings_viewport {
             self.settings_viewport_startup(ctx);
         } else {
             self.main_side_panel(ctx);
@@ -39,7 +39,7 @@ impl UrdState {
                 });
                 ui.separator();
                 ui.horizontal(|ui: &mut Ui| {
-                    if !self.render.show_add_mood_ui {
+                    if !self.render.show_add_mood_field {
                         ui.add_space(ui.available_width() / 3.95);
                     }
                     self.mood(ui);
@@ -100,7 +100,7 @@ impl UrdState {
                                                                 format!("{}, ", tag);
                                                             self.search_current_query();
                                                             self.render
-                                                                .viewports
+                                                                .view
                                                                 .show_search_page = true;
                                                         }
                                                     });
@@ -146,7 +146,7 @@ impl UrdState {
                                                                 format!("{}, ", tag);
                                                             self.search_current_query();
                                                             self.render
-                                                                .viewports
+                                                                .view
                                                                 .show_search_page = true;
                                                         }
                                                     });
@@ -196,7 +196,7 @@ impl UrdState {
                                                                 format!("{}, ", tag);
                                                             self.search_current_query();
                                                             self.render
-                                                                .viewports
+                                                                .view
                                                                 .show_search_page = true;
                                                         }
                                                     });
@@ -241,7 +241,7 @@ impl UrdState {
                                                                 format!("{}, ", tag);
                                                             self.search_current_query();
                                                             self.render
-                                                                .viewports
+                                                                .view
                                                                 .show_search_page = true;
                                                         }
                                                     });
@@ -277,7 +277,7 @@ impl UrdState {
                     };
                 }
             });
-        if self.render.show_add_mood_ui {
+        if self.render.show_add_mood_field {
             ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood");
             ui.label("Mood Colour: ");
             ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour).on_hover_text("Choose the colour of the new mood");
@@ -299,12 +299,12 @@ impl UrdState {
                     }
                     // Reset
                     self.state_store.new_mood = Mood::default();
-                    self.render.show_add_mood_ui = false;
+                    self.render.show_add_mood_field = false;
                 }
             };
         } else {
             if ui.button("Add mood").clicked() {
-                self.render.show_add_mood_ui = true;
+                self.render.show_add_mood_field = true;
                 self.state_store.new_mood.name = "Custom Mood".to_string();
             };
         };

@@ -8,11 +8,11 @@ impl UrdState {
     pub fn about_viewport_startup(&mut self, ctx: &Context) {
         if self
             .render
-            .viewports
+            .view
             .show_about_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
-            let show_viewport_pointer = self.render.viewports.show_about_viewport.clone();
+            let show_viewport_pointer = self.render.view.show_about_viewport.clone();
             ctx.show_viewport_deferred(
                 ViewportId::from_hash_of("about_viewport"),
                 ViewportBuilder::default()
