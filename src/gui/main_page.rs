@@ -35,6 +35,7 @@ impl UrdState {
             ui.separator();
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
+                    ui.add(TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center));
                     ui.heading(&self.journal.current_entry.title);
                 });
                 ui.separator();
@@ -348,6 +349,33 @@ impl UrdState {
                         "Writing journal to disk failed.".to_string(),
                     );
                 }
+            };
+            if ui.button("Debug Create").clicked() {
+                let date_split = self.journal.current_entry.title.split("-").collect::<Vec<&str>>();
+                debug_assert!(date_split.len() == 3);
+                let year = date_split[0].parse::<u16>().unwrap();
+                let month = date_split[1].parse::<u8>().unwrap();
+                let day = date_split[2].parse::<u8>().unwrap();
+                let date = {
+                    let mut out = Object::new();
+                    out.insert("year", year);
+                    out.insert("month", month);
+                    out.insert("day", day);
+                    out
+                };
+                self.journal.current_entry.metadata.insert("date".to_string(), XffValue::from(date));
+
+                self.save_entry_to_journal();
+                let save = self.journal.save();
+                if save.is_err() {
+                    self.error = Error::new(
+                        save.unwrap_err().to_string(),
+                        "Writing journal to disk failed.".to_string(),
+                    );
+                }
+                let next_day = day + 1;
+                let next_date = format!("{}-{:02}-{:02}", year, month, next_day);
+                self.journal.current_entry.title = next_date;
             };
             if ui.button("Reset entry").clicked() {
                 self.delete_entry_from_journal();
