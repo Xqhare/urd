@@ -2,10 +2,9 @@ use eframe::egui::{Align, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider
 use horae::TimeZone;
 
 use crate::{
-    error::Error,
-    settings::{
+    error::Error, moods::Mood, settings::{
         NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE,
-    },
+    }
 };
 
 use super::UrdState;
@@ -351,6 +350,43 @@ impl UrdState {
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Export);
                                     self.render.viewports.show_settings_viewport = false;
                                 }
+                            }).response
+                        });
+
+                        ui.add(|ui: &mut Ui| {
+                            ui.group(|ui: &mut Ui| {
+                                ui.label("Mood settings");
+
+                                Grid::new("mood_settings").num_columns(2).show(ui, |ui: &mut Ui| {
+                                    ui.label("Mood Name: ");
+                                    ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood");
+
+                                    ui.end_row();
+
+                                    ui.label("Mood Colour: ");
+                                    ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour).on_hover_text("Choose the colour of the new mood");
+                                });
+                                
+                                if ui.button("Add mood").clicked() {
+                                    if self.journal.moods.contains_key(&self.state_store.new_mood.name) {
+                                        self.error = Error::new(
+                                            "Mood already exists.".to_string(),
+                                            "Please choose a different name.".to_string(),
+                                        );
+                                    } else {
+                                        self.journal.moods.insert(self.state_store.new_mood.name.clone(), self.state_store.new_mood.colour.to_array().to_vec());
+                                        let save = self.journal.save();
+                                        if save.is_err() {
+                                            self.error = Error::new(
+                                                save.unwrap_err().to_string(),
+                                                "Writing journal to disk failed.".to_string(),
+                                            );
+                                        }
+                                        // Reset
+                                        self.state_store.new_mood = Mood::default();
+                                        self.render.show_add_mood_ui = false;
+                                    }
+                                };
                             }).response
                         });
 
