@@ -509,8 +509,9 @@ impl JournalEntry {
         }
     }
 
-    pub fn overwrite(&mut self, serialized: String) {
+    pub fn overwrite(&mut self, serialized: String, metadata: BTreeMap<String, XffValue>) {
         self.text = serialized.clone();
+        self.metadata = metadata;
         let new_metadata = deserialize_entry_metadata(serialized);
         self.metadata.insert(
             "project_tags".to_string(),
@@ -541,6 +542,8 @@ impl JournalEntry {
             out.insert("context_tags".to_string(), XffValue::Array(Array::new()));
             out.insert("special_tags".to_string(), XffValue::from(Object::new()));
             out.insert("bespoke_tags".to_string(), XffValue::Array(Array::new()));
+            out.insert("mood".to_string(), XffValue::String("".to_string()));
+            out.insert("important_day".to_string(), XffValue::Boolean(false));
             out
         };
     }
