@@ -112,7 +112,7 @@ You can change the password inside `Urd`, using the `Settings` menu.
 ### Dependencies
 
 #### `eframe`
-The only outside dependency of `Urd` is `eframe`, which can be found [here](https://github.com/emilk/egui).
+The only outside dependency is [`eframe`](https://github.com/emilk/egui).
 
 ### All other dependencies
 Written by me, you can find them on my [GitHub](https://github.com/xqhare).
