@@ -1,10 +1,5 @@
 use crate::{
-    error::Error,
-    journal_entries::Journal,
-    render::{Render, ShowFolder},
-    search::Search,
-    settings::{NeededPath, Settings},
-    startup::StartupState,
+    error::Error, journal_entries::Journal, moods::Mood, render::{Render, ShowFolder}, search::Search, settings::{NeededPath, Settings}, startup::StartupState
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -24,6 +19,18 @@ mod settings;
 
 const APP_NAME: &str = "Urd";
 
+pub struct StateStore {
+    pub new_mood: Mood,
+}
+
+impl Default for StateStore {
+    fn default() -> Self {
+        Self {
+            new_mood: Mood::default(),
+        }
+    }
+}
+
 pub struct UrdState {
     journal: Journal,
     settings: Settings,
@@ -31,6 +38,7 @@ pub struct UrdState {
     render: Render,
     search: Search,
     settings_backup: Option<Settings>,
+    state_store: StateStore,
 }
 
 impl Default for UrdState {
@@ -43,6 +51,7 @@ impl Default for UrdState {
             render: Render::default(),
             search: Search::default(),
             settings_backup: None,
+            state_store: StateStore::default(),
         }
     }
 }
@@ -58,6 +67,7 @@ impl UrdState {
                 render: Render::startup_default(),
                 search: Search::default(),
                 settings_backup: None,
+                state_store: StateStore::default(),
             }
         } else {
             UrdState {
@@ -67,6 +77,7 @@ impl UrdState {
                 render: Render::default(),
                 search: Search::default(),
                 settings_backup: None,
+                state_store: StateStore::default(),
             }
         }
     }
