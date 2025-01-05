@@ -1,4 +1,25 @@
+use eframe::egui::Color32;
 use nabu::{Array, Object, XffValue};
+
+pub struct Mood {
+    pub name: String,
+    pub colour: Color32,
+}
+
+impl Mood {
+    pub fn new(name: String, colour: Color32) -> Self {
+        Self { name, colour }
+    }
+}
+
+impl Default for Mood {
+    fn default() -> Self {
+        Self {
+            name: "".to_string(),
+            colour: Color32::from_rgba_unmultiplied(0, 0, 0, 255),
+        }
+    }
+}
 
 pub fn default_moods() -> Object {
     let mut out = Object::new();
