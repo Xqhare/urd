@@ -49,6 +49,7 @@ A journaling app written in rust.
     - Stored inside `journal.xff` inside their respective entry
     - List all important day entries
 - Better user onboarding
+    - On hover text for everything
     - Detection of first run is implemented
         - Opens `Help` window only currently
     - Open Modal `Welcome`
@@ -59,6 +60,9 @@ A journaling app written in rust.
         - Direct them to the `Settings` menu
         - Button `Take me to the settings menu`
         - Button `Got it - don't show again`
+    - Onboarding in the `Settings` menu
+        - Instead of main window display a panel with text and button for `next`
+        - explain settings page in detail
 
 ## Issues preventing a stable release
 
