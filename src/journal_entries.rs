@@ -440,6 +440,13 @@ pub struct JournalEntry {
 }
 
 impl JournalEntry {
+    pub fn debug_create(title: String, text: String, metadata: BTreeMap<String, XffValue>) -> Self {
+        Self {
+            title,
+            text,
+            metadata,
+        }
+    }
     pub fn new(settings: &Settings) -> Self {
         let (title, full_date_split) = {
             let mut date_time = horae::Utc::now();
