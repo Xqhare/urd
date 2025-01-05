@@ -2,13 +2,11 @@ use eframe::{
     egui::{CentralPanel, Ui},
     *,
 };
-use egui::{Align, FontId, Margin, ScrollArea, TextEdit};
-use nabu::Object;
+use egui::{Align, ComboBox, FontId, Margin, ScrollArea, Sides, TextEdit};
+use nabu::{Object, XffValue};
 
 use crate::{
-    error::Error,
-    journal_entries::{EntryType, Folder, JournalEntry},
-    settings::{MAX_FONT_SIZE, MIN_FONT_SIZE},
+    error::Error, journal_entries::{EntryType, Folder, JournalEntry}, moods::Mood, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}
 };
 
 use super::UrdState;
@@ -38,6 +36,20 @@ impl UrdState {
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
                     ui.heading(&self.journal.current_entry.title);
+                });
+                ui.separator();
+                ui.horizontal(|ui: &mut Ui| {
+                    if !self.render.show_add_mood_ui {
+                        ui.add_space(ui.available_width() / 3.95);
+                    }
+                    self.mood(ui);
+                    ui.separator();
+                    // Again hacky, but saves me from declaring another state field
+                    let mut tmp_bool = self.journal.current_entry.metadata.get_mut("important_day").unwrap().into_boolean().unwrap();
+                    if ui.checkbox(&mut tmp_bool, "Important Day").changed() {
+                        self.journal.current_entry.metadata.insert("important_day".to_string(), XffValue::from(tmp_bool));
+                        println!("{}", self.journal.current_entry.metadata.get("important_day").unwrap().into_boolean().unwrap());
+                    }
                 });
                 ui.separator();
                 ui.add_sized(ui.available_size(), |ui: &mut Ui| {
@@ -247,6 +259,57 @@ impl UrdState {
         });
     }
 
+    fn mood(&mut self, ui: &mut Ui) {
+        ComboBox::from_label("Mood")
+            .selected_text(self.journal.current_entry.metadata.get("mood").unwrap().into_string().unwrap())
+            .show_ui(ui, |ui: &mut Ui| {
+                for (mood, _) in self.journal.moods.iter() {
+                    // Hacky af, I know - but hey I can save here too!
+                    if ui.selectable_value(&mut self.journal.current_entry.metadata.get("mood").unwrap().into_string().unwrap(), mood.to_string(), mood).changed() {
+                        self.journal.current_entry.metadata.insert("mood".to_string(), XffValue::from(mood));
+                        let save = self.journal.save();
+                        if save.is_err() {
+                            self.error = Error::new(
+                                save.unwrap_err().to_string(),
+                                "Writing journal to disk failed.".to_string(),
+                            );
+                        }
+                    };
+                }
+            });
+        if self.render.show_add_mood_ui {
+            ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood");
+            ui.label("Mood Colour: ");
+            ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour).on_hover_text("Choose the colour of the new mood");
+            
+            if ui.button("Add mood").clicked() {
+                if self.journal.moods.contains_key(&self.state_store.new_mood.name) {
+                    self.error = Error::new(
+                        "Mood already exists.".to_string(),
+                        "Please choose a different name.".to_string(),
+                    );
+                } else {
+                    self.journal.moods.insert(self.state_store.new_mood.name.clone(), self.state_store.new_mood.colour.to_array().to_vec());
+                    let save = self.journal.save();
+                    if save.is_err() {
+                        self.error = Error::new(
+                            save.unwrap_err().to_string(),
+                            "Writing journal to disk failed.".to_string(),
+                        );
+                    }
+                    // Reset
+                    self.state_store.new_mood = Mood::default();
+                    self.render.show_add_mood_ui = false;
+                }
+            };
+        } else {
+            if ui.button("Add mood").clicked() {
+                self.render.show_add_mood_ui = true;
+                self.state_store.new_mood.name = "Custom Mood".to_string();
+            };
+        };
+    }
+
     fn central_panel_menu(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui: &mut Ui| {
             ui.group(|ui: &mut Ui| {
@@ -369,9 +432,6 @@ impl UrdState {
     }
 
     fn save_entry_to_journal(&mut self) {
-        self.journal
-            .current_entry
-            .overwrite(self.journal.current_entry.text.clone());
         let (year, month) = {
             let date = self
                 .journal
@@ -438,11 +498,11 @@ impl UrdState {
                         .entries
                         .push_front(EntryType::JournalEntry(self.journal.current_entry.clone()));
                 } else {
-                    let day_folder = day_search.unwrap().get_journal_entry_mut();
-                    if day_folder.is_some() {
-                        day_folder
+                    let day_entry = day_search.unwrap().get_journal_entry_mut();
+                    if day_entry.is_some() {
+                        day_entry
                             .unwrap()
-                            .overwrite(self.journal.current_entry.text.clone());
+                            .overwrite(self.journal.current_entry.text.clone(), self.journal.current_entry.metadata.clone());
                     }
                 }
             }
