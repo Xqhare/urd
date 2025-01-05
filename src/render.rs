@@ -11,6 +11,7 @@ pub enum ShowFolder {
 pub struct Render {
     pub viewports: Viewport,
     pub show_folder: ShowFolder,
+    pub show_add_mood_ui: bool,
 }
 
 impl Default for Render {
@@ -18,6 +19,7 @@ impl Default for Render {
         Render {
             viewports: Viewport::default(),
             show_folder: ShowFolder::All,
+            show_add_mood_ui: false,
         }
     }
 }
@@ -27,6 +29,7 @@ impl Render {
         Render {
             viewports: Viewport::startup_default(),
             show_folder: ShowFolder::All,
+            show_add_mood_ui: false,
         }
     }
 }
