@@ -238,14 +238,20 @@ impl UrdState {
                                 if self.render.view.show_important_days_page {
                                     self.render.view.show_important_days_page = false;
                                 } else {
+                                    self.construct_important_day_entries();
                                     self.render.view.show_important_days_page = true;
+                                    self.render.view.show_search_page = false;
+                                    self.render.view.show_mood_page = false;
                                 }
                             }
                             if ui.button("Moods").clicked() {
                                 if self.render.view.show_mood_page {
                                     self.render.view.show_mood_page = false;
                                 } else {
+                                    self.construct_mood_entries();
                                     self.render.view.show_mood_page = true;
+                                    self.render.view.show_search_page = false;
+                                    self.render.view.show_important_days_page = false;
                                 }
                             }
                             if ui.button("Export").clicked() {
