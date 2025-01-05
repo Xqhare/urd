@@ -156,7 +156,7 @@ impl UrdState {
     }
 }
 
-fn month_num_to_name(month: u8) -> &'static str {
+pub fn month_num_to_name(month: u8) -> &'static str {
     match month {
         1 => "January",
         2 => "February",
