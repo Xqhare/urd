@@ -21,6 +21,21 @@ impl Default for Mood {
     }
 }
 
+impl From<(String, XffValue)> for Mood {
+    fn from(value: (String, XffValue)) -> Self {
+        let colour = value.1.into_array().unwrap();
+        Self {
+            name: value.0,
+            colour: Color32::from_rgba_unmultiplied(
+                colour.get(0).unwrap().into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                colour.get(1).unwrap().into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                colour.get(2).unwrap().into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                colour.get(3).unwrap().into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+            ),
+        }
+    }
+}
+
 pub fn default_moods() -> Object {
     let mut out = Object::new();
     // Only one with opacity set to 0
