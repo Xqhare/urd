@@ -13,9 +13,7 @@ pub enum ShowFolder {
 pub struct Render {
     pub view: View,
     pub show_folder: ShowFolder,
-    pub show_add_mood_field: bool,
-    pub important_day_entries: Vec<JournalEntry>,
-    pub mood_entries: Vec<JournalEntry>,
+    pub entities: Entities,
 }
 
 impl Default for Render {
@@ -23,9 +21,7 @@ impl Default for Render {
         Render {
             view: View::default(),
             show_folder: ShowFolder::All,
-            show_add_mood_field: false,
-            important_day_entries: Vec::new(),
-            mood_entries: Vec::new(),
+            entities: Entities::default(),
         }
     }
 }
@@ -35,7 +31,19 @@ impl Render {
         Render {
             view: View::startup_default(),
             show_folder: ShowFolder::All,
-            show_add_mood_field: false,
+            entities: Entities::default(),
+        }
+    }
+}
+
+pub struct Entities {
+    pub important_day_entries: Vec<JournalEntry>,
+    pub mood_entries: Vec<JournalEntry>,
+}
+
+impl Default for Entities {
+    fn default() -> Self {
+        Entities {
             important_day_entries: Vec::new(),
             mood_entries: Vec::new(),
         }
@@ -43,27 +51,17 @@ impl Render {
 }
 
 pub struct View {
-    pub show_about_viewport: Arc<AtomicBool>,
-    pub show_licenses_viewport: Arc<AtomicBool>,
-    pub show_help_viewport: Arc<AtomicBool>,
-    pub show_settings_viewport: bool,
-    pub show_search_page: bool,
-    pub show_file_picker: bool,
-    pub show_important_days_page: bool,
-    pub show_mood_page: bool,
+    pub viewports: Viewports,
+    pub pages: Pages,
+    pub ui_state: UiState,
 }
 
 impl Default for View {
     fn default() -> Self {
         View {
-            show_about_viewport: Arc::new(AtomicBool::new(false)),
-            show_licenses_viewport: Arc::new(AtomicBool::new(false)),
-            show_help_viewport: Arc::new(AtomicBool::new(false)),
-            show_settings_viewport: false,
-            show_search_page: false,
-            show_file_picker: false,
-            show_important_days_page: false,
-            show_mood_page: false,
+            viewports: Viewports::default(),
+            pages: Pages::default(),
+            ui_state: UiState::default(),
         }
     }
 }
@@ -71,16 +69,71 @@ impl Default for View {
 impl View {
     pub fn startup_default() -> Self {
         View {
-            // ONLY DIFFERENCE
-            show_help_viewport: Arc::new(AtomicBool::new(true)),
-            // Same
-            show_about_viewport: Arc::new(AtomicBool::new(false)),
-            show_licenses_viewport: Arc::new(AtomicBool::new(false)),
-            show_settings_viewport: false,
+            viewports: Viewports::startup_default(),
+            pages: Pages::default(),
+            ui_state: UiState::default(),
+        }
+    }
+}
+
+pub struct UiState {
+    pub show_add_mood_field: bool,
+    pub show_destructive_action_confirmation: bool,
+}
+
+impl Default for UiState {
+    fn default() -> Self {
+        UiState {
+            show_add_mood_field: false,
+            show_destructive_action_confirmation: false,
+        }
+    }
+}
+
+pub struct Pages {
+    pub show_settings_page: bool,
+    pub show_search_page: bool,
+    pub show_file_picker_page: bool,
+    pub show_important_days_page: bool,
+    pub show_mood_page: bool,
+}
+
+impl Default for Pages {
+    fn default() -> Self {
+        Pages {
+            show_settings_page: false,
             show_search_page: false,
-            show_file_picker: false,
+            show_file_picker_page: false,
             show_important_days_page: false,
             show_mood_page: false,
+        }
+    }
+}
+
+pub struct Viewports {
+    pub show_about_viewport: Arc<AtomicBool>,
+    pub show_licenses_viewport: Arc<AtomicBool>,
+    pub show_help_viewport: Arc<AtomicBool>,
+}
+
+impl Default for Viewports {
+    fn default() -> Self {
+        Viewports {
+            show_about_viewport: Arc::new(AtomicBool::new(false)),
+            show_licenses_viewport: Arc::new(AtomicBool::new(false)),
+            show_help_viewport: Arc::new(AtomicBool::new(false)),
+        }
+    }
+}
+
+impl Viewports {
+    pub fn startup_default() -> Self {
+        Viewports {
+            // ONLY DIFFERENCE
+            show_about_viewport: Arc::new(AtomicBool::new(true)),
+            // Same
+            show_licenses_viewport: Arc::new(AtomicBool::new(false)),
+            show_help_viewport: Arc::new(AtomicBool::new(false)),
         }
     }
 }

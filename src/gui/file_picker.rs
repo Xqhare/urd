@@ -39,7 +39,7 @@ impl UrdState {
                                 ui.label(self.settings.custom_paths.backup_directory.clone());
                                 ui.separator();
                                 if ui.button("Done").clicked() {
-                                    self.render.view.show_file_picker = false;
+                                    self.render.view.show_file_picker_page = false;
                                     let pos_err = self.settings.save();
                                     if pos_err.is_err() {
                                         self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
@@ -74,7 +74,7 @@ impl UrdState {
                                 ui.label(self.settings.custom_paths.export_directory.clone());
                                 ui.separator();
                                 if ui.button("Done").clicked() {
-                                    self.render.view.show_file_picker = false;
+                                    self.render.view.show_file_picker_page = false;
                                     let pos_err = self.settings.save();
                                     if pos_err.is_err() {
                                         self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
@@ -109,7 +109,7 @@ impl UrdState {
                                 ui.label(self.settings.custom_paths.restore_file.clone());
                                 ui.separator();
                                 if ui.button("Done").clicked() {
-                                    self.render.view.show_file_picker = false;
+                                    self.render.view.show_file_picker_page = false;
                                     let pos_err = self.settings.save();
                                     if pos_err.is_err() {
                                         self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());

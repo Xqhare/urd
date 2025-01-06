@@ -13,7 +13,7 @@ use super::UrdState;
 
 impl UrdState {
     pub fn main_page(&mut self, ctx: &egui::Context) {
-        if self.render.view.show_settings_viewport {
+        if self.render.view.show_settings_page {
             self.settings_viewport_startup(ctx);
         } else {
             self.main_side_panel(ctx);

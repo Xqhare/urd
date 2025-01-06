@@ -158,7 +158,7 @@ impl UrdState {
         } else {
             if self.render.view.show_search_page {
                 self.search_page(ctx);
-            } else if self.render.view.show_file_picker {
+            } else if self.render.view.show_file_picker_page {
                 self.file_picker(ctx);
             } else {
                 self.main_page(ctx);
@@ -199,11 +199,11 @@ impl UrdState {
                     ui.horizontal(|ui: &mut Ui| {
                         ui.menu_button("Urd", |ui: &mut Ui| {
                             if ui.button("Settings").clicked() {
-                                if self.render.view.show_settings_viewport {
-                                    self.render.view.show_settings_viewport = false;
+                                if self.render.view.show_settings_page {
+                                    self.render.view.show_settings_page = false;
                                     self.settings_backup = None;
                                 } else {
-                                    self.render.view.show_settings_viewport = true;
+                                    self.render.view.show_settings_page = true;
                                     self.settings_backup = Some(self.settings.clone());
                                 }
                             }
@@ -268,7 +268,7 @@ impl UrdState {
                                 } else {
                                     self.settings.custom_paths.needed_path =
                                         Some(NeededPath::Export);
-                                    self.render.view.show_file_picker = true;
+                                    self.render.view.show_file_picker_page = true;
                                 }
                             }
                             ui.menu_button("Backup", |ui: &mut Ui| {
@@ -289,13 +289,13 @@ impl UrdState {
                                     } else {
                                         self.settings.custom_paths.needed_path =
                                             Some(NeededPath::Backup);
-                                        self.render.view.show_file_picker = true;
+                                        self.render.view.show_file_picker_page = true;
                                     }
                                 }
                                 if ui.button("Restore").clicked() {
                                     self.settings.custom_paths.needed_path =
                                         Some(NeededPath::Restore);
-                                    self.render.view.show_file_picker = true;
+                                    self.render.view.show_file_picker_page = true;
                                 }
                             });
                         });
@@ -310,9 +310,9 @@ impl UrdState {
                                 self.settings.password.unlocked_with_password = false;
                             }
                         }
-                        if self.render.view.show_file_picker {
+                        if self.render.view.show_file_picker_page {
                             if ui.button("Exit file picker").clicked() {
-                                self.render.view.show_file_picker = false;
+                                self.render.view.show_file_picker_page = false;
                             };
                         }
                     })
