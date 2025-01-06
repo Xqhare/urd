@@ -1,6 +1,6 @@
 use eframe::egui::{Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Sides, Slider, TextEdit, Ui};
 use horae::TimeZone;
-use nabu::Object;
+use nabu::{Object, XffValue};
 
 use crate::{
     error::Error, moods::{default_moods, Mood}, settings::{
@@ -449,6 +449,59 @@ impl UrdState {
                                         }
                                     });
                                 }
+                            }).response
+                        });
+
+                        ui.add(|ui: &mut Ui| {
+                            ui.group(|ui: &mut Ui| {
+                                ui.label("Aspirations settings");
+                                for entry in self.render.entities.aspirations.iter_mut() {
+                                    ui.group(|ui: &mut Ui| {
+                                        ui.label(format!("{}", entry.year));
+                                        Sides::new().show(ui, |ui: &mut Ui| {
+                                            ui.label("Theme: ");
+                                        }, |ui: &mut Ui| {
+                                            ui.add(TextEdit::singleline(&mut entry.edit_theme).horizontal_align(Align::Center).hint_text("Progress")).on_hover_text("Enter the theme of the year - One word only.");
+                                        });
+                                        Sides::new().show(ui, |ui: &mut Ui| {
+                                            ui.label("Pledge: "); 
+                                        }, |ui: &mut Ui| {
+                                            ui.add(TextEdit::singleline(&mut entry.edit_pledge).horizontal_align(Align::Center).hint_text("Walk more")).on_hover_text("Enter the pledge of the year - One sentence max.");
+                                        });
+                                        ui.vertical_centered_justified(|ui: &mut Ui| {
+                                            ui.label("Resolutions: ");
+                                            for resolution in entry.edit_resolutions.iter_mut() {
+                                                ui.add(TextEdit::singleline(resolution).horizontal_align(Align::Center).hint_text("Go to the gym")).on_hover_text("Enter one resolution per line.");
+                                            }
+                                        });
+                                        if ui.button("Add resolution").clicked() {
+                                            entry.edit_resolutions.push("".to_string());
+                                        }
+                                    });
+                                    if ui.button("Save").clicked() {
+                                        let xff_val = {
+                                            let mut out = Object::new();
+                                            out.insert("theme".to_string(), XffValue::from(entry.edit_theme.clone()));
+                                            out.insert("pledge".to_string(), XffValue::from(entry.edit_pledge.clone()));
+                                            out.insert("resolutions".to_string(), XffValue::from(entry.edit_resolutions.clone()));
+                                            XffValue::from(out)
+                                        };
+
+                                        for year in self.journal.entries.iter_mut() {
+                                            if year.get_folder().unwrap().name == entry.year {
+                                                year.get_folder_mut().unwrap().aspirations = xff_val;
+                                                break;
+                                            }
+                                        }
+                                        let save = self.journal.save();
+                                        if save.is_err() {
+                                            self.error = Error::new(
+                                                save.unwrap_err().to_string(),
+                                                "Writing journal to disk failed.".to_string(),
+                                            );
+                                        }
+                                    }
+                                };
                             }).response
                         });
 

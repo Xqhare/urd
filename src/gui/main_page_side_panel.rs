@@ -44,11 +44,41 @@ impl UrdState {
                 }
                 ShowFolder::Year(year) => {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
-                        ui.add_space(22.5);
+                        let year_folder = self.journal.entries.iter().find(|entry| entry.get_folder().unwrap().name == year.to_string()).expect("Failed to find displayed folder");
+                        let aspir = year_folder.get_folder().unwrap().aspirations.clone();
+                        if aspir.is_null() {
+                            ui.add_space(22.5);
                             if ui.heading(year.to_string()).clicked() {
                                 self.go_back_one_level();
                             }
-                        ui.add_space(22.5);
+                            ui.add_space(22.5);
+                        } else {
+                            let aspirations = aspir.into_object().unwrap();
+                            ui.add_space(2.5);
+                            if ui.heading(format!("{}", year.to_string())).clicked() {
+                                self.go_back_one_level();
+                            }
+                            let theme = aspirations.get("theme").unwrap().into_string().unwrap();
+                            if theme != "" {
+                                ui.add_space(2.5);
+                                ui.label(format!("The year of {}", theme));
+                            }
+                            let pledge = aspirations.get("pledge").unwrap().into_string().unwrap();
+                            if pledge != "" {
+                                ui.add_space(2.5);
+                                ui.label(format!("This year I pledge to {}", pledge));
+                            }
+                            let asps = aspirations.get("resolutions").unwrap().into_array().unwrap();
+                            if asps.len() > 0 {
+                                ui.add_space(2.5);
+                                ui.collapsing("New years resolutions", |ui: &mut Ui| {
+                                    for aspiration in asps {
+                                        ui.label(aspiration.into_string().unwrap());
+                                    }
+                                });
+                            }
+                            ui.add_space(2.5);
+                        }
                     });
                     ui.separator();
                     ScrollArea::vertical().show(ui, |ui: &mut Ui| {

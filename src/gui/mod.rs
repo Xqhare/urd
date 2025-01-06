@@ -1,5 +1,5 @@
 use crate::{
-    error::Error, journal_entries::Journal, moods::Mood, render::{Render, ShowFolder}, search::Search, settings::{NeededPath, Settings}, startup::StartupState
+    error::Error, journal_entries::Journal, moods::Mood, render::{Aspirations, Render, ShowFolder}, search::Search, settings::{NeededPath, Settings}, startup::StartupState
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -196,6 +196,59 @@ impl UrdState {
         }
     }
 
+    fn construct_moods(&self) -> Vec<Mood> {
+        let mut out: Vec<Mood> = Vec::new();
+        for (mood, col_ary) in self.journal.moods.iter() {
+            let (r, g, b, a) = {
+                let ary = col_ary.into_array().unwrap().into_vec();
+                (
+                ary[0].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                ary[1].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                ary[2].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                ary[3].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                )
+            };
+            out.push(Mood {
+                name: mood.clone(),
+                colour: Color32::from_rgba_unmultiplied(r, g, b, a),
+            });
+        }
+        out
+    }
+
+    fn construct_aspirations(&self) -> Vec<Aspirations> {
+        let mut out: Vec<Aspirations> = Vec::new();
+        for year in self.journal.entries.iter() {
+            let year_folder = year.get_folder().unwrap();
+            let year_str = year_folder.name.clone();
+            let aspirations = year_folder.aspirations.clone();
+            if aspirations.is_null() {
+                let mut tmp = Aspirations::default();
+                tmp.year = year_str;
+                out.push(tmp);
+            } else {
+                let obj = aspirations.into_object().unwrap();
+                let theme = obj.get("theme").unwrap().into_string().unwrap();
+                let pledge = obj.get("pledge").unwrap().into_string().unwrap();
+                let resulutions = {
+                    let tmp_res_vec = obj.get("resolutions").unwrap().into_array().unwrap();
+                    let mut res_out: Vec<String> = Vec::new();
+                    for res in tmp_res_vec {
+                        res_out.push(res.into_string().unwrap());
+                    }
+                    res_out
+                };
+                let mut tmp = Aspirations::default();
+                tmp.year = year_str;
+                tmp.edit_theme = theme;
+                tmp.edit_pledge = pledge;
+                tmp.edit_resolutions = resulutions;
+                out.push(tmp);
+            }
+        }
+        out
+    }
+
     fn main_top_panel(&mut self, ctx: &egui::Context) {
         TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
             ui.horizontal(|ui: &mut Ui| {
@@ -211,23 +264,9 @@ impl UrdState {
                                 } else {
                                     self.render.view.pages.show_settings_page = true;
                                     self.settings_backup = Some(self.settings.clone());
-                                    let mut tmp: Vec<Mood> = Vec::new();
-                                    for (mood, col_ary) in self.journal.moods.iter() {
-                                        let (r, g, b, a) = {
-                                            let ary = col_ary.into_array().unwrap().into_vec();
-                                            (
-                                            ary[0].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                                            ary[1].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                                            ary[2].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                                            ary[3].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                                            )
-                                        };
-                                        tmp.push(Mood {
-                                            name: mood.clone(),
-                                            colour: Color32::from_rgba_unmultiplied(r, g, b, a),
-                                        });
-                                    }
-                                    self.state_store.all_moods = tmp;
+                                    
+                                    self.state_store.all_moods = self.construct_moods();
+                                    self.render.entities.aspirations = self.construct_aspirations();
                                 }
                             }
                             if ui.button("About").clicked() {

@@ -39,6 +39,7 @@ impl Render {
 pub struct Entities {
     pub important_day_entries: Vec<JournalEntry>,
     pub mood_entries: Vec<JournalEntry>,
+    pub aspirations: Vec<Aspirations>,
 }
 
 impl Default for Entities {
@@ -46,6 +47,7 @@ impl Default for Entities {
         Entities {
             important_day_entries: Vec::new(),
             mood_entries: Vec::new(),
+            aspirations: Vec::new(),
         }
     }
 }
@@ -86,6 +88,24 @@ impl Default for UiState {
         UiState {
             show_add_mood_field: false,
             show_destructive_action_confirmation: false,
+        }
+    }
+}
+
+pub struct Aspirations {
+    pub year: String,
+    pub edit_theme: String,
+    pub edit_pledge: String,
+    pub edit_resolutions: Vec<String>,
+}
+
+impl Default for Aspirations {
+    fn default() -> Self {
+        Aspirations {
+            year: "".to_string(),
+            edit_theme: "".to_string(),
+            edit_pledge: "".to_string(),
+            edit_resolutions: Vec::new(),
         }
     }
 }

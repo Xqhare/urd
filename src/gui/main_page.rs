@@ -35,7 +35,8 @@ impl UrdState {
             ui.separator();
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
-                    ui.add(TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center));
+                    //DEBUG LEAVE FOR LATER
+                    //ui.add(TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center));
                     ui.heading(&self.journal.current_entry.title);
                 });
                 ui.separator();
@@ -354,7 +355,8 @@ impl UrdState {
                     );
                 }
             };
-            if ui.button("Debug Create").clicked() {
+            //DEBUG LEAVE FOR LATER
+            /* if ui.button("Debug Create").clicked() {
                 let date_split = self.journal.current_entry.title.split("-").collect::<Vec<&str>>();
                 debug_assert!(date_split.len() == 3);
                 let year = date_split[0].parse::<u16>().unwrap();
@@ -380,7 +382,7 @@ impl UrdState {
                 let next_day = day + 1;
                 let next_date = format!("{}-{:02}-{:02}", year, month, next_day);
                 self.journal.current_entry.title = next_date;
-            };
+            }; */
             if ui.button("Reset entry").clicked() {
                 self.delete_entry_from_journal();
                 let save = self.journal.save();

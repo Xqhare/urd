@@ -15,28 +15,17 @@ A journaling app written in rust.
 - Daily mood tracker
     - To add new moods or edit existing moods, use the `Settings` menu
 - Important day marker
+- Years aspirations
+    1. Year Theme
+        - Give your year a theme, e.g. `Learning` or `Growth` will be displayed as `Year of Learning` or `Year of Growth`
+    2. Year Pledge
+        - Give yourself a pledge for the year, e.g. `learn more about Rust` will be displayed as `This year I pledge to learn more about Rust`
+    3. Years Resolutions
+        - The classic year resolutions
+        - As many as you want!
+        - No you cannot mark them completed, you won't finish them anyway!
 
 ## Roadmap
-
-- Year of X (e.g. Progress) / pledge for the year / new year's resolution
-    - All three of these can be set in the `side_bar` at the top
-        - They are non-exclusive - None, one, all or any combination are possible
-        - They are stored in the `journal.xff` file, inside their respective `year` folders
-    1. Year Theme
-        - Can be displayed inside `side_bar` at the top inside the year folder name
-        - No longer than a few words
-    2. Year Pledge
-        - Can be displayed inside `side_bar` at the top inside the year folder name
-        - Basically a singular resolution
-    3. Year Resolutions
-        - Can be made accessible inside `side_bar` at the top inside the year folder name with a button
-            - Opens a modal with all resolutions ready to be marked completed
-        - Can be a larger number of resolutions
-            - To set, use a list of resolutions
-                - One text field per resolution
-                    - If empty, the resolution will not be saved
-                - Button `Add resolution` at bottom
-                    - Adds another text field
 
 ## Issues preventing a stable release
 
