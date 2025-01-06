@@ -1,18 +1,29 @@
 
-use eframe::egui::{CentralPanel, Context, Ui};
-
-use crate::journal_entries::JournalEntry;
+use eframe::egui::{CentralPanel, Context, ScrollArea, Ui};
 
 use super::UrdState;
 
 impl UrdState {
     pub fn important_days_page(&mut self, ctx: &Context) {
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
-            ui.heading("Important Days");
-            for tmp in &self.render.entities.important_day_entries {
-                ui.label(tmp.title.clone());
-                ui.separator();
-            }
+            ScrollArea::vertical().show(ui, |ui: &mut Ui| {
+                ui.vertical_centered_justified(|ui: &mut Ui| {
+                    ui.heading("All your important days");
+                    ui.label("Click on an entry to open it.");
+                    for tmp in &self.render.entities.important_day_entries {
+                        ui.group(|ui: &mut Ui| {
+                            let title = ui.label(tmp.title.clone());
+                            let mood = ui.label(format!("Mood: {}", tmp.metadata.get("mood").unwrap().into_string().unwrap()));
+                            let sep = ui.separator();
+                            let text = ui.label(tmp.text.clone());
+                            if title.clicked() || mood.clicked() || sep.clicked() || text.clicked() {
+                                self.journal.current_entry = tmp.clone();
+                                self.render.view.pages.show_important_days_page = false;
+                            }
+                        });
+                    }
+                })
+            })
         });
     }
 

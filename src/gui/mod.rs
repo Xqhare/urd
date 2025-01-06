@@ -6,7 +6,7 @@ use eframe::{
     epaint::Vec2,
     *,
 };
-use egui::{Align, Id, Modal, TextEdit, TopBottomPanel};
+use egui::{Align, Color32, Id, Modal, TextEdit, TopBottomPanel};
 
 mod about;
 mod file_picker;
@@ -23,12 +23,14 @@ const APP_NAME: &str = "Urd";
 
 pub struct StateStore {
     pub new_mood: Mood,
+    pub all_moods: Vec<Mood>,
 }
 
 impl Default for StateStore {
     fn default() -> Self {
         Self {
             new_mood: Mood::default(),
+            all_moods: Vec::new(),
         }
     }
 }
@@ -205,9 +207,27 @@ impl UrdState {
                                 if self.render.view.pages.show_settings_page {
                                     self.render.view.pages.show_settings_page = false;
                                     self.settings_backup = None;
+                                    self.state_store.all_moods = Vec::new();
                                 } else {
                                     self.render.view.pages.show_settings_page = true;
                                     self.settings_backup = Some(self.settings.clone());
+                                    let mut tmp: Vec<Mood> = Vec::new();
+                                    for (mood, col_ary) in self.journal.moods.iter() {
+                                        let (r, g, b, a) = {
+                                            let ary = col_ary.into_array().unwrap().into_vec();
+                                            (
+                                            ary[0].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                                            ary[1].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                                            ary[2].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                                            ary[3].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                                            )
+                                        };
+                                        tmp.push(Mood {
+                                            name: mood.clone(),
+                                            colour: Color32::from_rgba_unmultiplied(r, g, b, a),
+                                        });
+                                    }
+                                    self.state_store.all_moods = tmp;
                                 }
                             }
                             if ui.button("About").clicked() {

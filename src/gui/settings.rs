@@ -1,5 +1,6 @@
-use eframe::egui::{Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider, TextEdit, Ui};
+use eframe::egui::{Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Sides, Slider, TextEdit, Ui};
 use horae::TimeZone;
+use nabu::Object;
 
 use crate::{
     error::Error, moods::{default_moods, Mood}, settings::{
@@ -29,6 +30,7 @@ impl UrdState {
                                         let but = ui.button("Cancel and Close");
                                         if but.clicked() {
                                             self.settings = self.settings_backup.clone().unwrap();
+                                            self.state_store.all_moods = Vec::new();
                                             self.settings.overwrite_window_size = false;
                                             self.settings.overwrite_side_panel_width = false;
                                             self.render.view.pages.show_settings_page = false;
@@ -39,9 +41,13 @@ impl UrdState {
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
                                         let but = ui.button("Save");
                                         if but.clicked() {
-                                            let save = self.settings.save();
-                                            if save.is_err() {
-                                                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                            self.export_and_save_moods();
+                                            let save_settings = self.settings.save();
+                                            let save_journal = self.journal.save();
+                                            if save_settings.is_err() {
+                                                self.error = Error::new(save_settings.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                            } else if save_journal.is_err() {
+                                                self.error = Error::new(save_journal.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
                                                 self.settings.overwrite_side_panel_width = false;
@@ -53,14 +59,19 @@ impl UrdState {
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
                                         let but = ui.button("Save and Close");
                                         if but.clicked() {
-                                            let save = self.settings.save();
-                                            if save.is_err() {
-                                                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                            self.export_and_save_moods();
+                                            let save_settings = self.settings.save();
+                                            let save_journal = self.journal.save();
+                                            if save_settings.is_err() {
+                                                self.error = Error::new(save_settings.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                            } else if save_journal.is_err() {
+                                                self.error = Error::new(save_journal.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
                                                 self.render.view.pages.show_settings_page = false;
                                                 self.settings.overwrite_side_panel_width = false;
                                                 self.settings_backup = None;
+                                                self.state_store.all_moods = Vec::new();
                                             }
                                         };
                                         but
@@ -69,9 +80,12 @@ impl UrdState {
                                 if ui.button("Restore defaults").clicked() {
                                     self.settings = Settings::default();
                                     self.settings_backup = Some(self.settings.clone());
-                                    let save = self.settings.save();
-                                    if save.is_err() {
-                                        self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                    let save_settings = self.settings.save();
+                                    let save_journal = self.journal.save();
+                                    if save_settings.is_err() {
+                                        self.error = Error::new(save_settings.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                    } else if save_journal.is_err() {
+                                        self.error = Error::new(save_journal.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
                                     }
                                 };
                             }).response
@@ -357,36 +371,62 @@ impl UrdState {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Mood settings");
 
-                                Grid::new("mood_settings").num_columns(2).show(ui, |ui: &mut Ui| {
-                                    ui.label("Mood Name: ");
-                                    ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood");
-
-                                    ui.end_row();
-
-                                    ui.label("Mood Colour: ");
-                                    ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour).on_hover_text("Choose the colour of the new mood");
-                                });
-                                
-                                if ui.button("Add mood").clicked() {
-                                    if self.journal.moods.contains_key(&self.state_store.new_mood.name) {
-                                        self.error = Error::new(
-                                            "Mood already exists.".to_string(),
-                                            "Please choose a different name.".to_string(),
-                                        );
-                                    } else {
-                                        self.journal.moods.insert(self.state_store.new_mood.name.clone(), self.state_store.new_mood.colour.to_array().to_vec());
-                                        let save = self.journal.save();
-                                        if save.is_err() {
+                                ui.group(|ui: &mut Ui| {
+                                    /* Grid::new("mood_settings").num_columns(2).show(ui, |ui: &mut Ui| {
+                                        ui.label("Mood Name: ");
+                                        ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood - This cannot be changed later!");
+                                    }); */
+                                    Sides::new().show(ui, |ui: &mut Ui| {
+                                        ui.label("Mood Name: ");
+                                    }, |ui: &mut Ui| {
+                                        ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood - This cannot be changed later!");
+                                    });
+                                    Sides::new().show(ui, |ui: &mut Ui| {
+                                        ui.label("Mood Colour: ");
+                                    }, |ui: &mut Ui| {
+                                        ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour).on_hover_text("Choose the colour of the new mood");
+                                    });
+                                    
+                                    if ui.button("Add mood").clicked() {
+                                        if self.journal.moods.contains_key(&self.state_store.new_mood.name) {
                                             self.error = Error::new(
-                                                save.unwrap_err().to_string(),
-                                                "Writing journal to disk failed.".to_string(),
+                                                "Mood already exists.".to_string(),
+                                                "Please choose a different name.".to_string(),
                                             );
+                                        } else {
+                                            self.journal.moods.insert(self.state_store.new_mood.name.clone(), self.state_store.new_mood.colour.to_array().to_vec());
+                                            let save = self.journal.save();
+                                            if save.is_err() {
+                                                self.error = Error::new(
+                                                    save.unwrap_err().to_string(),
+                                                    "Writing journal to disk failed.".to_string(),
+                                                );
+                                            }
+                                            // Reset
+                                            self.state_store.new_mood = Mood::default();
+                                            self.render.view.ui_state.show_add_mood_field = false;
                                         }
-                                        // Reset
-                                        self.state_store.new_mood = Mood::default();
-                                        self.render.view.ui_state.show_add_mood_field = false;
+                                    };
+                                });
+                                ui.group(|ui: &mut Ui| {
+                                    ui.label("All moods");
+                                    for mood in self.state_store.all_moods.iter_mut() {
+                                        if mood.name != "" {
+                                            Sides::new().show(ui, |ui: &mut Ui| {
+                                                ui.label(&mood.name);
+                                            }, |ui: &mut Ui| {
+                                                ui.color_edit_button_srgba(&mut mood.colour);
+                                                });
+                                            /* Grid::new(format!("mood_{}", mood.name)).num_columns(2).show(ui, |ui: &mut Ui| {
+                                                ui.label(&mood.name);
+                                                ui.color_edit_button_srgba(&mut mood.colour);
+                                            }); */
+                                        }
                                     }
-                                };
+                                    if ui.button("Save").clicked() {
+                                        self.export_and_save_moods();
+                                    }
+                                });
                                 if !self.render.view.ui_state.show_destructive_action_confirmation {
                                     if ui.button("Restore default moods").clicked() {
                                         self.render.view.ui_state.show_destructive_action_confirmation = true;
@@ -420,5 +460,20 @@ impl UrdState {
                 })
             })
         });
+    }
+
+    fn export_and_save_moods(&mut self) {
+        let mut tmp = Object::new();
+        for mood in self.state_store.all_moods.iter() {
+            tmp.insert(mood.name.clone(), mood.colour.to_array().to_vec());
+        }
+        self.journal.moods = tmp;
+        let save = self.journal.save();
+        if save.is_err() {
+            self.error = Error::new(
+                save.unwrap_err().to_string(),
+                "Writing journal to disk failed.".to_string(),
+            );
+        }
     }
 }
