@@ -1,4 +1,3 @@
-
 use eframe::egui::{CentralPanel, Color32, Context, ScrollArea, Sides, Ui};
 
 use super::{main_page_side_panel::month_num_to_name, UrdState};

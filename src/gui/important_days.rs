@@ -1,4 +1,3 @@
-
 use eframe::egui::{CentralPanel, Context, ScrollArea, Ui};
 
 use super::UrdState;
@@ -13,10 +12,14 @@ impl UrdState {
                     for tmp in &self.render.entities.important_day_entries {
                         ui.group(|ui: &mut Ui| {
                             let title = ui.label(tmp.title.clone());
-                            let mood = ui.label(format!("Mood: {}", tmp.metadata.get("mood").unwrap().into_string().unwrap()));
+                            let mood = ui.label(format!(
+                                "Mood: {}",
+                                tmp.metadata.get("mood").unwrap().into_string().unwrap()
+                            ));
                             let sep = ui.separator();
                             let text = ui.label(tmp.text.clone());
-                            if title.clicked() || mood.clicked() || sep.clicked() || text.clicked() {
+                            if title.clicked() || mood.clicked() || sep.clicked() || text.clicked()
+                            {
                                 self.journal.current_entry = tmp.clone();
                                 self.render.view.pages.show_important_days_page = false;
                             }
@@ -36,8 +39,17 @@ impl UrdState {
                 for entry in &month.get_folder().unwrap().entries {
                     debug_assert!(entry.is_journal_entry());
                     let entry = entry.get_journal_entry().unwrap();
-                    if entry.metadata.get("important_day").unwrap().into_boolean().unwrap() {
-                        self.render.entities.important_day_entries.push(entry.clone());
+                    if entry
+                        .metadata
+                        .get("important_day")
+                        .unwrap()
+                        .into_boolean()
+                        .unwrap()
+                    {
+                        self.render
+                            .entities
+                            .important_day_entries
+                            .push(entry.clone());
                     }
                 }
             }

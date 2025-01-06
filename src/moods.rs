@@ -1,5 +1,5 @@
 use eframe::egui::Color32;
-use nabu::{Object, XffValue, tvec_to_xff_value};
+use nabu::{tvec_to_xff_value, Object, XffValue};
 
 pub struct Mood {
     pub name: String,
@@ -21,10 +21,42 @@ impl From<(String, XffValue)> for Mood {
         Self {
             name: value.0,
             colour: Color32::from_rgba_unmultiplied(
-                colour.get(0).unwrap().into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                colour.get(1).unwrap().into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                colour.get(2).unwrap().into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                colour.get(3).unwrap().into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                colour
+                    .get(0)
+                    .unwrap()
+                    .into_number()
+                    .unwrap()
+                    .into_usize()
+                    .unwrap()
+                    .try_into()
+                    .expect("Colour value out of range"),
+                colour
+                    .get(1)
+                    .unwrap()
+                    .into_number()
+                    .unwrap()
+                    .into_usize()
+                    .unwrap()
+                    .try_into()
+                    .expect("Colour value out of range"),
+                colour
+                    .get(2)
+                    .unwrap()
+                    .into_number()
+                    .unwrap()
+                    .into_usize()
+                    .unwrap()
+                    .try_into()
+                    .expect("Colour value out of range"),
+                colour
+                    .get(3)
+                    .unwrap()
+                    .into_number()
+                    .unwrap()
+                    .into_usize()
+                    .unwrap()
+                    .try_into()
+                    .expect("Colour value out of range"),
             ),
         }
     }
@@ -67,4 +99,3 @@ pub fn default_moods() -> Object {
     out.insert("Worried", tvec_to_xff_value![u8; 45, 0, 30, 255]);
     out
 }
-

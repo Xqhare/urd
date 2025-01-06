@@ -1,11 +1,15 @@
-use eframe::egui::{Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Sides, Slider, TextEdit, Ui};
+use eframe::egui::{
+    Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Sides, Slider, TextEdit, Ui,
+};
 use horae::TimeZone;
 use nabu::{Object, XffValue};
 
 use crate::{
-    error::Error, moods::{default_moods, Mood}, settings::{
+    error::Error,
+    moods::{default_moods, Mood},
+    settings::{
         NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE,
-    }
+    },
 };
 
 use super::UrdState;
@@ -386,7 +390,6 @@ impl UrdState {
                                     }, |ui: &mut Ui| {
                                         ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour).on_hover_text("Choose the colour of the new mood");
                                     });
-                                    
                                     if ui.button("Add mood").clicked() {
                                         if self.journal.moods.contains_key(&self.state_store.new_mood.name) {
                                             self.error = Error::new(

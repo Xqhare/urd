@@ -1,5 +1,11 @@
 use crate::{
-    error::Error, journal_entries::Journal, moods::Mood, render::{Aspirations, Render, ShowFolder}, search::Search, settings::{NeededPath, Settings}, startup::StartupState
+    error::Error,
+    journal_entries::Journal,
+    moods::Mood,
+    render::{Aspirations, Render},
+    search::Search,
+    settings::{NeededPath, Settings},
+    startup::StartupState,
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -11,13 +17,13 @@ use egui::{Align, Color32, Id, Modal, TextEdit, TopBottomPanel};
 mod about;
 mod file_picker;
 mod help;
+mod important_days;
 mod licenses;
 mod main_page;
 mod main_page_side_panel;
+mod moods;
 mod search_page;
 mod settings;
-mod important_days;
-mod moods;
 
 const APP_NAME: &str = "Urd";
 
@@ -202,10 +208,34 @@ impl UrdState {
             let (r, g, b, a) = {
                 let ary = col_ary.into_array().unwrap().into_vec();
                 (
-                ary[0].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                ary[1].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                ary[2].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                ary[3].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                    ary[0]
+                        .into_number()
+                        .unwrap()
+                        .into_usize()
+                        .unwrap()
+                        .try_into()
+                        .expect("Colour value out of range"),
+                    ary[1]
+                        .into_number()
+                        .unwrap()
+                        .into_usize()
+                        .unwrap()
+                        .try_into()
+                        .expect("Colour value out of range"),
+                    ary[2]
+                        .into_number()
+                        .unwrap()
+                        .into_usize()
+                        .unwrap()
+                        .try_into()
+                        .expect("Colour value out of range"),
+                    ary[3]
+                        .into_number()
+                        .unwrap()
+                        .into_usize()
+                        .unwrap()
+                        .try_into()
+                        .expect("Colour value out of range"),
                 )
             };
             out.push(Mood {
@@ -264,7 +294,7 @@ impl UrdState {
                                 } else {
                                     self.render.view.pages.show_settings_page = true;
                                     self.settings_backup = Some(self.settings.clone());
-                                    
+
                                     self.state_store.all_moods = self.construct_moods();
                                     self.render.entities.aspirations = self.construct_aspirations();
                                 }
@@ -364,7 +394,9 @@ impl UrdState {
                                 }
                             });
                         });
-                        if self.render.view.pages.show_important_days_page || self.render.view.pages.show_mood_page {
+                        if self.render.view.pages.show_important_days_page
+                            || self.render.view.pages.show_mood_page
+                        {
                             if ui.button("Back to Home").clicked() {
                                 self.render.view.pages.show_important_days_page = false;
                                 self.render.view.pages.show_mood_page = false;

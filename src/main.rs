@@ -3,12 +3,12 @@ use error::Error;
 mod error;
 mod gui;
 mod journal_entries;
+mod moods;
 mod paths;
 mod render;
 mod search;
 mod settings;
 mod startup;
-mod moods;
 
 fn main() {
     let mut settings = startup::startup_appstate();
@@ -26,5 +26,3 @@ fn main() {
     }
     gui::gui_startup(settings);
 }
-
-

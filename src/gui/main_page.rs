@@ -2,11 +2,14 @@ use eframe::{
     egui::{CentralPanel, Ui},
     *,
 };
-use egui::{Align, ComboBox, FontId, Margin, ScrollArea, Sides, TextEdit};
+use egui::{Align, ComboBox, FontId, Margin, ScrollArea, TextEdit};
 use nabu::{Object, XffValue};
 
 use crate::{
-    error::Error, journal_entries::{EntryType, Folder, JournalEntry}, moods::Mood, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}
+    error::Error,
+    journal_entries::{EntryType, Folder, JournalEntry},
+    moods::Mood,
+    settings::{MAX_FONT_SIZE, MIN_FONT_SIZE},
 };
 
 use super::UrdState;
@@ -47,10 +50,29 @@ impl UrdState {
                     self.mood(ui);
                     ui.separator();
                     // Again hacky, but saves me from declaring another state field
-                    let mut tmp_bool = self.journal.current_entry.metadata.get_mut("important_day").unwrap().into_boolean().unwrap();
+                    let mut tmp_bool = self
+                        .journal
+                        .current_entry
+                        .metadata
+                        .get_mut("important_day")
+                        .unwrap()
+                        .into_boolean()
+                        .unwrap();
                     if ui.checkbox(&mut tmp_bool, "Important Day").changed() {
-                        self.journal.current_entry.metadata.insert("important_day".to_string(), XffValue::from(tmp_bool));
-                        println!("{}", self.journal.current_entry.metadata.get("important_day").unwrap().into_boolean().unwrap());
+                        self.journal
+                            .current_entry
+                            .metadata
+                            .insert("important_day".to_string(), XffValue::from(tmp_bool));
+                        println!(
+                            "{}",
+                            self.journal
+                                .current_entry
+                                .metadata
+                                .get("important_day")
+                                .unwrap()
+                                .into_boolean()
+                                .unwrap()
+                        );
                     }
                 });
                 ui.separator();
@@ -267,12 +289,37 @@ impl UrdState {
 
     fn mood(&mut self, ui: &mut Ui) {
         ComboBox::from_label("Mood")
-            .selected_text(self.journal.current_entry.metadata.get("mood").unwrap().into_string().unwrap())
+            .selected_text(
+                self.journal
+                    .current_entry
+                    .metadata
+                    .get("mood")
+                    .unwrap()
+                    .into_string()
+                    .unwrap(),
+            )
             .show_ui(ui, |ui: &mut Ui| {
                 for (mood, _) in self.journal.moods.iter() {
                     // Hacky af, I know - but hey I can save here too!
-                    if ui.selectable_value(&mut self.journal.current_entry.metadata.get("mood").unwrap().into_string().unwrap(), mood.to_string(), mood).changed() {
-                        self.journal.current_entry.metadata.insert("mood".to_string(), XffValue::from(mood));
+                    if ui
+                        .selectable_value(
+                            &mut self
+                                .journal
+                                .current_entry
+                                .metadata
+                                .get("mood")
+                                .unwrap()
+                                .into_string()
+                                .unwrap(),
+                            mood.to_string(),
+                            mood,
+                        )
+                        .changed()
+                    {
+                        self.journal
+                            .current_entry
+                            .metadata
+                            .insert("mood".to_string(), XffValue::from(mood));
                         let save = self.journal.save();
                         if save.is_err() {
                             self.error = Error::new(
@@ -284,18 +331,27 @@ impl UrdState {
                 }
             });
         if self.render.view.ui_state.show_add_mood_field {
-            ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood");
+            ui.text_edit_singleline(&mut self.state_store.new_mood.name)
+                .on_hover_text("Enter the name of the new mood");
             ui.label("Mood Colour: ");
-            ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour).on_hover_text("Choose the colour of the new mood");
-            
+            ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour)
+                .on_hover_text("Choose the colour of the new mood");
+
             if ui.button("Add mood").clicked() {
-                if self.journal.moods.contains_key(&self.state_store.new_mood.name) {
+                if self
+                    .journal
+                    .moods
+                    .contains_key(&self.state_store.new_mood.name)
+                {
                     self.error = Error::new(
                         "Mood already exists.".to_string(),
                         "Please choose a different name.".to_string(),
                     );
                 } else {
-                    self.journal.moods.insert(self.state_store.new_mood.name.clone(), self.state_store.new_mood.colour.to_array().to_vec());
+                    self.journal.moods.insert(
+                        self.state_store.new_mood.name.clone(),
+                        self.state_store.new_mood.colour.to_array().to_vec(),
+                    );
                     let save = self.journal.save();
                     if save.is_err() {
                         self.error = Error::new(
@@ -534,9 +590,10 @@ impl UrdState {
                 } else {
                     let day_entry = day_search.unwrap().get_journal_entry_mut();
                     if day_entry.is_some() {
-                        day_entry
-                            .unwrap()
-                            .overwrite(self.journal.current_entry.text.clone(), self.journal.current_entry.metadata.clone());
+                        day_entry.unwrap().overwrite(
+                            self.journal.current_entry.text.clone(),
+                            self.journal.current_entry.metadata.clone(),
+                        );
                     }
                 }
             }

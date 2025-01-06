@@ -7,7 +7,7 @@ pub struct Error {
 
 impl Error {
     /// Create a new error with a message to be displayed and set `show_error` to true
-    /// 
+    ///
     /// param msg: The error message to be displayed
     /// param msg_ctx: The context of the error
     ///

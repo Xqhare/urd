@@ -133,12 +133,16 @@ impl Folder {
         for entry in entries {
             out.push_back(EntryType::deserialize(&entry));
         }
-        Self { name, entries: out, aspirations: value
-            .into_object()
-            .unwrap()
-            .get("aspirations")
-            .unwrap()
-            .clone() }
+        Self {
+            name,
+            entries: out,
+            aspirations: value
+                .into_object()
+                .unwrap()
+                .get("aspirations")
+                .unwrap()
+                .clone(),
+        }
     }
 }
 
@@ -373,15 +377,27 @@ impl Journal {
                         .with_extension("txt");
                     let text = format!(
                         "Mood: {} - Important Day: {}\n\n{}",
-                        entry.get_journal_entry().unwrap().metadata.get("mood").unwrap().into_string().unwrap(),
+                        entry
+                            .get_journal_entry()
+                            .unwrap()
+                            .metadata
+                            .get("mood")
+                            .unwrap()
+                            .into_string()
+                            .unwrap(),
                         // TODO: make this nicerererer
-                        entry.get_journal_entry().unwrap().metadata.get("important_day").unwrap().into_boolean().unwrap().to_string(),
+                        entry
+                            .get_journal_entry()
+                            .unwrap()
+                            .metadata
+                            .get("important_day")
+                            .unwrap()
+                            .into_boolean()
+                            .unwrap()
+                            .to_string(),
                         entry.get_journal_entry().unwrap().text
                     );
-                    let pos_err4 = std::fs::write(
-                        entry_file.clone(),
-                        text
-                    );
+                    let pos_err4 = std::fs::write(entry_file.clone(), text);
                     if pos_err4.is_err() {
                         return Err(pos_err4.unwrap_err().to_string());
                     }
@@ -440,13 +456,6 @@ pub struct JournalEntry {
 }
 
 impl JournalEntry {
-    pub fn debug_create(title: String, text: String, metadata: BTreeMap<String, XffValue>) -> Self {
-        Self {
-            title,
-            text,
-            metadata,
-        }
-    }
     pub fn new(settings: &Settings) -> Self {
         let (title, full_date_split) = {
             let mut date_time = horae::Utc::now();
