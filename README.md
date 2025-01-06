@@ -13,6 +13,7 @@ A journaling app written in rust.
 - Backups
 - Export your journal
 - Daily mood tracker
+    - To add new moods or edit existing moods, use the `Settings` menu
 - Important day marker
 
 ## Roadmap
