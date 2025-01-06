@@ -12,6 +12,8 @@ A journaling app written in rust.
     - This can be customised in the `Settings` menu
 - Backups
 - Export your journal
+- Daily mood tracker
+- Important day marker
 
 ## Roadmap
 
@@ -34,20 +36,11 @@ A journaling app written in rust.
                     - If empty, the resolution will not be saved
                 - Button `Add resolution` at bottom
                     - Adds another text field
-- Daily mood tracker
-    - Simple dropdown to select
-    - Button `Add mood`
-        - If clicked is replaced with a text field and colour picker
-    - Moods saved persistently
-        - inside `journal.xff` as a list of all moods
-        - inside `journal.xff`, inside their respective entry
-    - Display of moods
-        - Grid of all days
-            - Cells coloured by mood
-- Important day marker
-    - Simple checkbox to mark
-    - Stored inside `journal.xff` inside their respective entry
-    - List all important day entries
+
+## Issues preventing a stable release
+
+- Creating a new viewport will crash the app if it's not supported by the device
+- max tag length is 46 characters, more starts to break the Metadata UI, below the entry text field
 - Better user onboarding
     - On hover text for everything
     - Detection of first run is implemented
@@ -64,10 +57,7 @@ A journaling app written in rust.
         - Instead of main window display a panel with text and button for `next`
         - explain settings page in detail
 
-## Issues preventing a stable release
 
-- Creating a new viewport will crash the app if it's not supported by the device
-- max tag length is 46 characters, more starts to break the Metadata UI, below the entry text field
 
 ## Password protection
 
