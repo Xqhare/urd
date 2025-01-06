@@ -2,7 +2,7 @@ use eframe::egui::{Align, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider
 use horae::TimeZone;
 
 use crate::{
-    error::Error, moods::Mood, settings::{
+    error::Error, moods::{default_moods, Mood}, settings::{
         NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE,
     }
 };
@@ -31,7 +31,7 @@ impl UrdState {
                                             self.settings = self.settings_backup.clone().unwrap();
                                             self.settings.overwrite_window_size = false;
                                             self.settings.overwrite_side_panel_width = false;
-                                            self.render.view.show_settings_viewport = false;
+                                            self.render.view.pages.show_settings_page = false;
                                         };
                                         but
                                     });
@@ -58,7 +58,7 @@ impl UrdState {
                                                 self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
-                                                self.render.view.show_settings_viewport = false;
+                                                self.render.view.pages.show_settings_page = false;
                                                 self.settings.overwrite_side_panel_width = false;
                                                 self.settings_backup = None;
                                             }
@@ -69,6 +69,7 @@ impl UrdState {
                                 if ui.button("Restore defaults").clicked() {
                                     self.settings = Settings::default();
                                     self.settings_backup = Some(self.settings.clone());
+                                    self.journal.moods = default_moods();
                                     let save = self.settings.save();
                                     if save.is_err() {
                                         self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
@@ -330,9 +331,9 @@ impl UrdState {
                                     ui.end_row();
                                 });
                                 if ui.button("Launch backup wizard").clicked() {
-                                    self.render.view.show_file_picker = true;
+                                    self.render.view.pages.show_file_picker_page = true;
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Backup);
-                                    self.render.view.show_settings_viewport = false;
+                                    self.render.view.pages.show_settings_page = false;
                                 }
                             }).response
                         });
@@ -346,9 +347,9 @@ impl UrdState {
                                     ui.end_row();
                                 });
                                 if ui.button("Launch export wizard").clicked() {
-                                    self.render.view.show_file_picker = true;
+                                    self.render.view.pages.show_file_picker_page = true;
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Export);
-                                    self.render.view.show_settings_viewport = false;
+                                    self.render.view.pages.show_settings_page = false;
                                 }
                             }).response
                         });
@@ -384,9 +385,33 @@ impl UrdState {
                                         }
                                         // Reset
                                         self.state_store.new_mood = Mood::default();
-                                        self.render.show_add_mood_field = false;
+                                        self.render.view.ui_state.show_add_mood_field = false;
                                     }
                                 };
+                                if !self.render.view.ui_state.show_destructive_action_confirmation {
+                                    if ui.button("Restore default moods").clicked() {
+                                        self.render.view.ui_state.show_destructive_action_confirmation = true;
+                                                                            }
+                                } else {
+                                    ui.vertical_centered_justified(|ui: &mut Ui| {
+                                        ui.heading("This action will be destructive. If you have used ANY non default moods your journal will be unreadable!");
+                                        ui.label("The only way to get it back is by recreating every custom mood you used, with the exact name you used.");
+                                        if ui.button("I understand, proceed").clicked() {
+                                            self.journal.moods = default_moods();
+                                            let save = self.journal.save();
+                                            if save.is_err() {
+                                                self.error = Error::new(
+                                                    save.unwrap_err().to_string(),
+                                                    "Writing journal to disk failed.".to_string(),
+                                                );
+                                            }
+                                            self.render.view.ui_state.show_destructive_action_confirmation = false;
+                                        }
+                                        if ui.button("Cancel").clicked() {
+                                            self.render.view.ui_state.show_destructive_action_confirmation = false;
+                                        }
+                                    });
+                                }
                             }).response
                         });
 
