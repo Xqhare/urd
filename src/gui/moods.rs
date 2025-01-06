@@ -1,5 +1,5 @@
 
-use eframe::egui::{CentralPanel, Color32, Context, ScrollArea, Ui};
+use eframe::egui::{CentralPanel, Color32, Context, ScrollArea, Sides, Ui};
 
 use super::{main_page_side_panel::month_num_to_name, UrdState};
 
@@ -33,11 +33,15 @@ impl UrdState {
                     ui.group(|ui: &mut Ui| {
                         ui.vertical_centered_justified(|ui: &mut Ui| {
                             ui.heading(format!("{}", year.get_folder().unwrap().name));
-                            ui.label("31. <-- | --> 01.");
+                            ui.label("01. <-- | --> 31.");
                         });
                         for month in &year.get_folder().unwrap().entries {
                             ui.horizontal(|ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
+                                    
                                 ui.label(format!("{}", month_num_to_name(month.get_folder().unwrap().name.parse().expect("Failed to parse month, month is not a number (u8)"))));
+                                }, |ui: &mut Ui| {
+                                    
                                 for day in &month.get_folder().unwrap().entries {
                                     let entry = day.get_journal_entry().unwrap();
                                     let mood = entry.metadata.get("mood").unwrap().into_string().unwrap();
@@ -59,6 +63,7 @@ impl UrdState {
                                         ui.painter().rect_filled( area , 2.0, mood_colour);
                                     });
                                 };
+                                });
                             });
                         };
                     });
