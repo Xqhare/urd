@@ -41,7 +41,7 @@ pub fn default_moods() -> Object {
     out.insert("Calm", tvec_to_xff_value![u8; 50, 75, 100, 255]);
     out.insert("Confident", tvec_to_xff_value![u8; 160, 130, 0, 255]);
     out.insert("Confused", tvec_to_xff_value![u8; 255, 175, 0, 255]);
-    out.insert("Depressed", tvec_to_xff_value![u8; 45, 30, 15, 255]);
+    out.insert("Depressed", tvec_to_xff_value![u8; 55, 30, 0, 255]);
     out.insert("Embarrassed", tvec_to_xff_value![u8; 175, 0, 150, 255]);
     out.insert("Energetic", tvec_to_xff_value![u8; 0, 155, 55, 255]);
     out.insert("Excited", tvec_to_xff_value![u8; 0, 200, 75, 255]);
@@ -49,13 +49,13 @@ pub fn default_moods() -> Object {
     out.insert("Hollow", tvec_to_xff_value![u8; 200, 200, 200, 255]);
     out.insert("Hopeful", tvec_to_xff_value![u8; 125, 125, 0, 255]);
     out.insert("Ill", tvec_to_xff_value![u8; 80, 180, 0, 255]);
-    out.insert("Intense", tvec_to_xff_value![u8; 88, 88, 0 , 255]);
+    out.insert("Intense", tvec_to_xff_value![u8; 108, 88, 0 , 255]);
     out.insert("Nervous", tvec_to_xff_value![u8; 40, 80, 120, 255]);
     out.insert("Overwhelmed", tvec_to_xff_value![u8; 125, 150, 175, 255]);
     out.insert("Playful", tvec_to_xff_value![u8; 75, 50, 190, 255]);
     out.insert("Relaxed", tvec_to_xff_value![u8; 0, 125, 200, 255]);
     out.insert("Restless", tvec_to_xff_value![u8; 75, 85, 105, 255]);
-    out.insert("Sad", tvec_to_xff_value![u8; 20, 30, 45, 255]);
+    out.insert("Sad", tvec_to_xff_value![u8; 0, 45, 55, 255]);
     out.insert("Scared", tvec_to_xff_value![u8; 69, 69, 0, 255]);
     out.insert("Serious", tvec_to_xff_value![u8; 42, 69, 138, 255]);
     out.insert("Shocked", tvec_to_xff_value![u8; 50, 150, 100, 255]);
@@ -64,7 +64,7 @@ pub fn default_moods() -> Object {
     out.insert("Stressed", tvec_to_xff_value![u8; 200, 80, 0, 255]);
     out.insert("Surprised", tvec_to_xff_value![u8; 0, 222, 111, 255]);
     out.insert("Troubled", tvec_to_xff_value![u8; 60, 15, 0, 255]);
-    out.insert("Worried", tvec_to_xff_value![u8; 45, 30, 30, 255]);
+    out.insert("Worried", tvec_to_xff_value![u8; 45, 0, 30, 255]);
     out
 }
 

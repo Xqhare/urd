@@ -1,5 +1,5 @@
 
-use eframe::egui::{CentralPanel, Color32, Context, Grid, Rounding, ScrollArea, Ui};
+use eframe::egui::{CentralPanel, Color32, Context, ScrollArea, Ui};
 
 use super::{main_page_side_panel::month_num_to_name, UrdState};
 
@@ -21,12 +21,14 @@ impl UrdState {
                     ui.colored_label(mood_colour, mood);
                 }
             });
-            ui.vertical_centered_justified(|ui: &mut Ui| {
-                ui.separator();
-                ui.heading("Your mood over time");
+            ui.vertical(|ui: &mut Ui| {
                 ui.separator();
             });
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
+                ui.vertical_centered_justified(|ui: &mut Ui| {
+                    ui.heading("Your mood over time");
+                    ui.separator();
+                });
                 for year in &self.journal.entries {
                     ui.group(|ui: &mut Ui| {
                         ui.vertical_centered_justified(|ui: &mut Ui| {
@@ -52,7 +54,7 @@ impl UrdState {
                                     let mood_colour = Color32::from_rgba_unmultiplied(r, g, b, a);
 
                                     ui.group(|ui: &mut Ui| {
-                                        ui.label("     ");
+                                        ui.label("     ").on_hover_text(format!("Your mood on the {}. was {}", entry.metadata.get("date").unwrap().into_object().unwrap().get("day").unwrap().into_number().unwrap().into_usize().unwrap(), mood));
                                         let area = ui.min_rect();
                                         ui.painter().rect_filled( area , 2.0, mood_colour);
                                     });
