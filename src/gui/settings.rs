@@ -94,64 +94,63 @@ impl UrdState {
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Window settings");
-                                Grid::new("window_settings").num_columns(2).show(ui, |ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Window width: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(Slider::new(&mut self.settings.size.size[0], 100.0..=MAX_WINDOW_SIZE[0]));
-                                    ui.end_row();
-
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Window height: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(Slider::new(&mut self.settings.size.size[1], 100.0..=MAX_WINDOW_SIZE[1]));
-                                    ui.end_row();
-
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
+                                    ui.label("Side panel width: ");
+                                }, |ui: &mut Ui| {
+                                    ui.add(Slider::new(&mut self.settings.size.side_panel_width, 10.0..=MAX_SIDE_PANEL_WIDTH));
+                                });
+                                Grid::new("window_settings").num_columns(2).show(ui, |ui: &mut Ui| {
                                     ui.checkbox(&mut self.settings.overwrite_window_size, "Overwrite window Size");
                                     ui.add_enabled(self.settings.overwrite_window_size, |ui: &mut Ui| {
                                         ui.vertical_centered_justified(|ui: &mut Ui| {
-                                            ui.add(TextEdit::singleline(&mut self.settings.overwrite_window_size_store[0]).horizontal_align(Align::Center));
+                                            let width_txt = ui.add(TextEdit::singleline(&mut self.settings.overwrite_window_size_store[0]).horizontal_align(Align::Center));
                                             ui.spacing();
                                             ui.label("x");
                                             ui.spacing();
-                                            ui.add(TextEdit::singleline(&mut self.settings.overwrite_window_size_store[1]).horizontal_align(Align::Center));
+                                            let height_txt = ui.add(TextEdit::singleline(&mut self.settings.overwrite_window_size_store[1]).horizontal_align(Align::Center));
+                                            if width_txt.changed() || height_txt.changed() {
+                                                let overwrite_width = self.settings.overwrite_window_size_store[0].parse::<f32>();
+                                                let overwrite_height = self.settings.overwrite_window_size_store[1].parse::<f32>();
+                                                if overwrite_height.is_err() {
+                                                    self.error = Error::new(format!("{} = {}", self.settings.overwrite_window_size_store[1], overwrite_height.unwrap_err()), "Invalid window size height input".to_string());
+                                                    self.settings.overwrite_window_size_store[1] = "".to_string();
+                                                } else if overwrite_width.is_err() {
+                                                    self.error = Error::new(format!("{} = {}", self.settings.overwrite_window_size_store[0], overwrite_width.unwrap_err()), "Invalid window size width input".to_string());
+                                                    self.settings.overwrite_window_size_store[0] = "".to_string();
+                                                } else {
+                                                    self.settings.size.size[0] = overwrite_width.unwrap();
+                                                    self.settings.size.size[1] = overwrite_height.unwrap();
+                                                }
+                                            }
                                         }).response
                                     });
-                                    if self.settings.overwrite_window_size {
-                                        let overwrite_width = self.settings.overwrite_window_size_store[0].parse::<f32>();
-                                        let overwrite_height = self.settings.overwrite_window_size_store[1].parse::<f32>();
-                                        if overwrite_height.is_err() {
-                                            self.error = Error::new(format!("{} = {}", self.settings.overwrite_window_size_store[1], overwrite_height.unwrap_err()), "Invalid window size height input".to_string());
-                                            self.settings.overwrite_window_size_store[1] = self.settings.overwrite_window_size_store[0].clone();
-                                            return;
-                                        } else if overwrite_width.is_err() {
-                                            self.error = Error::new(format!("{} = {}", self.settings.overwrite_window_size_store[0], overwrite_width.unwrap_err()), "Invalid window size width input".to_string());
-                                            self.settings.overwrite_window_size_store[0] = self.settings.overwrite_window_size_store[1].clone();
-                                            return;
-                                        } else {
-                                            self.settings.size.size[0] = overwrite_width.unwrap();
-                                            self.settings.size.size[1] = overwrite_height.unwrap();
-                                        }
-                                    }
-                                    ui.end_row();
-
-                                    ui.label("Side panel width: ");
-                                    ui.add(Slider::new(&mut self.settings.size.side_panel_width, 10.0..=MAX_SIDE_PANEL_WIDTH));
                                     ui.end_row();
 
                                     ui.checkbox(&mut self.settings.overwrite_side_panel_width, "Overwrite side panel width");
                                     ui.add_enabled(self.settings.overwrite_side_panel_width, |ui: &mut Ui| {
                                         ui.vertical_centered_justified(|ui: &mut Ui| {
-                                            ui.add(TextEdit::singleline(&mut self.settings.overwrite_side_panel_width_store).horizontal_align(Align::Center));
+                                            if ui.add(TextEdit::singleline(&mut self.settings.overwrite_side_panel_width_store).horizontal_align(Align::Center)).changed() {
+                                                let overwrite_panel_width = self.settings.overwrite_side_panel_width_store.parse::<f32>();
+                                                if overwrite_panel_width.is_err() {
+                                                    self.error = Error::new(format!("{} = {}", self.settings.overwrite_side_panel_width_store, overwrite_panel_width.unwrap_err()), "Invalid side panel width input".to_string());
+                                                    self.settings.overwrite_side_panel_width_store = self.settings.size.side_panel_width.to_string();
+                                                } else {
+                                                    self.settings.size.side_panel_width = overwrite_panel_width.unwrap();
+                                                }
+                                                println!("panel change triggered");
+                                            };
                                         }).response
                                     });
-                                    if self.settings.overwrite_side_panel_width {
-                                        let overwrite_panel_width = self.settings.overwrite_side_panel_width_store.parse::<f32>();
-                                        if overwrite_panel_width.is_err() {
-                                            self.error = Error::new(format!("{} = {}", self.settings.overwrite_side_panel_width_store, overwrite_panel_width.unwrap_err()), "Invalid side panel width input".to_string());
-                                            self.settings.overwrite_side_panel_width_store = self.settings.size.side_panel_width.to_string();
-                                            return;
-                                        } else {
-                                            self.settings.size.side_panel_width = overwrite_panel_width.unwrap();
-                                        }
-                                    }
-                                    ui.end_row();
                                 });
                             }).response
                         });
@@ -159,31 +158,29 @@ impl UrdState {
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Font settings");
-                                Grid::new("font_settings").num_columns(2).show(ui, |ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Text colour: ");
-                                    ui.scope(|ui: &mut Ui| {
-                                        ui.add_space(250.0 / 1.2);
-                                        if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
-                                            let save = self.settings.save();
-                                            if save.is_err() {
-                                                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
-                                            }
-                                        };
-                                    });
-                                    ui.end_row();
-
+                                }, |ui: &mut Ui| {
+                                    if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
+                                        let save = self.settings.save();
+                                        if save.is_err() {
+                                            self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                        }
+                                    };
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Font size: ");
-                                    ui.scope(|ui: &mut Ui| {
-                                        ui.add_space(250.0 / 2.5);
-                                        ui.add(Slider::new(&mut self.settings.font.size, MIN_FONT_SIZE..=MAX_FONT_SIZE));
-                                    });
-                                    ui.end_row();
-
+                                }, |ui: &mut Ui| {
+                                    ui.add(Slider::new(&mut self.settings.font.size, MIN_FONT_SIZE..=MAX_FONT_SIZE));
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Monospace: ");
-                                    ui.scope(|ui: &mut Ui| {
-                                        ui.add_space(250.0 / 1.2);
-                                        ui.checkbox(&mut self.settings.font.monospace, "");
-                                    });
+                                }, |ui: &mut Ui| {
+                                        if self.settings.font.monospace {
+                                            ui.checkbox(&mut self.settings.font.monospace, "Enabled");
+                                        } else {
+                                            ui.checkbox(&mut self.settings.font.monospace, "Disabled");
+                                        }
                                 });
                             }).response
                         });
@@ -192,18 +189,21 @@ impl UrdState {
                             ui.group(|ui: &mut Ui| {
                                 let pw_set = if self.settings.password.password == "" { false } else { true };
                                 ui.label("Security");
-                                Grid::new("pw").num_columns(2).show(ui, |ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Old password: ");
+                                }, |ui: &mut Ui| {
                                     ui.add_enabled(pw_set, |ui: &mut Ui| {
                                         ui.add(TextEdit::singleline(&mut self.settings.password.password_input).horizontal_align(Align::Center).password(true))
                                     });
-                                    ui.end_row();
-
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("New password: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.password.new_password_input[0]).horizontal_align(Align::Center).password(true));
-                                    ui.end_row();
-
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Repeat new password: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.password.new_password_input[1]).horizontal_align(Align::Center).password(true));
                                 });
                                 if ui.button("Set new password").clicked() {
@@ -254,25 +254,19 @@ impl UrdState {
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Date settings");
-                                Grid::new("date_settings").num_columns(2).show(ui, |ui: &mut Ui| {
-                                    ui.scope(|ui: &mut Ui| {
-                                        ui.label("Timezone: ");
-                                        // justified with security
-                                        ui.add_space(250.0 / 4.25);
-                                    });
-                                    ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
-                                            for tz in self.settings.timezone.all_timezones_str.iter() {
-                                                if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.to_string()).clicked() {
-                                                    let save = self.settings.save();
-                                                    if save.is_err() {
-                                                        self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
-                                                    }
+                                Sides::new().show(ui, |ui: &mut Ui| {
+                                    ui.label("Timezone: ");
+                                }, |ui: &mut Ui| {
+                                    ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
+                                        for tz in self.settings.timezone.all_timezones_str.iter() {
+                                            if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.to_string()).clicked() {
+                                                let save = self.settings.save();
+                                                if save.is_err() {
+                                                    self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
                                                 }
                                             }
-                                        }).response
-                                    });
-                                    ui.end_row();
+                                        }
+                                    })
                                 });
                             }).response
                         });
@@ -282,13 +276,15 @@ impl UrdState {
                                 ui.label("File marker Settings");
                                 let year = horae::Utc::now().date().year.to_string();
                                 ui.label("Current file marker").on_hover_text("Used for the current day / month / year.");
-                                Grid::new("current_file_marker").num_columns(2).show(ui, |ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Start: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_currently.start).horizontal_align(Align::Center));
-                                    ui.end_row();
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("End: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_currently.end).horizontal_align(Align::Center));
-                                    ui.end_row();
                                 });
                                 ui.vertical_centered_justified(|ui: &mut Ui| {
                                     ui.group(|ui: &mut Ui| {
@@ -299,11 +295,14 @@ impl UrdState {
                                 });
                                 ui.separator();
                                 ui.label("Completed normally file marker").on_hover_text("Used if a month / year has passed. Marks 'Completed' years or months.");
-                                Grid::new("completed_file_marker").num_columns(2).show(ui, |ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Start: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_normally.start).horizontal_align(Align::Center));
-                                    ui.end_row();
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("End: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_normally.end).horizontal_align(Align::Center));
                                 });
                                 ui.vertical_centered_justified(|ui: &mut Ui| {
@@ -315,11 +314,14 @@ impl UrdState {
                                 });
                                 ui.separator();
                                 ui.label("Perfectly completed file marker").on_hover_text("Used if a journal entry was made on every day of the month or year.");
-                                Grid::new("perfectly_completed_file_marker").num_columns(2).show(ui, |ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Start: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_perfectly.start).horizontal_align(Align::Center));
-                                    ui.end_row();
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("End: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.gui.file_marker_perfectly.end).horizontal_align(Align::Center));
                                 });
                                 ui.vertical_centered_justified(|ui: &mut Ui| {
@@ -335,13 +337,15 @@ impl UrdState {
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Backup settings");
-                                Grid::new("backup_settings").num_columns(2).show(ui, |ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Path: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.custom_paths.backup_directory).horizontal_align(Align::Center));
-                                    ui.end_row();
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Automatic backup");
+                                }, |ui: &mut Ui| {
                                     ui.checkbox(&mut self.settings.automatic_backups, "Every launch");
-                                    ui.end_row();
                                 });
                                 if ui.button("Launch backup wizard").clicked() {
                                     self.render.view.pages.show_file_picker_page = true;
@@ -354,10 +358,10 @@ impl UrdState {
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Export settings");
-                                Grid::new("export_settings").num_columns(2).show(ui, |ui: &mut Ui| {
+                                Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Path: ");
+                                }, |ui: &mut Ui| {
                                     ui.add(TextEdit::singleline(&mut self.settings.custom_paths.export_directory).horizontal_align(Align::Center));
-                                    ui.end_row();
                                 });
                                 if ui.button("Launch export wizard").clicked() {
                                     self.render.view.pages.show_file_picker_page = true;
@@ -372,10 +376,6 @@ impl UrdState {
                                 ui.label("Mood settings");
 
                                 ui.group(|ui: &mut Ui| {
-                                    /* Grid::new("mood_settings").num_columns(2).show(ui, |ui: &mut Ui| {
-                                        ui.label("Mood Name: ");
-                                        ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood - This cannot be changed later!");
-                                    }); */
                                     Sides::new().show(ui, |ui: &mut Ui| {
                                         ui.label("Mood Name: ");
                                     }, |ui: &mut Ui| {
@@ -417,10 +417,6 @@ impl UrdState {
                                             }, |ui: &mut Ui| {
                                                 ui.color_edit_button_srgba(&mut mood.colour);
                                                 });
-                                            /* Grid::new(format!("mood_{}", mood.name)).num_columns(2).show(ui, |ui: &mut Ui| {
-                                                ui.label(&mood.name);
-                                                ui.color_edit_button_srgba(&mut mood.colour);
-                                            }); */
                                         }
                                     }
                                     if ui.button("Save").clicked() {
