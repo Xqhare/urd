@@ -38,31 +38,29 @@ impl UrdState {
                         for month in &year.get_folder().unwrap().entries {
                             ui.horizontal(|ui: &mut Ui| {
                                 Sides::new().show(ui, |ui: &mut Ui| {
-                                    
-                                ui.label(format!("{}", month_num_to_name(month.get_folder().unwrap().name.parse().expect("Failed to parse month, month is not a number (u8)"))));
+                                    ui.label(format!("{}", month_num_to_name(month.get_folder().unwrap().name.parse().expect("Failed to parse month, month is not a number (u8)"))));
                                 }, |ui: &mut Ui| {
-                                    
-                                for day in &month.get_folder().unwrap().entries {
-                                    let entry = day.get_journal_entry().unwrap();
-                                    let mood = entry.metadata.get("mood").unwrap().into_string().unwrap();
-                                    let (r, g, b, a) = {
-                                        let tmp = self.journal.moods.get(&mood).unwrap();
-                                        let ary = tmp.into_array().unwrap().into_vec();
-                                        (
-                                        ary[0].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                                        ary[1].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                                        ary[2].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                                        ary[3].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
-                                        )
-                                    };
-                                    let mood_colour = Color32::from_rgba_unmultiplied(r, g, b, a);
+                                    for day in &month.get_folder().unwrap().entries {
+                                        let entry = day.get_journal_entry().unwrap();
+                                        let mood = entry.metadata.get("mood").unwrap().into_string().unwrap();
+                                        let (r, g, b, a) = {
+                                            let tmp = self.journal.moods.get(&mood).unwrap();
+                                            let ary = tmp.into_array().unwrap().into_vec();
+                                            (
+                                            ary[0].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                                            ary[1].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                                            ary[2].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                                            ary[3].into_number().unwrap().into_usize().unwrap().try_into().expect("Colour value out of range"),
+                                            )
+                                        };
+                                        let mood_colour = Color32::from_rgba_unmultiplied(r, g, b, a);
 
-                                    ui.group(|ui: &mut Ui| {
-                                        ui.label("     ").on_hover_text(format!("Your mood on the {}. was {}", entry.metadata.get("date").unwrap().into_object().unwrap().get("day").unwrap().into_number().unwrap().into_usize().unwrap(), mood));
-                                        let area = ui.min_rect();
-                                        ui.painter().rect_filled( area , 2.0, mood_colour);
-                                    });
-                                };
+                                        ui.group(|ui: &mut Ui| {
+                                            ui.label("     ").on_hover_text(format!("Your mood on the {}. was {}", entry.metadata.get("date").unwrap().into_object().unwrap().get("day").unwrap().into_number().unwrap().into_usize().unwrap(), mood));
+                                            let area = ui.min_rect();
+                                            ui.painter().rect_filled( area , 2.0, mood_colour);
+                                        });
+                                    };
                                 });
                             });
                         };
