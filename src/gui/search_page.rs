@@ -14,7 +14,7 @@ impl UrdState {
                 ui.add_space(1.0);
                 ui.horizontal(|ui: &mut Ui| {
                     if ui.button("Back").clicked() {
-                        self.render.view.show_search_page = false;
+                        self.render.view.pages.show_search_page = false;
                     };
                     if ui.button("Clear").clicked() {
                         self.search.query = "".to_string();
@@ -60,7 +60,7 @@ impl UrdState {
                             }
                             if clicked {
                                 self.journal.current_entry = result.clone();
-                                self.render.view.show_search_page = false;
+                                self.render.view.pages.show_search_page = false;
                             }
                         });
                     });

@@ -68,7 +68,7 @@ impl UrdState {
     }
 
     pub fn construct_mood_entries(&mut self) {
-        self.render.mood_entries.clear();
+        self.render.entities.mood_entries.clear();
         for year in &self.journal.entries {
             debug_assert!(year.is_folder());
             for month in &year.get_folder().unwrap().entries {
@@ -77,7 +77,7 @@ impl UrdState {
                     debug_assert!(entry.is_journal_entry());
                     let entry = entry.get_journal_entry().unwrap();
                     if entry.metadata.get("mood").unwrap().into_string().unwrap() != "" {
-                        self.render.mood_entries.push(entry.clone());
+                        self.render.entities.mood_entries.push(entry.clone());
                     }
                 }
             }

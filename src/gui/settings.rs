@@ -1,4 +1,4 @@
-use eframe::egui::{Align, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider, TextEdit, Ui};
+use eframe::egui::{Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Slider, TextEdit, Ui};
 use horae::TimeZone;
 
 use crate::{
@@ -69,7 +69,6 @@ impl UrdState {
                                 if ui.button("Restore defaults").clicked() {
                                     self.settings = Settings::default();
                                     self.settings_backup = Some(self.settings.clone());
-                                    self.journal.moods = default_moods();
                                     let save = self.settings.save();
                                     if save.is_err() {
                                         self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
@@ -394,19 +393,21 @@ impl UrdState {
                                                                             }
                                 } else {
                                     ui.vertical_centered_justified(|ui: &mut Ui| {
-                                        ui.heading("This action will be destructive. If you have used ANY non default moods your journal will be unreadable!");
-                                        ui.label("The only way to get it back is by recreating every custom mood you used, with the exact name you used.");
-                                        if ui.button("I understand, proceed").clicked() {
-                                            self.journal.moods = default_moods();
-                                            let save = self.journal.save();
-                                            if save.is_err() {
-                                                self.error = Error::new(
-                                                    save.unwrap_err().to_string(),
-                                                    "Writing journal to disk failed.".to_string(),
-                                                );
+                                        ui.heading("This action is destructive. If you have used ANY non default moods your journal will be unreadable!");
+                                        ui.scope(|ui: &mut Ui| {
+                                            ui.visuals_mut().override_text_color = Some(Color32::from_rgb(255, 0, 0));
+                                            if ui.button("I understand, proceed").clicked() {
+                                                self.journal.moods = default_moods();
+                                                let save = self.journal.save();
+                                                if save.is_err() {
+                                                    self.error = Error::new(
+                                                        save.unwrap_err().to_string(),
+                                                        "Writing journal to disk failed.".to_string(),
+                                                    );
+                                                }
+                                                self.render.view.ui_state.show_destructive_action_confirmation = false;
                                             }
-                                            self.render.view.ui_state.show_destructive_action_confirmation = false;
-                                        }
+                                        });
                                         if ui.button("Cancel").clicked() {
                                             self.render.view.ui_state.show_destructive_action_confirmation = false;
                                         }

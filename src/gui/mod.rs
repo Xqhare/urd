@@ -151,14 +151,14 @@ impl UrdState {
 
     fn normal_mode(&mut self, ctx: &egui::Context) {
         self.main_top_panel(ctx);
-        if self.render.view.show_important_days_page {
+        if self.render.view.pages.show_important_days_page {
             self.important_days_page(ctx);
-        } else if self.render.view.show_mood_page {
+        } else if self.render.view.pages.show_mood_page {
             self.moods_page(ctx);
         } else {
-            if self.render.view.show_search_page {
+            if self.render.view.pages.show_search_page {
                 self.search_page(ctx);
-            } else if self.render.view.show_file_picker_page {
+            } else if self.render.view.pages.show_file_picker_page {
                 self.file_picker(ctx);
             } else {
                 self.main_page(ctx);
@@ -168,6 +168,7 @@ impl UrdState {
         if self
             .render
             .view
+            .viewports
             .show_about_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
@@ -176,6 +177,7 @@ impl UrdState {
         if self
             .render
             .view
+            .viewports
             .show_licenses_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
@@ -184,6 +186,7 @@ impl UrdState {
         if self
             .render
             .view
+            .viewports
             .show_help_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
@@ -199,59 +202,62 @@ impl UrdState {
                     ui.horizontal(|ui: &mut Ui| {
                         ui.menu_button("Urd", |ui: &mut Ui| {
                             if ui.button("Settings").clicked() {
-                                if self.render.view.show_settings_page {
-                                    self.render.view.show_settings_page = false;
+                                if self.render.view.pages.show_settings_page {
+                                    self.render.view.pages.show_settings_page = false;
                                     self.settings_backup = None;
                                 } else {
-                                    self.render.view.show_settings_page = true;
+                                    self.render.view.pages.show_settings_page = true;
                                     self.settings_backup = Some(self.settings.clone());
                                 }
                             }
                             if ui.button("About").clicked() {
                                 self.render
                                     .view
+                                    .viewports
                                     .show_about_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                             if ui.button("Licenses").clicked() {
                                 self.render
                                     .view
+                                    .viewports
                                     .show_licenses_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                             if ui.button("Help").clicked() {
                                 self.render
                                     .view
+                                    .viewports
                                     .show_help_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
                         });
                         ui.menu_button("Journal", |ui: &mut Ui| {
                             if ui.button("Search").clicked() {
-                                if self.render.view.show_search_page {
-                                    self.render.view.show_search_page = false;
+                                if self.render.view.pages.show_search_page {
+                                    self.render.view.pages.show_search_page = false;
                                 } else {
-                                    self.render.view.show_search_page = true;
+                                    self.render.view.pages.show_search_page = true;
                                 }
                             }
                             if ui.button("Important Days").clicked() {
-                                if self.render.view.show_important_days_page {
-                                    self.render.view.show_important_days_page = false;
+                                if self.render.view.pages.show_important_days_page {
+                                    self.render.view.pages.show_important_days_page = false;
                                 } else {
                                     self.construct_important_day_entries();
-                                    self.render.view.show_important_days_page = true;
-                                    self.render.view.show_search_page = false;
-                                    self.render.view.show_mood_page = false;
+                                    self.render.view.pages.show_important_days_page = true;
+                                    self.render.view.pages.show_search_page = false;
+                                    self.render.view.pages.show_mood_page = false;
                                 }
                             }
                             if ui.button("Moods").clicked() {
-                                if self.render.view.show_mood_page {
-                                    self.render.view.show_mood_page = false;
+                                if self.render.view.pages.show_mood_page {
+                                    self.render.view.pages.show_mood_page = false;
                                 } else {
                                     self.construct_mood_entries();
-                                    self.render.view.show_mood_page = true;
-                                    self.render.view.show_search_page = false;
-                                    self.render.view.show_important_days_page = false;
+                                    self.render.view.pages.show_mood_page = true;
+                                    self.render.view.pages.show_search_page = false;
+                                    self.render.view.pages.show_important_days_page = false;
                                 }
                             }
                             if ui.button("Export").clicked() {
@@ -268,7 +274,7 @@ impl UrdState {
                                 } else {
                                     self.settings.custom_paths.needed_path =
                                         Some(NeededPath::Export);
-                                    self.render.view.show_file_picker_page = true;
+                                    self.render.view.pages.show_file_picker_page = true;
                                 }
                             }
                             ui.menu_button("Backup", |ui: &mut Ui| {
@@ -289,20 +295,20 @@ impl UrdState {
                                     } else {
                                         self.settings.custom_paths.needed_path =
                                             Some(NeededPath::Backup);
-                                        self.render.view.show_file_picker_page = true;
+                                        self.render.view.pages.show_file_picker_page = true;
                                     }
                                 }
                                 if ui.button("Restore").clicked() {
                                     self.settings.custom_paths.needed_path =
                                         Some(NeededPath::Restore);
-                                    self.render.view.show_file_picker_page = true;
+                                    self.render.view.pages.show_file_picker_page = true;
                                 }
                             });
                         });
-                        if self.render.view.show_important_days_page || self.render.view.show_mood_page {
+                        if self.render.view.pages.show_important_days_page || self.render.view.pages.show_mood_page {
                             if ui.button("Back to Home").clicked() {
-                                self.render.view.show_important_days_page = false;
-                                self.render.view.show_mood_page = false;
+                                self.render.view.pages.show_important_days_page = false;
+                                self.render.view.pages.show_mood_page = false;
                             }
                         }
                         if self.settings.password.password != "" {
@@ -310,9 +316,9 @@ impl UrdState {
                                 self.settings.password.unlocked_with_password = false;
                             }
                         }
-                        if self.render.view.show_file_picker_page {
+                        if self.render.view.pages.show_file_picker_page {
                             if ui.button("Exit file picker").clicked() {
-                                self.render.view.show_file_picker_page = false;
+                                self.render.view.pages.show_file_picker_page = false;
                             };
                         }
                     })

@@ -12,10 +12,11 @@ impl UrdState {
         if self
             .render
             .view
+            .viewports
             .show_licenses_viewport
             .load(std::sync::atomic::Ordering::Relaxed)
         {
-            let show_viewport_pointer = self.render.view.show_licenses_viewport.clone();
+            let show_viewport_pointer = self.render.view.viewports.show_licenses_viewport.clone();
             ctx.show_viewport_deferred(
                 ViewportId::from_hash_of("licenses_viewport"),
                 ViewportBuilder::default()
