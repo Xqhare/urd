@@ -150,10 +150,10 @@ impl Viewports {
     pub fn startup_default() -> Self {
         Viewports {
             // ONLY DIFFERENCE
-            show_about_viewport: Arc::new(AtomicBool::new(true)),
+            show_help_viewport: Arc::new(AtomicBool::new(true)),
             // Same
             show_licenses_viewport: Arc::new(AtomicBool::new(false)),
-            show_help_viewport: Arc::new(AtomicBool::new(false)),
+            show_about_viewport: Arc::new(AtomicBool::new(false)),
         }
     }
 }
