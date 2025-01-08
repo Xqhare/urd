@@ -421,9 +421,37 @@ impl UrdState {
                 if self.error.show_error {
                     self.error_modal(ui);
                 };
+                if self.settings.show_tips_and_tricks {
+                    self.tips_and_tricks_modal(ui);
+                }
             });
             ui.add_space(1.0);
         });
+    }
+
+    fn tips_and_tricks_modal(&mut self, ui: &mut Ui) {
+        let tips_and_tricks_modal = Modal::new(Id::new("Tips and Tricks Modal")).show(ui.ctx(), |ui: &mut Ui| {
+            ui.vertical_centered_justified(|ui: &mut Ui| {
+                ui.heading("Tips and Tricks");
+            });
+            ui.separator();
+            ui.vertical_centered_justified(|ui: &mut Ui| {
+                ui.label(self.state_store.tips_and_tricks.tips_and_tricks[self.state_store.tips_and_tricks.index].title.clone());
+            });
+            ui.separator();
+            ui.label(self.state_store.tips_and_tricks.tips_and_tricks[self.state_store.tips_and_tricks.index].text.clone());
+            ui.separator();
+            ui.scope(|ui: &mut Ui| {
+                ui.vertical_centered_justified(|ui: &mut Ui| {
+                    if ui.button("Dismiss").clicked() {
+                        self.settings.show_tips_and_tricks = false;
+                    }
+                });
+            });
+        });
+        if tips_and_tricks_modal.should_close() {
+            self.settings.show_tips_and_tricks = false;
+        }
     }
 
     fn error_modal(&mut self, ui: &mut Ui) {
