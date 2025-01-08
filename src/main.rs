@@ -9,6 +9,7 @@ mod render;
 mod search;
 mod settings;
 mod startup;
+mod tips_and_tricks;
 
 fn main() {
     let mut settings = startup::startup_appstate();

@@ -23,6 +23,7 @@ pub struct Settings {
     pub custom_paths: CustomPaths,
     pub automatic_backups: bool,
     // Not part of persistent state
+    pub show_tips_and_tricks: bool,
     pub overwrite_window_size: bool,
     pub overwrite_window_size_store: [String; 2],
     pub overwrite_side_panel_width: bool,
@@ -43,6 +44,7 @@ impl Default for Settings {
             gui: Gui::default(),
             custom_paths: CustomPaths::default(),
             // default true
+            show_tips_and_tricks: true,
             // default false
             automatic_backups: false,
             overwrite_window_size: false,
@@ -76,6 +78,9 @@ impl Settings {
 
         let automatic_backups = XffValue::from(self.automatic_backups);
         serialized.insert("automatic_backups", automatic_backups);
+
+        let show_tips_and_tricks = XffValue::from(self.show_tips_and_tricks);
+        serialized.insert("show_tips_and_tricks", show_tips_and_tricks);
 
         XffValue::from(serialized)
     }
@@ -116,6 +121,10 @@ impl Settings {
             .unwrap()
             .into_boolean()
             .unwrap();
+        let show_tips_and_tricks = match deserialized.get("show_tips_and_tricks") {
+            Some(v) => v.into_boolean().unwrap(),
+            None => true,
+        };
         Ok(Settings {
             font,
             gui,
@@ -128,6 +137,7 @@ impl Settings {
             overwrite_side_panel_width_store: size.side_panel_width.to_string(),
             overwrite_window_size_store: [size.size[0].to_string(), size.size[1].to_string()],
             size,
+            show_tips_and_tricks,
         })
     }
 }

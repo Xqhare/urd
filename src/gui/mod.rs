@@ -5,7 +5,7 @@ use crate::{
     render::{Aspirations, Render},
     search::Search,
     settings::{NeededPath, Settings},
-    startup::StartupState,
+    startup::StartupState, tips_and_tricks::TipsNTricks,
 };
 use eframe::{
     egui::{CentralPanel, Ui},
@@ -30,6 +30,7 @@ const APP_NAME: &str = "Urd";
 pub struct StateStore {
     pub new_mood: Mood,
     pub all_moods: Vec<Mood>,
+    pub tips_and_tricks: TipsNTricks,
 }
 
 impl Default for StateStore {
@@ -37,6 +38,7 @@ impl Default for StateStore {
         Self {
             new_mood: Mood::default(),
             all_moods: Vec::new(),
+            tips_and_tricks: TipsNTricks::default(),
         }
     }
 }
