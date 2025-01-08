@@ -10,6 +10,7 @@ impl Default for TipsNTricks {
     fn default() -> Self {
         let mut out: Vec<TipOrTrick> = Vec::new();
         let tips = vec![
+            ("You can hide me!", "Pressing the Escape key will hide this until the next time you open Urd."),
             ("Search", "TODO"),
             ("Backup", "TODO"),
             ("Restore", "TODO"),
