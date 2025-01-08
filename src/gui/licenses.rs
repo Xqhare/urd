@@ -6,6 +6,7 @@ const LICENSES_WINDOW_SIZE: [f32; 2] = [300.0, 500.0];
 const EFRAME_LICENSE: &str = include_str!("../../licenses/MIT-Eframe");
 const HORAE_LICENSE: &str = include_str!("../../licenses/MIT-Horae");
 const NABU_LICENSE: &str = include_str!("../../licenses/MIT-Nabu");
+const FORTUNA_LICENSE: &str = include_str!("../../licenses/MIT-Fortuna");
 
 impl UrdState {
     pub fn licenses_viewport_startup(&mut self, ctx: &Context) {
@@ -42,6 +43,10 @@ impl UrdState {
                             ui.hyperlink_to("Nabu", "https://github.com/xqhare/nabu");
                             ui.label("MIT License");
                             ui.label(NABU_LICENSE);
+                            ui.separator();
+                            ui.hyperlink_to("Fortuna", "https://github.com/xqhare/fortuna");
+                            ui.label("MIT License");
+                            ui.label(FORTUNA_LICENSE);
                         });
                     });
                     // Close viewport

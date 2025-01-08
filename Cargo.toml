@@ -12,3 +12,4 @@ lto = "fat"
 eframe = "0.30"
 horae = { git = "https://github.com/xqhare/horae" }
 nabu = { git = "https://github.com/xqhare/nabu" }
+fortuna = { git = "https://github.com/xqhare/fortuna" }
