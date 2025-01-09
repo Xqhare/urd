@@ -508,9 +508,25 @@ impl UrdState {
                             }).response
                         });
 
+                        ui.add(|ui: &mut Ui| {
+                            ui.group(|ui: &mut Ui| {
+                                ui.label("Tips and Tricks settings");
+                                Sides::new().show(ui, |ui: &mut Ui| {
+                                    ui.label("Show tips and tricks at startup: ");
+                                }, |ui: &mut Ui| {
+                                        if self.settings.tips_and_tricks_at_startup {
+                                            ui.checkbox(&mut self.settings.tips_and_tricks_at_startup, "Enabled");
+                                        } else {
+                                            
+                                            ui.checkbox(&mut self.settings.tips_and_tricks_at_startup, "Disabled");
+                                        }
+                                });
+                            }).response
+                        });
+
                     });
-                })
-            })
+                });
+            });
         });
     }
 

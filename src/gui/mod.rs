@@ -60,7 +60,7 @@ impl Default for UrdState {
             journal: Journal::new(&settings),
             settings,
             error: Error::default(),
-            render: Render::default(),
+            render: Render::startup_default(),
             search: Search::default(),
             settings_backup: None,
             state_store: StateStore::default(),
@@ -69,7 +69,7 @@ impl Default for UrdState {
 }
 
 impl UrdState {
-    pub fn new(settings: Settings, journal: Journal, error: Error, first_run: bool) -> Self {
+    pub fn new(settings: Settings, journal: Journal, error: Error, first_run: bool, show_tips_and_tricks: bool) -> Self {
         if first_run {
             let settings = Settings::default();
             UrdState {
@@ -86,7 +86,7 @@ impl UrdState {
                 journal,
                 settings,
                 error,
-                render: Render::default(),
+                render: Render::new(show_tips_and_tricks),
                 search: Search::default(),
                 settings_backup: None,
                 state_store: StateStore::default(),
@@ -421,7 +421,7 @@ impl UrdState {
                 if self.error.show_error {
                     self.error_modal(ui);
                 };
-                if self.settings.show_tips_and_tricks {
+                if self.render.show_tips_and_tricks {
                     self.tips_and_tricks_modal(ui);
                 }
             });
@@ -443,14 +443,44 @@ impl UrdState {
             ui.separator();
             ui.scope(|ui: &mut Ui| {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
-                    if ui.button("Dismiss").clicked() {
-                        self.settings.show_tips_and_tricks = false;
-                    }
+                    ui.horizontal(|ui: &mut Ui| {
+                        if ui.button("Next").clicked() {
+                            let tmp = self.state_store.tips_and_tricks.index.saturating_add(1);
+                            if tmp <= self.state_store.tips_and_tricks.tips_and_tricks.len() - 1 {
+                                self.state_store.tips_and_tricks.index = tmp;
+                            } else {
+                                self.state_store.tips_and_tricks.index = 0;
+                            }
+                        }
+                        if ui.button("Previous").clicked() {
+                            if self.state_store.tips_and_tricks.index == 0 {
+                                self.state_store.tips_and_tricks.index = self.state_store.tips_and_tricks.tips_and_tricks.len() - 1;
+                            } else {
+                                self.state_store.tips_and_tricks.index = self.state_store.tips_and_tricks.index.saturating_sub(1);
+                            }
+                        }
+                    });
+                    ui.horizontal(|ui: &mut Ui| {
+                        if ui.button("Dismiss").clicked() {
+                            self.render.show_tips_and_tricks = false;
+                        }
+                        if ui.button("Don't show again").clicked() {
+                            self.settings.tips_and_tricks_at_startup = false;
+                            self.render.show_tips_and_tricks = false;
+                            let save_settings = self.settings.save();
+                            if save_settings.is_err() {
+                                self.error = Error::new(
+                                    save_settings.unwrap_err().to_string(),
+                                    "Writing settings to disk failed.".to_string(),
+                                );
+                            }
+                        }
+                    });
                 });
             });
         });
         if tips_and_tricks_modal.should_close() {
-            self.settings.show_tips_and_tricks = false;
+            self.render.show_tips_and_tricks = false;
         }
     }
 
@@ -496,6 +526,7 @@ pub fn gui_startup(startup_state: StartupState) {
                 startup_state.journal,
                 startup_state.error,
                 startup_state.first_run,
+                startup_state.show_tips_and_tricks,
             )))
         }),
     )

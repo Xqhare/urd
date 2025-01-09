@@ -12,6 +12,7 @@ pub struct StartupState {
     pub journal: Journal,
     pub error: Error,
     pub first_run: bool,
+    pub show_tips_and_tricks: bool,
 }
 
 pub fn startup_appstate() -> StartupState {
@@ -32,6 +33,7 @@ pub fn startup_appstate() -> StartupState {
                         "Loading journal failed.".to_string(),
                     ),
                     first_run: false,
+                    show_tips_and_tricks: false,
                 };
             }
             StartupState {
@@ -39,6 +41,7 @@ pub fn startup_appstate() -> StartupState {
                 journal: journal.unwrap(),
                 error: settings.unwrap_err(),
                 first_run: false,
+                show_tips_and_tricks: false,
             }
         } else {
             let tmp_settings = settings.unwrap();
@@ -54,9 +57,11 @@ pub fn startup_appstate() -> StartupState {
                         "Loading journal failed.".to_string(),
                     ),
                     first_run: false,
+                    show_tips_and_tricks: false,
                 };
             } else {
                 StartupState {
+                    show_tips_and_tricks: tmp_settings.tips_and_tricks_at_startup,
                     settings: tmp_settings,
                     journal: journal.unwrap(),
                     error: Error::default(),
@@ -75,6 +80,7 @@ pub fn startup_appstate() -> StartupState {
             journal,
             error: Error::default(),
             first_run: true,
+            show_tips_and_tricks: true,
         }
     }
 }

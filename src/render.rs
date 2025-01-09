@@ -14,16 +14,7 @@ pub struct Render {
     pub view: View,
     pub show_folder: ShowFolder,
     pub entities: Entities,
-}
-
-impl Default for Render {
-    fn default() -> Self {
-        Render {
-            view: View::default(),
-            show_folder: ShowFolder::All,
-            entities: Entities::default(),
-        }
-    }
+    pub show_tips_and_tricks: bool,
 }
 
 impl Render {
@@ -32,6 +23,16 @@ impl Render {
             view: View::startup_default(),
             show_folder: ShowFolder::All,
             entities: Entities::default(),
+            show_tips_and_tricks: true,
+        }
+    }
+
+    pub fn new(show_tips_and_tricks: bool) -> Self {
+        Render {
+            view: View::default(),
+            show_folder: ShowFolder::All,
+            entities: Entities::default(),
+            show_tips_and_tricks,
         }
     }
 }
