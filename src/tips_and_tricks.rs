@@ -11,6 +11,14 @@ impl Default for TipsNTricks {
         let mut out: Vec<TipOrTrick> = Vec::new();
         let tips = vec![
             ("You can hide me!", "Pressing the Escape key will hide this until the next time you open Urd."),
+            ("", "Clicking on the field in the top left corner will take you up a level in the file tree."),
+            ("", "Clicking on an entry in the left side panel will open it. If it is a folder (years or months) this folder will be opened on the left side. If it is a journal entry, it will open in the main panel to the right."),
+            ("", "Journal entry dates cannot be changed."),
+            ("", "You can add custom moods!"),
+            ("", "Had an important day? Mark it and find it later!"),
+            ("Theme", "Urd always follows the system theme."),
+            ("", ""),
+            ("", ""),
             ("Search", "TODO"),
             ("Backup", "TODO"),
             ("Restore", "TODO"),
