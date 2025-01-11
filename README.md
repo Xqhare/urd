@@ -34,6 +34,9 @@ A journaling app written in rust.
 - User onboarding
     - [x] First run detection
     - [ ] Tips and Tricks modal (WIP)
+        - [x] Backend
+        - [x] GUI
+        - [ ] Tips and Tricks
     - [ ] Tutorials
         - [ ] Main screen
         - [ ] Settings
