@@ -31,17 +31,18 @@ A journaling app written in rust.
 
 ## Roadmap
 
-- User onboarding
+- [ ] User onboarding
     - [x] First run detection
     - [ ] Tips and Tricks modal (WIP)
         - [x] Backend
         - [x] GUI
-        - [ ] Tips and Tricks
+        - [ ] Tips and Tricks (WIP)
     - [ ] Tutorials
         - [ ] Main screen
         - [ ] Settings
     - [ ] Hover text
     - [ ] Welcome screen
+    - [ ] Update help window
 - [ ] Contacts
     - [ ] Name
     - [ ] With text field for free form input? / key value pairs of custom metadata?
@@ -52,6 +53,7 @@ A journaling app written in rust.
     - [ ] Contacts in settings / own contacts page
     - [ ] Searchable contacts list
     - [ ] Searchable journal for entries with contacts
+- [ ] Proper page change using the main menu (clear all and show home)
 
 
 ## Install
