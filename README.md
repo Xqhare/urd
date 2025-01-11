@@ -74,6 +74,10 @@ Download the executable from the latest [release](https://github.com/xqhare/urd/
 > Windows binaries are only compiled at release time, and are not built for every version.
 > (from 0.4.2 onwards)
 
+> [!IMPORTANT]
+> When compiling from source, make sure to use the `--release` flag.
+> Without this flag a `cmd` window will be generated whenever `Urd` is run.
+
 Put the executable in any location you like.
 `Urd` will generate a directory called `urd_data` in the same directory as the binary.
 This directory will store all your data, including your journal entries and settings.
