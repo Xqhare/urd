@@ -436,7 +436,7 @@ impl UrdState {
             });
             ui.separator();
             ui.vertical_centered_justified(|ui: &mut Ui| {
-                ui.label(self.state_store.tips_and_tricks.tips_and_tricks[self.state_store.tips_and_tricks.index].title.clone());
+                ui.label(format!("#{} {}", self.state_store.tips_and_tricks.index, self.state_store.tips_and_tricks.tips_and_tricks[self.state_store.tips_and_tricks.index].title.clone()))
             });
             ui.separator();
             ui.label(self.state_store.tips_and_tricks.tips_and_tricks[self.state_store.tips_and_tricks.index].text.clone());
@@ -444,6 +444,13 @@ impl UrdState {
             ui.scope(|ui: &mut Ui| {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
                     ui.horizontal(|ui: &mut Ui| {
+                        if ui.button("Previous").clicked() {
+                            if self.state_store.tips_and_tricks.index == 0 {
+                                self.state_store.tips_and_tricks.index = self.state_store.tips_and_tricks.tips_and_tricks.len() - 1;
+                            } else {
+                                self.state_store.tips_and_tricks.index = self.state_store.tips_and_tricks.index.saturating_sub(1);
+                            }
+                        }
                         if ui.button("Next").clicked() {
                             let tmp = self.state_store.tips_and_tricks.index.saturating_add(1);
                             if tmp <= self.state_store.tips_and_tricks.tips_and_tricks.len() - 1 {
@@ -452,15 +459,6 @@ impl UrdState {
                                 self.state_store.tips_and_tricks.index = 0;
                             }
                         }
-                        if ui.button("Previous").clicked() {
-                            if self.state_store.tips_and_tricks.index == 0 {
-                                self.state_store.tips_and_tricks.index = self.state_store.tips_and_tricks.tips_and_tricks.len() - 1;
-                            } else {
-                                self.state_store.tips_and_tricks.index = self.state_store.tips_and_tricks.index.saturating_sub(1);
-                            }
-                        }
-                    });
-                    ui.horizontal(|ui: &mut Ui| {
                         if ui.button("Dismiss").clicked() {
                             self.render.show_tips_and_tricks = false;
                         }
