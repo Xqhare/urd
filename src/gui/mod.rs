@@ -290,10 +290,11 @@ impl UrdState {
                         ui.menu_button("Urd", |ui: &mut Ui| {
                             if ui.button("Settings").clicked() {
                                 if self.render.view.pages.show_settings_page {
-                                    self.render.view.pages.show_settings_page = false;
                                     self.settings_backup = None;
                                     self.state_store.all_moods = Vec::new();
+                                    self.clear_ui();
                                 } else {
+                                    self.clear_ui();
                                     self.render.view.pages.show_settings_page = true;
                                     self.settings_backup = Some(self.settings.clone());
 
@@ -326,29 +327,28 @@ impl UrdState {
                         ui.menu_button("Journal", |ui: &mut Ui| {
                             if ui.button("Search").clicked() {
                                 if self.render.view.pages.show_search_page {
-                                    self.render.view.pages.show_search_page = false;
+                                    self.clear_ui();
                                 } else {
+                                    self.clear_ui();
                                     self.render.view.pages.show_search_page = true;
                                 }
                             }
                             if ui.button("Important Days").clicked() {
                                 if self.render.view.pages.show_important_days_page {
-                                    self.render.view.pages.show_important_days_page = false;
+                                    self.clear_ui();
                                 } else {
                                     self.construct_important_day_entries();
+                                    self.clear_ui();
                                     self.render.view.pages.show_important_days_page = true;
-                                    self.render.view.pages.show_search_page = false;
-                                    self.render.view.pages.show_mood_page = false;
                                 }
                             }
                             if ui.button("Moods").clicked() {
                                 if self.render.view.pages.show_mood_page {
-                                    self.render.view.pages.show_mood_page = false;
+                                    self.clear_ui();
                                 } else {
                                     self.construct_mood_entries();
+                                    self.clear_ui();
                                     self.render.view.pages.show_mood_page = true;
-                                    self.render.view.pages.show_search_page = false;
-                                    self.render.view.pages.show_important_days_page = false;
                                 }
                             }
                             if ui.button("Export").clicked() {
@@ -365,6 +365,7 @@ impl UrdState {
                                 } else {
                                     self.settings.custom_paths.needed_path =
                                         Some(NeededPath::Export);
+                                    self.clear_ui();
                                     self.render.view.pages.show_file_picker_page = true;
                                 }
                             }
@@ -386,12 +387,14 @@ impl UrdState {
                                     } else {
                                         self.settings.custom_paths.needed_path =
                                             Some(NeededPath::Backup);
+                                    self.clear_ui();
                                         self.render.view.pages.show_file_picker_page = true;
                                     }
                                 }
                                 if ui.button("Restore").clicked() {
                                     self.settings.custom_paths.needed_path =
                                         Some(NeededPath::Restore);
+                                    self.clear_ui();
                                     self.render.view.pages.show_file_picker_page = true;
                                 }
                             });
@@ -400,8 +403,7 @@ impl UrdState {
                             || self.render.view.pages.show_mood_page
                         {
                             if ui.button("Back to Home").clicked() {
-                                self.render.view.pages.show_important_days_page = false;
-                                self.render.view.pages.show_mood_page = false;
+                                self.clear_ui();
                             }
                         }
                         if self.settings.password.password != "" {
@@ -412,6 +414,7 @@ impl UrdState {
                         if self.render.view.pages.show_file_picker_page {
                             if ui.button("Exit file picker").clicked() {
                                 self.render.view.pages.show_file_picker_page = false;
+                                self.clear_ui();
                             };
                         }
                     })
@@ -505,6 +508,13 @@ impl UrdState {
         if error_modal.should_close() {
             self.error.show_error = false;
         }
+    }
+
+    pub fn clear_ui(&mut self) {
+        self.render.view.pages.show_important_days_page = false;
+        self.render.view.pages.show_mood_page = false;
+        self.render.view.pages.show_search_page = false;
+        self.render.view.pages.show_settings_page = false;
     }
 }
 

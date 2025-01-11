@@ -56,7 +56,7 @@ A journaling app written in rust.
     - [ ] Contacts in settings / own contacts page
     - [ ] Searchable contacts list
     - [ ] Searchable journal for entries with contacts
-- [ ] *Proper page change using the main menu (clear all and show home)*
+- [x] *Proper page change using the main menu (clear all and show home)*
 
 
 ## Install
