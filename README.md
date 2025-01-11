@@ -33,10 +33,10 @@ A journaling app written in rust.
 
 - [ ] User onboarding
     - [x] First run detection
-    - [ ] Tips and Tricks modal (WIP)
+    - [x] Tips and Tricks modal
         - [x] Backend
         - [x] GUI
-        - [ ] Tips and Tricks (WIP)
+        - [x] Tips and Tricks
     - [ ] Tutorials
         - [ ] Main screen
         - [ ] Settings
