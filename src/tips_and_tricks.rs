@@ -29,7 +29,7 @@ impl Default for TipsNTricks {
             ("Context tags", "The context tags of the entry. Added by prepending the word with '@'. e.g. @Work"),
             ("Special tags", "These tags consists of a key:value pair. You can use this to store any information you want. e.g. date_due:2025-03-15"),
             ("Bespoke tags", "Tags for any miscellaneous information. They are added by prepending the word with '#'. e.g. #Tag"),
-            ("Settings", "Check out the settings page to fine tune Urd to your needs. You can find it inside the Urd menu button."),
+            ("Settings", "Check out the settings page to fine tune Urd to your needs. You can find it inside the Urd menu button. Remember to save them after you made changes!"),
             ("Password", "You can set up a password to secure your journal from prying eyes. Check the settings!"),
             ("Help", "You can open the Help window to learn more about anything in Urd. You can find it inside the Urd menu button."),
             ("Search", "You can use the search feature to find entries. Check the search page for more information."),

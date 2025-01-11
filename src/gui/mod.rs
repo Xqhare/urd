@@ -436,7 +436,7 @@ impl UrdState {
             });
             ui.separator();
             ui.vertical_centered_justified(|ui: &mut Ui| {
-                ui.label(format!("#{} {}", self.state_store.tips_and_tricks.index, self.state_store.tips_and_tricks.tips_and_tricks[self.state_store.tips_and_tricks.index].title.clone()))
+                ui.label(format!("#{} {}", self.state_store.tips_and_tricks.index + 1, self.state_store.tips_and_tricks.tips_and_tricks[self.state_store.tips_and_tricks.index].title.clone()))
             });
             ui.separator();
             ui.label(self.state_store.tips_and_tricks.tips_and_tricks[self.state_store.tips_and_tricks.index].text.clone());
