@@ -55,7 +55,10 @@ impl UrdState {
                                         let mood_colour = Color32::from_rgba_unmultiplied(r, g, b, a);
 
                                         ui.group(|ui: &mut Ui| {
-                                            ui.label("     ").on_hover_text(format!("Your mood on the {}. was {}", entry.metadata.get("date").unwrap().into_object().unwrap().get("day").unwrap().into_number().unwrap().into_usize().unwrap(), mood));
+                                            if ui.label("     ").on_hover_text(format!("Your mood on the {}. was {}", entry.metadata.get("date").unwrap().into_object().unwrap().get("day").unwrap().into_number().unwrap().into_usize().unwrap(), mood)).clicked() {
+                                                    self.journal.current_entry = entry.clone();
+                                                    self.render.view.pages.show_mood_page = false;
+                                            }
                                             let area = ui.min_rect();
                                             ui.painter().rect_filled( area , 2.0, mood_colour);
                                         });
