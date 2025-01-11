@@ -42,6 +42,17 @@ A journaling app written in rust.
         - [ ] Settings
     - [ ] Hover text
     - [ ] Welcome screen
+- [ ] Contacts
+    - [ ] Name
+    - [ ] With text field for free form input? / key value pairs of custom metadata?
+    - [ ] Automatic metadata insertion
+        - [ ] Upon contact creation and edit
+        - [ ] Upon journal entry creation and edit
+    - [ ] Display on main screen of contacts in current entry
+    - [ ] Contacts in settings / own contacts page
+    - [ ] Searchable contacts list
+    - [ ] Searchable journal for entries with contacts
+
 
 ## Install
 
