@@ -170,8 +170,8 @@ impl UrdState {
             self.state_store.setup_wizard_progress = 0.50;
         };
         if ui.button("Previous").clicked() {
-            self.state_store.wizard_setup_step = 1;
-            self.state_store.setup_wizard_progress = 0.25;
+            self.state_store.wizard_setup_step = 0;
+            self.state_store.setup_wizard_progress = 0.0;
         }
         if ui.button("Skip").clicked() {
             self.state_store.wizard_setup_step = 2;
@@ -197,8 +197,8 @@ impl UrdState {
             })
         });
         if ui.button("Previous").clicked() {
-            self.state_store.wizard_setup_step = 2;
-            self.state_store.setup_wizard_progress = 0.5;
+            self.state_store.wizard_setup_step = 1;
+            self.state_store.setup_wizard_progress = 0.25;
         }
         if ui.button("Next").clicked() {
             let save = self.settings.save();
@@ -237,6 +237,10 @@ impl UrdState {
                     entry.edit_resolutions.push("".to_string());
                 }
             });
+            if ui.button("Previous").clicked() {
+                self.state_store.wizard_setup_step = 2;
+                self.state_store.setup_wizard_progress = 0.50;
+            }
             if ui.button("Finish").clicked() {
                 let xff_val = {
                     let mut out = Object::new();
