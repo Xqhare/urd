@@ -24,6 +24,7 @@ mod main_page_side_panel;
 mod moods;
 mod search_page;
 mod settings;
+mod welcome_page;
 
 const APP_NAME: &str = "Urd";
 
@@ -31,14 +32,20 @@ pub struct StateStore {
     pub new_mood: Mood,
     pub all_moods: Vec<Mood>,
     pub tips_and_tricks: TipsNTricks,
+    pub first_run: bool,
+    pub setup_wizard_progress: f32,
+    pub wizard_setup_step: u8,
 }
 
-impl Default for StateStore {
-    fn default() -> Self {
+impl StateStore {
+    fn new(first_run: bool) -> Self {
         Self {
             new_mood: Mood::default(),
             all_moods: Vec::new(),
             tips_and_tricks: TipsNTricks::default(),
+            first_run,
+            setup_wizard_progress: 0.0,
+            wizard_setup_step: 0,
         }
     }
 }
@@ -53,21 +60,6 @@ pub struct UrdState {
     state_store: StateStore,
 }
 
-impl Default for UrdState {
-    fn default() -> Self {
-        let settings = Settings::default();
-        UrdState {
-            journal: Journal::new(&settings),
-            settings,
-            error: Error::default(),
-            render: Render::startup_default(),
-            search: Search::default(),
-            settings_backup: None,
-            state_store: StateStore::default(),
-        }
-    }
-}
-
 impl UrdState {
     pub fn new(settings: Settings, journal: Journal, error: Error, first_run: bool, show_tips_and_tricks: bool) -> Self {
         if first_run {
@@ -79,7 +71,7 @@ impl UrdState {
                 render: Render::startup_default(),
                 search: Search::default(),
                 settings_backup: None,
-                state_store: StateStore::default(),
+                state_store: StateStore::new(first_run),
             }
         } else {
             UrdState {
@@ -89,7 +81,7 @@ impl UrdState {
                 render: Render::new(show_tips_and_tricks),
                 search: Search::default(),
                 settings_backup: None,
-                state_store: StateStore::default(),
+                state_store: StateStore::new(first_run),
             }
         }
     }
@@ -97,10 +89,14 @@ impl UrdState {
 
 impl App for UrdState {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        if self.settings.password.password != "" && !self.settings.password.unlocked_with_password {
-            self.protected_mode(ctx);
+        if self.state_store.first_run {
+            self.welcome_page(ctx);
         } else {
-            self.normal_mode(ctx);
+            if self.settings.password.password != "" && !self.settings.password.unlocked_with_password {
+                self.protected_mode(ctx);
+            } else {
+                self.normal_mode(ctx);
+            }
         }
     }
 }
@@ -323,6 +319,11 @@ impl UrdState {
                                     .show_help_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
+                            if ui.button("Exit").clicked() {
+                                let _ = self.journal.save();
+                                let _ = self.settings.save();
+                                std::process::exit(0);
+                            };
                         });
                         ui.menu_button("Journal", |ui: &mut Ui| {
                             if ui.button("Search").clicked() {

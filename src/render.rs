@@ -15,6 +15,7 @@ pub struct Render {
     pub show_folder: ShowFolder,
     pub entities: Entities,
     pub show_tips_and_tricks: bool,
+    pub show_setup_wizard: bool,
 }
 
 impl Render {
@@ -24,6 +25,7 @@ impl Render {
             show_folder: ShowFolder::All,
             entities: Entities::default(),
             show_tips_and_tricks: true,
+            show_setup_wizard: false,
         }
     }
 
@@ -33,6 +35,7 @@ impl Render {
             show_folder: ShowFolder::All,
             entities: Entities::default(),
             show_tips_and_tricks,
+            show_setup_wizard: false,
         }
     }
 }
