@@ -63,6 +63,7 @@ A journaling app written in rust.
 
 
 ## Install
+I do not guarantee that any released binary will work on your device.
 
 ### Linux
 Build from source, or download the binary from the latest [release](https://github.com/xqhare/urd/releases). (If I can be arsed to do it)
