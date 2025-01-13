@@ -402,6 +402,7 @@ impl UrdState {
                         });
                         if self.render.view.pages.show_important_days_page
                             || self.render.view.pages.show_mood_page
+                            || self.render.view.pages.show_search_page
                         {
                             if ui.button("Back to Home").clicked() {
                                 self.clear_ui();
