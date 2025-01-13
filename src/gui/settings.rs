@@ -24,14 +24,14 @@ impl UrdState {
                             ui.group(|ui: &mut Ui| {
                                 Grid::new("buttons").num_columns(2).show(ui, |ui: &mut Ui| {
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        let but = ui.button("Cancel");
+                                        let but = ui.button("Cancel").on_hover_text("Revert changes");
                                         if but.clicked() {
                                             self.settings = self.settings_backup.clone().unwrap();
                                         }
                                         but
                                     });
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        let but = ui.button("Cancel and Close");
+                                        let but = ui.button("Cancel and Close").on_hover_text("Revert changes and close settings");
                                         if but.clicked() {
                                             self.settings = self.settings_backup.clone().unwrap();
                                             self.state_store.all_moods = Vec::new();
@@ -43,7 +43,7 @@ impl UrdState {
                                     });
                                     ui.end_row();
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        let but = ui.button("Save");
+                                        let but = ui.button("Save").on_hover_text("Save changes");
                                         if but.clicked() {
                                             self.export_and_save_moods();
                                             let save_settings = self.settings.save();
@@ -61,7 +61,7 @@ impl UrdState {
                                         but
                                     });
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        let but = ui.button("Save and Close");
+                                        let but = ui.button("Save and Close").on_hover_text("Save changes and close settings");
                                         if but.clicked() {
                                             self.export_and_save_moods();
                                             let save_settings = self.settings.save();
@@ -81,7 +81,7 @@ impl UrdState {
                                         but
                                     });
                                 });
-                                if ui.button("Restore defaults").clicked() {
+                                if ui.button("Restore defaults").on_hover_text("Restores the default settings").clicked() {
                                     self.settings = Settings::default();
                                     self.settings_backup = Some(self.settings.clone());
                                     let save_settings = self.settings.save();
@@ -344,14 +344,14 @@ impl UrdState {
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Path: ");
                                 }, |ui: &mut Ui| {
-                                    ui.add(TextEdit::singleline(&mut self.settings.custom_paths.backup_directory).horizontal_align(Align::Center));
+                                    ui.add(TextEdit::singleline(&mut self.settings.custom_paths.backup_directory).horizontal_align(Align::Center).hint_text("Enter absolute path to the backup directory or launch the wizard"));
                                 });
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Automatic backup");
                                 }, |ui: &mut Ui| {
                                     ui.checkbox(&mut self.settings.automatic_backups, "Every launch");
                                 });
-                                if ui.button("Launch backup wizard").clicked() {
+                                if ui.button("Launch backup wizard").on_hover_text("Launches the backup wizard").clicked() {
                                     self.render.view.pages.show_file_picker_page = true;
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Backup);
                                     self.render.view.pages.show_settings_page = false;
@@ -365,9 +365,9 @@ impl UrdState {
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Path: ");
                                 }, |ui: &mut Ui| {
-                                    ui.add(TextEdit::singleline(&mut self.settings.custom_paths.export_directory).horizontal_align(Align::Center));
+                                    ui.add(TextEdit::singleline(&mut self.settings.custom_paths.export_directory).horizontal_align(Align::Center).hint_text("Enter absolute path to the export directory or launch the wizard"));
                                 });
-                                if ui.button("Launch export wizard").clicked() {
+                                if ui.button("Launch export wizard").on_hover_text("Launches the export wizard").clicked() {
                                     self.render.view.pages.show_file_picker_page = true;
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Export);
                                     self.render.view.pages.show_settings_page = false;
@@ -383,14 +383,14 @@ impl UrdState {
                                     Sides::new().show(ui, |ui: &mut Ui| {
                                         ui.label("Mood Name: ");
                                     }, |ui: &mut Ui| {
-                                        ui.text_edit_singleline(&mut self.state_store.new_mood.name).on_hover_text("Enter the name of the new mood - This cannot be changed later!");
+                                        ui.add(TextEdit::singleline(&mut self.state_store.new_mood.name).horizontal_align(Align::Center).hint_text("Enter the name of the new mood - This cannot be changed later!"));
                                     });
                                     Sides::new().show(ui, |ui: &mut Ui| {
                                         ui.label("Mood Colour: ");
                                     }, |ui: &mut Ui| {
                                         ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour).on_hover_text("Choose the colour of the new mood");
                                     });
-                                    if ui.button("Add mood").clicked() {
+                                    if ui.button("Add mood").on_hover_text("Save the mood").clicked() {
                                         if self.journal.moods.contains_key(&self.state_store.new_mood.name) {
                                             self.error = Error::new(
                                                 "Mood already exists.".to_string(),
@@ -422,12 +422,12 @@ impl UrdState {
                                                 });
                                         }
                                     }
-                                    if ui.button("Save").clicked() {
+                                    if ui.button("Save").on_hover_text("Save all moods").clicked() {
                                         self.export_and_save_moods();
                                     }
                                 });
                                 if !self.render.view.ui_state.show_destructive_action_confirmation {
-                                    if ui.button("Restore default moods").clicked() {
+                                    if ui.button("Restore default moods").on_hover_text("Restores the default moods - this action is destructive").clicked() {
                                         self.render.view.ui_state.show_destructive_action_confirmation = true;
                                                                             }
                                 } else {
@@ -435,7 +435,7 @@ impl UrdState {
                                         ui.heading("This action is destructive. If you have used ANY non default moods your journal will be unreadable!");
                                         ui.scope(|ui: &mut Ui| {
                                             ui.visuals_mut().override_text_color = Some(Color32::from_rgb(255, 0, 0));
-                                            if ui.button("I understand, proceed").clicked() {
+                                            if ui.button("I understand, proceed").on_hover_text("You have been warned!").clicked() {
                                                 self.journal.moods = default_moods();
                                                 let save = self.journal.save();
                                                 if save.is_err() {
@@ -447,7 +447,7 @@ impl UrdState {
                                                 self.render.view.ui_state.show_destructive_action_confirmation = false;
                                             }
                                         });
-                                        if ui.button("Cancel").clicked() {
+                                        if ui.button("Cancel").on_hover_text("Nothing has happened yet, take me back!").clicked() {
                                             self.render.view.ui_state.show_destructive_action_confirmation = false;
                                         }
                                     });
@@ -477,11 +477,11 @@ impl UrdState {
                                                 ui.add(TextEdit::singleline(resolution).horizontal_align(Align::Center).hint_text("Go to the gym")).on_hover_text("Enter one resolution per line.");
                                             }
                                         });
-                                        if ui.button("Add resolution").clicked() {
+                                        if ui.button("Add resolution").on_hover_text("You can create as many resolutions as you want").clicked() {
                                             entry.edit_resolutions.push("".to_string());
                                         }
                                     });
-                                    if ui.button("Save").clicked() {
+                                    if ui.button("Save").on_hover_text("Save the aspirations").clicked() {
                                         let xff_val = {
                                             let mut out = Object::new();
                                             out.insert("theme".to_string(), XffValue::from(entry.edit_theme.clone()));
