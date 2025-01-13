@@ -45,7 +45,8 @@ impl UrdState {
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
                                         let but = ui.button("Save").on_hover_text("Save changes");
                                         if but.clicked() {
-                                            self.export_and_save_moods();
+                                            self.export_moods();
+                                            self.export_aspirations();
                                             let save_settings = self.settings.save();
                                             let save_journal = self.journal.save();
                                             if save_settings.is_err() {
@@ -63,7 +64,8 @@ impl UrdState {
                                     ui.add_sized(ui.available_size(), |ui: &mut Ui| {
                                         let but = ui.button("Save and Close").on_hover_text("Save changes and close settings");
                                         if but.clicked() {
-                                            self.export_and_save_moods();
+                                            self.export_moods();
+                                            self.export_aspirations();
                                             let save_settings = self.settings.save();
                                             let save_journal = self.journal.save();
                                             if save_settings.is_err() {
@@ -422,9 +424,6 @@ impl UrdState {
                                                 });
                                         }
                                     }
-                                    if ui.button("Save").on_hover_text("Save all moods").clicked() {
-                                        self.export_and_save_moods();
-                                    }
                                 });
                                 if !self.render.view.ui_state.show_destructive_action_confirmation {
                                     if ui.button("Restore default moods").on_hover_text("Restores the default moods - this action is destructive").clicked() {
@@ -458,6 +457,13 @@ impl UrdState {
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Aspirations settings");
+                                Sides::new().show(ui, |ui: &mut Ui| {
+                                    ui.label("Show all years: ");
+                                }, |ui: &mut Ui| {
+                                    if ui.checkbox(&mut self.render.edit_all_aspirations, "Show all years").on_hover_text("Check to edit aspirations for all years").changed() {
+                                        self.render.entities.aspirations = self.construct_aspirations();
+                                    };
+                                });
                                 for entry in self.render.entities.aspirations.iter_mut() {
                                     ui.group(|ui: &mut Ui| {
                                         ui.label(format!("{}", entry.year));
@@ -481,29 +487,6 @@ impl UrdState {
                                             entry.edit_resolutions.push("".to_string());
                                         }
                                     });
-                                    if ui.button("Save").on_hover_text("Save the aspirations").clicked() {
-                                        let xff_val = {
-                                            let mut out = Object::new();
-                                            out.insert("theme".to_string(), XffValue::from(entry.edit_theme.clone()));
-                                            out.insert("pledge".to_string(), XffValue::from(entry.edit_pledge.clone()));
-                                            out.insert("resolutions".to_string(), XffValue::from(entry.edit_resolutions.clone()));
-                                            XffValue::from(out)
-                                        };
-
-                                        for year in self.journal.entries.iter_mut() {
-                                            if year.get_folder().unwrap().name == entry.year {
-                                                year.get_folder_mut().unwrap().aspirations = xff_val;
-                                                break;
-                                            }
-                                        }
-                                        let save = self.journal.save();
-                                        if save.is_err() {
-                                            self.error = Error::new(
-                                                save.unwrap_err().to_string(),
-                                                "Writing journal to disk failed.".to_string(),
-                                            );
-                                        }
-                                    }
                                 };
                             }).response
                         });
@@ -530,18 +513,30 @@ impl UrdState {
         });
     }
 
-    fn export_and_save_moods(&mut self) {
+    fn export_aspirations(&mut self) {
+        for entry in self.render.entities.aspirations.iter() {
+            let xff_val = {
+                let mut out = Object::new();
+                out.insert("theme".to_string(), XffValue::from(entry.edit_theme.clone()));
+                out.insert("pledge".to_string(), XffValue::from(entry.edit_pledge.clone()));
+                out.insert("resolutions".to_string(), XffValue::from(entry.edit_resolutions.clone()));
+                XffValue::from(out)
+            };
+
+            for year in self.journal.entries.iter_mut() {
+                if year.get_folder().unwrap().name == entry.year {
+                    year.get_folder_mut().unwrap().aspirations = xff_val;
+                    break;
+                }
+            }
+        }
+    }
+
+    fn export_moods(&mut self) {
         let mut tmp = Object::new();
         for mood in self.state_store.all_moods.iter() {
             tmp.insert(mood.name.clone(), mood.colour.to_array().to_vec());
         }
         self.journal.moods = tmp;
-        let save = self.journal.save();
-        if save.is_err() {
-            self.error = Error::new(
-                save.unwrap_err().to_string(),
-                "Writing journal to disk failed.".to_string(),
-            );
-        }
     }
 }

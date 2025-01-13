@@ -16,6 +16,7 @@ pub struct Render {
     pub entities: Entities,
     pub show_tips_and_tricks: bool,
     pub show_setup_wizard: bool,
+    pub edit_all_aspirations: bool,
 }
 
 impl Render {
@@ -26,6 +27,7 @@ impl Render {
             entities: Entities::default(),
             show_tips_and_tricks: true,
             show_setup_wizard: false,
+            edit_all_aspirations: false,
         }
     }
 
@@ -36,6 +38,7 @@ impl Render {
             entities: Entities::default(),
             show_tips_and_tricks,
             show_setup_wizard: false,
+            edit_all_aspirations: false,
         }
     }
 }
