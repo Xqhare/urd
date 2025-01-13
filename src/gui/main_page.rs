@@ -40,7 +40,7 @@ impl UrdState {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
                     //DEBUG LEAVE FOR LATER
                     //ui.add(TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center));
-                    ui.heading(&self.journal.current_entry.title);
+                    ui.heading(&self.journal.current_entry.title).on_hover_text("The title of this entry. It is the date of the entry and cannot be changed");
                 });
                 ui.separator();
                 ui.horizontal(|ui: &mut Ui| {
@@ -58,7 +58,7 @@ impl UrdState {
                         .unwrap()
                         .into_boolean()
                         .unwrap();
-                    if ui.checkbox(&mut tmp_bool, "Important Day").changed() {
+                    if ui.checkbox(&mut tmp_bool, "Important Day").on_hover_text("Mark this day as important to find it easier").changed() {
                         self.journal
                             .current_entry
                             .metadata
@@ -83,12 +83,13 @@ impl UrdState {
                             .lock_focus(true)
                             .text_color(self.settings.font.text_colour)
                             .font(font.clone())
-                            .margin(Margin::same(5.0)),
+                            .margin(Margin::same(5.0))
+                            .hint_text("Write your journal entry here")
                     )
                 });
                 ui.group(|ui: &mut Ui| {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
-                        ui.heading("Metadata");
+                        ui.heading("Metadata").on_hover_text("The metadata of this entry; Project tags, Context tags, Special tags and Bespoke tags");
                         ui.horizontal(|ui: &mut Ui| {
                             let tmp_project_tags = {
                                 let bind = self
@@ -113,13 +114,13 @@ impl UrdState {
                                 |ui: &mut Ui| {
                                     ui.group(|ui: &mut Ui| {
                                         ui.vertical(|ui: &mut Ui| {
-                                            ui.heading("Project Tags");
+                                            ui.heading("Project Tags").on_hover_text("The project tags of this entry. They are added by prepending the word with `+`");
                                             if project_tags_as_txt.len() == 0 {
                                                 ui.label("Add with `+{tag}`");
                                             } else {
                                                 for tag in project_tags_as_txt {
                                                     ui.group(|ui: &mut Ui| {
-                                                        if ui.label(&tag).clicked() {
+                                                        if ui.label(&tag).on_hover_text("Click to search").clicked() {
                                                             self.search.query =
                                                                 format!("{}, ", tag);
                                                             self.search_current_query();
@@ -160,13 +161,13 @@ impl UrdState {
                                 |ui: &mut Ui| {
                                     ui.group(|ui: &mut Ui| {
                                         ui.vertical(|ui: &mut Ui| {
-                                            ui.heading("Context Tags");
+                                            ui.heading("Context Tags").on_hover_text("The context tags of this entry. They are added by prepending the word with `@`");
                                             if context_tags_as_txt.len() == 0 {
                                                 ui.label("Add with `@{tag}`");
                                             } else {
                                                 for tag in context_tags_as_txt {
                                                     ui.group(|ui: &mut Ui| {
-                                                        if ui.label(&tag).clicked() {
+                                                        if ui.label(&tag).on_hover_text("Click to search").clicked() {
                                                             self.search.query =
                                                                 format!("{}, ", tag);
                                                             self.search_current_query();
@@ -211,15 +212,15 @@ impl UrdState {
                                 |ui: &mut Ui| {
                                     ui.group(|ui: &mut Ui| {
                                         ui.vertical(|ui: &mut Ui| {
-                                            ui.heading("Special Tags");
+                                            ui.heading("Special Tags").on_hover_text("The special tags of this entry. They are added by prepending the word with `{key}:{value}`");
                                             if special_tags_as_txt.len() == 0 {
                                                 ui.label("Add with `{key}:{value}`");
                                             } else {
                                                 for tag in special_tags_as_txt {
                                                     ui.group(|ui: &mut Ui| {
-                                                        if ui.label(&tag).clicked() {
+                                                        if ui.label(&tag).on_hover_text("Click to search key").clicked() {
                                                             self.search.query =
-                                                                format!("{}, ", tag);
+                                                                format!("{}, ", tag.split(":").next().unwrap());
                                                             self.search_current_query();
                                                             self.render
                                                                 .view
@@ -257,13 +258,13 @@ impl UrdState {
                                 |ui: &mut Ui| {
                                     ui.group(|ui: &mut Ui| {
                                         ui.vertical(|ui: &mut Ui| {
-                                            ui.heading("Bespoke Tags");
+                                            ui.heading("Bespoke Tags").on_hover_text("The bespoke tags of this entry. They are added by prepending the word with `#{value}`");
                                             if bespoke_tags_as_txt.len() == 0 {
                                                 ui.label("Add with `#{value}`");
                                             } else {
                                                 for tag in bespoke_tags_as_txt {
                                                     ui.group(|ui: &mut Ui| {
-                                                        if ui.label(&tag).clicked() {
+                                                        if ui.label(&tag).on_hover_text("Click to search").clicked() {
                                                             self.search.query =
                                                                 format!("{}, ", tag);
                                                             self.search_current_query();
@@ -329,7 +330,7 @@ impl UrdState {
                         }
                     };
                 }
-            });
+            }).response.on_hover_text("Select the mood of this entry");
         if self.render.view.ui_state.show_add_mood_field {
             ui.text_edit_singleline(&mut self.state_store.new_mood.name)
                 .on_hover_text("Enter the name of the new mood");
@@ -337,7 +338,7 @@ impl UrdState {
             ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour)
                 .on_hover_text("Choose the colour of the new mood");
 
-            if ui.button("Add mood").clicked() {
+            if ui.button("Add mood").on_hover_text("Save the custom mood").clicked() {
                 if self
                     .journal
                     .moods
@@ -365,7 +366,7 @@ impl UrdState {
                 }
             };
         } else {
-            if ui.button("Add mood").clicked() {
+            if ui.button("Add mood").on_hover_text("Add a custom mood").clicked() {
                 self.render.view.ui_state.show_add_mood_field = true;
                 self.state_store.new_mood.name = "Custom Mood".to_string();
             };
@@ -376,9 +377,10 @@ impl UrdState {
         ui.horizontal(|ui: &mut Ui| {
             ui.group(|ui: &mut Ui| {
                 ui.horizontal(|ui: &mut Ui| {
-                    ui.label("Text Colour: ");
+                    ui.label("Text Colour: ").on_hover_text("Click to change the text colour");
                     if ui
                         .color_edit_button_srgba(&mut self.settings.font.text_colour)
+                        .on_hover_text("Click to change the text colour")
                         .changed()
                     {
                         let save = self.settings.save();
@@ -392,16 +394,16 @@ impl UrdState {
                 })
             });
             ui.group(|ui: &mut Ui| {
-                ui.label("Font Size: ");
+                ui.label("Font Size: ").on_hover_text("Drag and drop or enter a number to change the font size");
                 ui.add(egui::Slider::new(
                     &mut self.settings.font.size,
                     MIN_FONT_SIZE..=MAX_FONT_SIZE,
-                ));
+                )).on_hover_text("Drag and drop or enter a number to change the font size");
             });
             ui.group(|ui: &mut Ui| {
-                ui.checkbox(&mut self.settings.font.monospace, "Monospace");
+                ui.checkbox(&mut self.settings.font.monospace, "Monospace").on_hover_text("Toggle monospace font");
             });
-            if ui.button("Save entry").clicked() {
+            if ui.button("Save entry").on_hover_text("Save the current entry").clicked() {
                 self.save_entry_to_journal();
                 let save = self.journal.save();
                 if save.is_err() {
@@ -439,7 +441,7 @@ impl UrdState {
                 let next_date = format!("{}-{:02}-{:02}", year, month, next_day);
                 self.journal.current_entry.title = next_date;
             }; */
-            if ui.button("Reset entry").clicked() {
+            if ui.button("Reset entry").on_hover_text("Reset the current entry. Deletes all text and leaves the entry empty").clicked() {
                 self.delete_entry_from_journal();
                 let save = self.journal.save();
                 if save.is_err() {
@@ -452,7 +454,7 @@ impl UrdState {
             // Fallback option, if urd is kept open for a long time (the date has changed since
             // startup) no new entry will be generated automatically - this will create such a new entry, but
             // only if it does not already exist. This also loads that entry.
-            if ui.button("Todays entry").clicked() {
+            if ui.button("Todays entry").on_hover_text("Creates a new entry or opens the existing entry for today").clicked() {
                 let date_today = {
                     let mut tmp = horae::Utc::now();
                     tmp.with_timezone(self.settings.timezone.timezone);
