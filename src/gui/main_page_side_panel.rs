@@ -13,9 +13,9 @@ impl UrdState {
                 ShowFolder::All => {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
                         ui.add_space(22.5);
-                            ui.heading("Years");
+                            ui.heading("Years").on_hover_text("You are at the root of the journal");
                         ui.add_space(22.5);
-                    });
+                    }).response.on_hover_text("You are at the root of the journal");
                     ui.separator();
                     ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                         let current_year = horae::Utc::now().date().year;
@@ -34,7 +34,7 @@ impl UrdState {
                             };
                             ui.vertical_centered_justified(|ui: &mut Ui| {
                                 ui.group(|ui: &mut Ui| {
-                                    if ui.label(display_txt).clicked() {
+                                    if ui.label(display_txt).on_hover_text("Click to open").clicked() {
                                         self.render.show_folder = ShowFolder::Year(name.parse().expect("Failed to parse year, year is not a number (u16)"));
                                     }
                                 });
@@ -48,36 +48,46 @@ impl UrdState {
                         let aspir = year_folder.get_folder().unwrap().aspirations.clone();
                         if aspir.is_null() {
                             ui.add_space(22.5);
-                            if ui.heading(year.to_string()).clicked() {
+                            if ui.heading(year.to_string()).on_hover_text("Click to go back").clicked() {
                                 self.go_back_one_level();
                             }
                             ui.add_space(22.5);
                         } else {
                             let aspirations = aspir.into_object().unwrap();
-                            ui.add_space(2.5);
-                            if ui.heading(format!("{}", year.to_string())).clicked() {
-                                self.go_back_one_level();
-                            }
-                            let theme = aspirations.get("theme").unwrap().into_string().unwrap();
-                            if theme != "" {
-                                ui.add_space(2.5);
-                                ui.label(format!("The year of {}", theme));
-                            }
-                            let pledge = aspirations.get("pledge").unwrap().into_string().unwrap();
-                            if pledge != "" {
-                                ui.add_space(2.5);
-                                ui.label(format!("This year I pledge to {}", pledge));
-                            }
-                            let asps = aspirations.get("resolutions").unwrap().into_array().unwrap();
-                            if asps.len() > 0 {
-                                ui.add_space(2.5);
-                                ui.collapsing("New years resolutions", |ui: &mut Ui| {
-                                    for aspiration in asps {
-                                        ui.label(aspiration.into_string().unwrap());
+                            if aspirations.len() == 0 {
+                                ui.add_space(22.5);
+                                if ui.heading(year.to_string()).on_hover_text("Click to go back").clicked() {
+                                    self.go_back_one_level();
+                                }
+                                ui.add_space(22.5);
+                            } else {
+                                let theme = aspirations.get("theme").unwrap().into_string().unwrap();
+                                let pledge = aspirations.get("pledge").unwrap().into_string().unwrap();
+                                let asps = aspirations.get("resolutions").unwrap().into_array().unwrap();
+                                if theme == "" && pledge == "" && asps.len() == 0 {
+                                    ui.add_space(22.5);
+                                    if ui.heading(year.to_string()).on_hover_text("Click to go back").clicked() {
+                                        self.go_back_one_level();
                                     }
-                                });
+                                    ui.add_space(22.5);
+                                } else {
+                                    ui.add_space(2.5);
+                                    if ui.heading(format!("{}", year.to_string())).on_hover_text("Click to go back").clicked() {
+                                        self.go_back_one_level();
+                                    }
+                                    ui.add_space(2.5);
+                                    ui.label(format!("The year of {}", theme)).on_hover_text("Your theme for this year");
+                                    ui.add_space(2.5);
+                                    ui.label(format!("This year I pledge to {}", pledge)).on_hover_text("Your pledge for this year");
+                                    ui.add_space(2.5);
+                                    ui.collapsing("New years resolutions", |ui: &mut Ui| {
+                                        for aspiration in asps {
+                                            ui.label(aspiration.into_string().unwrap()).on_hover_text("You can do it!");
+                                        }
+                                    }).header_response.on_hover_text("Your resolutions for this year");
+                                    ui.add_space(2.5);
+                                }
                             }
-                            ui.add_space(2.5);
                         }
                     });
                     ui.separator();
@@ -100,7 +110,7 @@ impl UrdState {
                             };
                             ui.vertical_centered_justified(|ui: &mut Ui| {
                                 ui.group(|ui: &mut Ui| {
-                                    if ui.label(display_txt).clicked() {
+                                    if ui.label(display_txt).on_hover_text("Click to open").clicked() {
                                         self.render.show_folder = ShowFolder::Month(year, folder.name.parse().expect("Failed to parse month, month is not a number (u8)"));
                                     }
                                 });
@@ -111,7 +121,7 @@ impl UrdState {
                 ShowFolder::Month(year, month) => {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
                         ui.add_space(22.5);
-                            if ui.heading(format!("{} {}", month_num_to_name(month), year.to_string())).clicked() {
+                            if ui.heading(format!("{} {}", month_num_to_name(month), year.to_string())).on_hover_text("Click to go back").clicked() {
                                 self.go_back_one_level();
                             }
                         ui.add_space(22.5);
@@ -133,11 +143,11 @@ impl UrdState {
                             };
                             ui.vertical_centered_justified(|ui: &mut Ui| {
                                 ui.group(|ui: &mut Ui| {
-                                    if ui.label(entry.title.as_str()).clicked() {
+                                    if ui.label(entry.title.as_str()).on_hover_text("Date of the entry. Click to open").clicked() {
                                         self.journal.current_entry = entry.clone();
                                     };
                                     ui.group(|ui: &mut Ui| {
-                                        if ui.label(body).clicked() {
+                                        if ui.label(body).on_hover_text("Click to open").clicked() {
                                             self.journal.current_entry = entry.clone();
                                         };
                                     });
