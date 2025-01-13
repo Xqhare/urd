@@ -246,7 +246,37 @@ impl UrdState {
 
     fn construct_aspirations(&self) -> Vec<Aspirations> {
         let mut out: Vec<Aspirations> = Vec::new();
-        for year in self.journal.entries.iter() {
+        if self.render.edit_all_aspirations {
+            for year in self.journal.entries.iter() {
+                let year_folder = year.get_folder().unwrap();
+                let year_str = year_folder.name.clone();
+                let aspirations = year_folder.aspirations.clone();
+                if aspirations.is_null() {
+                    let mut tmp = Aspirations::default();
+                    tmp.year = year_str;
+                    out.push(tmp);
+                } else {
+                    let obj = aspirations.into_object().unwrap();
+                    let theme = obj.get("theme").unwrap().into_string().unwrap();
+                    let pledge = obj.get("pledge").unwrap().into_string().unwrap();
+                    let resulutions = {
+                        let tmp_res_vec = obj.get("resolutions").unwrap().into_array().unwrap();
+                        let mut res_out: Vec<String> = Vec::new();
+                        for res in tmp_res_vec {
+                            res_out.push(res.into_string().unwrap());
+                        }
+                        res_out
+                    };
+                    let mut tmp = Aspirations::default();
+                    tmp.year = year_str;
+                    tmp.edit_theme = theme;
+                    tmp.edit_pledge = pledge;
+                    tmp.edit_resolutions = resulutions;
+                    out.push(tmp);
+                }
+            }
+        } else {
+            let year = self.journal.entries.front().unwrap();
             let year_folder = year.get_folder().unwrap();
             let year_str = year_folder.name.clone();
             let aspirations = year_folder.aspirations.clone();
