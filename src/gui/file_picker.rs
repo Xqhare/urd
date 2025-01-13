@@ -18,7 +18,6 @@ impl UrdState {
                             ui.heading("Backup wizard");
                             ui.separator();
                             ui.label("Provide a backup path by dragging-and-dropping the directory into the window!");
-                            ui.separator();
                             ui.label("Automatic backups: ");
                             ui.checkbox(&mut self.settings.automatic_backups, "Every launch");
                             if !ctx.input(|i| i.raw.dropped_files.is_empty()) {
@@ -38,7 +37,7 @@ impl UrdState {
                                 ui.label("Backup path: ");
                                 ui.label(self.settings.custom_paths.backup_directory.clone());
                                 ui.separator();
-                                if ui.button("Done").clicked() {
+                                if ui.button("Done").on_hover_text("Save, create backup and close file picker").clicked() {
                                     self.render.view.pages.show_file_picker_page = false;
                                     let pos_err = self.settings.save();
                                     if pos_err.is_err() {
@@ -55,7 +54,6 @@ impl UrdState {
                             ui.heading("Export wizard");
                             ui.separator();
                             ui.label("Provide an export path by dragging-and-dropping the directory into the window!");
-                            ui.separator();
                             if !ctx.input(|i| i.raw.dropped_files.is_empty()) {
                                 let dropped_file = ctx.input(|i| {
                                     // The array of files is only larger than 1 if several files are
@@ -73,7 +71,7 @@ impl UrdState {
                                 ui.label("Export path: ");
                                 ui.label(self.settings.custom_paths.export_directory.clone());
                                 ui.separator();
-                                if ui.button("Done").clicked() {
+                                if ui.button("Done").on_hover_text("Save, export and close file picker").clicked() {
                                     self.render.view.pages.show_file_picker_page = false;
                                     let pos_err = self.settings.save();
                                     if pos_err.is_err() {
@@ -90,7 +88,6 @@ impl UrdState {
                             ui.heading("Restore wizard");
                             ui.separator();
                             ui.label("Provide a backup file by dragging-and-dropping the file into the window!");
-                            ui.separator();
                             if !ctx.input(|i| i.raw.dropped_files.is_empty()) {
                                 let dropped_file = ctx.input(|i| {
                                     // The array of files is only larger than 1 if several files are
@@ -108,7 +105,7 @@ impl UrdState {
                                 ui.label("Restore file: ");
                                 ui.label(self.settings.custom_paths.restore_file.clone());
                                 ui.separator();
-                                if ui.button("Done").clicked() {
+                                if ui.button("Restore from file").on_hover_text("Try to restore from file and close file picker").clicked() {
                                     self.render.view.pages.show_file_picker_page = false;
                                     let pos_err = self.settings.save();
                                     if pos_err.is_err() {
