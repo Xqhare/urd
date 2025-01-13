@@ -284,7 +284,7 @@ impl UrdState {
                 ui.add(|ui: &mut Ui| {
                     ui.horizontal(|ui: &mut Ui| {
                         ui.menu_button("Urd", |ui: &mut Ui| {
-                            if ui.button("Settings").clicked() {
+                            if ui.button("Settings").on_hover_text("Opens the settings page").clicked() {
                                 if self.render.view.pages.show_settings_page {
                                     self.settings_backup = None;
                                     self.state_store.all_moods = Vec::new();
@@ -298,35 +298,35 @@ impl UrdState {
                                     self.render.entities.aspirations = self.construct_aspirations();
                                 }
                             }
-                            if ui.button("About").clicked() {
+                            if ui.button("About").on_hover_text("Opens the about window").clicked() {
                                 self.render
                                     .view
                                     .viewports
                                     .show_about_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
-                            if ui.button("Licenses").clicked() {
+                            if ui.button("Licenses").on_hover_text("Opens the licenses window").clicked() {
                                 self.render
                                     .view
                                     .viewports
                                     .show_licenses_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
-                            if ui.button("Help").clicked() {
+                            if ui.button("Help").on_hover_text("Opens the help window").clicked() {
                                 self.render
                                     .view
                                     .viewports
                                     .show_help_viewport
                                     .store(true, std::sync::atomic::Ordering::Relaxed);
                             }
-                            if ui.button("Exit").clicked() {
+                            if ui.button("Exit").on_hover_text("Exit and save Urd").clicked() {
                                 let _ = self.journal.save();
                                 let _ = self.settings.save();
                                 std::process::exit(0);
                             };
                         });
                         ui.menu_button("Journal", |ui: &mut Ui| {
-                            if ui.button("Search").clicked() {
+                            if ui.button("Search").on_hover_text("Opens the search page").clicked() {
                                 if self.render.view.pages.show_search_page {
                                     self.clear_ui();
                                 } else {
@@ -334,7 +334,7 @@ impl UrdState {
                                     self.render.view.pages.show_search_page = true;
                                 }
                             }
-                            if ui.button("Important Days").clicked() {
+                            if ui.button("Important Days").on_hover_text("Opens the important days page").clicked() {
                                 if self.render.view.pages.show_important_days_page {
                                     self.clear_ui();
                                 } else {
@@ -343,7 +343,7 @@ impl UrdState {
                                     self.render.view.pages.show_important_days_page = true;
                                 }
                             }
-                            if ui.button("Moods").clicked() {
+                            if ui.button("Moods").on_hover_text("Opens the moods page").clicked() {
                                 if self.render.view.pages.show_mood_page {
                                     self.clear_ui();
                                 } else {
@@ -352,7 +352,7 @@ impl UrdState {
                                     self.render.view.pages.show_mood_page = true;
                                 }
                             }
-                            if ui.button("Export").clicked() {
+                            if ui.button("Export").on_hover_text("Exports the journal to a file").clicked() {
                                 if self.settings.custom_paths.export_directory != "" {
                                     let pos_err = self
                                         .journal
@@ -371,7 +371,7 @@ impl UrdState {
                                 }
                             }
                             ui.menu_button("Backup", |ui: &mut Ui| {
-                                if ui.button("Create").clicked() {
+                                if ui.button("Create").on_hover_text("Creates a backup of the journal").clicked() {
                                     if self.settings.custom_paths.backup_directory != "" {
                                         // Backup already set up
                                         let pos_err = self.journal.create_backup(
@@ -392,7 +392,7 @@ impl UrdState {
                                         self.render.view.pages.show_file_picker_page = true;
                                     }
                                 }
-                                if ui.button("Restore").clicked() {
+                                if ui.button("Restore").on_hover_text("Restores the journal from a backup").clicked() {
                                     self.settings.custom_paths.needed_path =
                                         Some(NeededPath::Restore);
                                     self.clear_ui();
@@ -403,18 +403,19 @@ impl UrdState {
                         if self.render.view.pages.show_important_days_page
                             || self.render.view.pages.show_mood_page
                             || self.render.view.pages.show_search_page
+                            || self.render.view.pages.show_settings_page
                         {
-                            if ui.button("Back to Home").clicked() {
+                            if ui.button("Back to Home").on_hover_text("Closes the current page").clicked() {
                                 self.clear_ui();
                             }
                         }
                         if self.settings.password.password != "" {
-                            if ui.button("Lock Urd").clicked() {
+                            if ui.button("Lock Urd").on_hover_text("Locks Urd - You will need to enter your password to unlock").clicked() {
                                 self.settings.password.unlocked_with_password = false;
                             }
                         }
                         if self.render.view.pages.show_file_picker_page {
-                            if ui.button("Exit file picker").clicked() {
+                            if ui.button("Exit file picker").on_hover_text("Closes the file picker").clicked() {
                                 self.render.view.pages.show_file_picker_page = false;
                                 self.clear_ui();
                             };
@@ -449,14 +450,14 @@ impl UrdState {
             ui.scope(|ui: &mut Ui| {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
                     ui.horizontal(|ui: &mut Ui| {
-                        if ui.button("Previous").clicked() {
+                        if ui.button("Previous").on_hover_text("Goes to the previous tip").clicked() {
                             if self.state_store.tips_and_tricks.index == 0 {
                                 self.state_store.tips_and_tricks.index = self.state_store.tips_and_tricks.tips_and_tricks.len() - 1;
                             } else {
                                 self.state_store.tips_and_tricks.index = self.state_store.tips_and_tricks.index.saturating_sub(1);
                             }
                         }
-                        if ui.button("Next").clicked() {
+                        if ui.button("Next").on_hover_text("Goes to the next tip").clicked() {
                             let tmp = self.state_store.tips_and_tricks.index.saturating_add(1);
                             if tmp <= self.state_store.tips_and_tricks.tips_and_tricks.len() - 1 {
                                 self.state_store.tips_and_tricks.index = tmp;
@@ -464,10 +465,10 @@ impl UrdState {
                                 self.state_store.tips_and_tricks.index = 0;
                             }
                         }
-                        if ui.button("Dismiss").clicked() {
+                        if ui.button("Dismiss").on_hover_text("Closes the tips and tricks modal").clicked() {
                             self.render.show_tips_and_tricks = false;
                         }
-                        if ui.button("Don't show again").clicked() {
+                        if ui.button("Don't show again").on_hover_text("Disables the tips and tricks modal").clicked() {
                             self.settings.tips_and_tricks_at_startup = false;
                             self.render.show_tips_and_tricks = false;
                             let save_settings = self.settings.save();
@@ -501,7 +502,7 @@ impl UrdState {
             ui.separator();
             ui.scope(|ui: &mut Ui| {
                 ui.vertical_centered_justified(|ui: &mut Ui| {
-                    if ui.button("Dismiss").clicked() {
+                    if ui.button("Dismiss").on_hover_text("Closes the error modal").clicked() {
                         self.error.show_error = false;
                     }
                 });
