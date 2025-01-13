@@ -40,6 +40,7 @@ impl Default for TipsNTricks {
             ("Opening an entry", "You will most often open an entry by clicking on it in the sidebar. Clicking an entry inside any submenu like search will also open it."),
             ("Mood subpage", "Opening the mood page, found inside the journal menu, will show you all entries you have created. They are displayed as little blocks with a colour specific to the mood of an entry. You can click on them to open and edit them."),
             // TODO: Add more tips!
+            ("Hover text", "Hover over any gui element to get more information about it. Try it with the buttons below!"), 
         ];
         let index = {
             let mut rng = Fortuna::new();
