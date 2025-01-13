@@ -57,10 +57,6 @@ A journaling app written in rust.
     - [ ] Searchable contacts list
     - [ ] Searchable journal for entries with contacts
 - [x] *Proper page change using the main menu (clear all and show home)*
-- [ ] Multiple languages
-    - [x] English
-    - [ ] German
-
 
 ## Install
 I do not guarantee that any released binary will work on your device.
