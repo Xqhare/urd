@@ -1,5 +1,5 @@
 
-use eframe::egui::{Align, CentralPanel, Color32, ComboBox, Context, ProgressBar, Sides, Slider, TextEdit, TopBottomPanel, Ui};
+use eframe::egui::{Align, CentralPanel, Color32, ComboBox, Context, Grid, ProgressBar, Sides, Slider, TextEdit, TopBottomPanel, Ui};
 use horae::TimeZone;
 use nabu::{Object, XffValue};
 
@@ -290,8 +290,21 @@ impl UrdState {
     fn end_setup(&mut self, ui: &mut Ui) {
         ui.heading("Final steps");
         ui.group(|ui: &mut Ui| {
-            ui.label("Add Urd to your start up applications to never miss a day in your journal.");
-            ui.label("Consider adding Urd to your task bar or creating a shortcut.");
+            Grid::new("final_steps").num_columns(1).striped(true).show(ui, |ui: &mut Ui| {
+                ui.scope(|ui: &mut Ui| {
+                    ui.label("Add Urd to your start up applications to never miss a day in your journal.");
+                    ui.add_space(ui.available_width());
+                });
+                ui.end_row();
+                ui.label("Consider adding Urd to your task bar or creating a shortcut.");
+            });
+            /* ui.vertical(|ui: &mut Ui| {
+                ui.horizontal(|ui: &mut Ui| {
+                    ui.label("Add Urd to your start up applications to never miss a day in your journal.");
+                    ui.add_space(ui.available_width());
+                });
+                ui.label("Consider adding Urd to your task bar or creating a shortcut.");
+            }); */
         });
         if ui.button("Previous").clicked() {
             self.state_store.wizard_setup_step = 3;
