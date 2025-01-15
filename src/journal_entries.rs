@@ -343,7 +343,7 @@ impl Journal {
 
     pub fn export(&self, export_dir: &str) -> Result<(), String> {
         let this_dir = Path::new(export_dir);
-        let urd_dir = this_dir.with_file_name("Urd-Journal");
+        let urd_dir = this_dir.join("Urd-Journal/");
         // Clean up of possible previous export
         if urd_dir.exists() {
             let pos_err0 = std::fs::remove_dir_all(urd_dir.clone());
@@ -358,14 +358,14 @@ impl Journal {
             return Err(pos_err1.unwrap_err().to_string());
         }
         for year in &self.entries {
-            let year_dir = urd_dir.with_file_name(year.get_folder().unwrap().name.clone());
+            let year_dir = urd_dir.join(format!("{}/", year.get_folder().unwrap().name.clone()));
             let pos_err2 = std::fs::create_dir(year_dir.clone());
             if pos_err2.is_err() {
                 return Err(pos_err2.unwrap_err().to_string());
             }
             let year_folder = year.get_folder().unwrap();
             for month in &year_folder.entries {
-                let month_dir = year_dir.with_file_name(month.get_folder().unwrap().name.clone());
+                let month_dir = year_dir.join(format!("{}", month.get_folder().unwrap().name.clone()));
                 let pos_err3 = std::fs::create_dir(month_dir.clone());
                 if pos_err3.is_err() {
                     return Err(pos_err3.unwrap_err().to_string());
@@ -373,7 +373,7 @@ impl Journal {
                 let month_folder = month.get_folder().unwrap();
                 for entry in &month_folder.entries {
                     let entry_file = month_dir
-                        .with_file_name(entry.get_journal_entry().unwrap().title.clone())
+                        .join(entry.get_journal_entry().unwrap().title.clone())
                         .with_extension("txt");
                     let text = format!(
                         "Mood: {} - Important Day: {}\n\n{}",
@@ -418,9 +418,15 @@ impl Journal {
             };
             let tmp = format!("{date}-urd-journal-backup.xff");
             let tmp_dir = Path::new(backup_dir);
-            let out = tmp_dir.with_file_name(tmp);
+            let out = tmp_dir.join(tmp);
             out
         };
+        if file_name.exists() {
+            let pos_err = std::fs::remove_file(file_name.clone());
+            if pos_err.is_err() {
+                return Err(pos_err.unwrap_err().to_string());
+            }
+        }
         let out = nabu::serde::write(file_name, serialized);
         match out {
             Ok(_) => Ok(()),
