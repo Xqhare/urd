@@ -346,14 +346,23 @@ impl UrdState {
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Path: ");
                                 }, |ui: &mut Ui| {
-                                    ui.add(TextEdit::singleline(&mut self.settings.custom_paths.backup_directory).horizontal_align(Align::Center).hint_text("Enter absolute path to the backup directory or launch the wizard"));
+                                    if &self.settings.custom_paths.backup_directory == "" {
+                                        ui.label("Not set - To set, launch the wizard with the button below").on_hover_text("Set up a backup directory");
+                                    } else {
+                                        ui.label(&self.settings.custom_paths.backup_directory).on_hover_text("To change the path, launch the wizard with the button below");
+                                    }
                                 });
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Automatic backup");
                                 }, |ui: &mut Ui| {
                                     ui.checkbox(&mut self.settings.automatic_backups, "Every launch");
                                 });
-                                if ui.button("Launch backup wizard").on_hover_text("Launches the backup wizard").clicked() {
+                                if self.settings.automatic_backups {
+                                    ui.label("Backups will be put into the specified path every time the program is launched.");
+                                    ui.label("Please note, backups are created with the current date, meaning that they will be overwritten if a backup is made on the same day.");
+                                    ui.label("This means in practice that only the state before your last launch will be saved. (And you save a ton of space! But still don't forget to delete old backups)");
+                                }
+                                if ui.button("Launch backup wizard").on_hover_text("Set up a backup directory").clicked() {
                                     self.render.view.pages.show_file_picker_page = true;
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Backup);
                                     self.render.view.pages.show_settings_page = false;
@@ -367,9 +376,13 @@ impl UrdState {
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Path: ");
                                 }, |ui: &mut Ui| {
-                                    ui.add(TextEdit::singleline(&mut self.settings.custom_paths.export_directory).horizontal_align(Align::Center).hint_text("Enter absolute path to the export directory or launch the wizard"));
+                                    if &self.settings.custom_paths.export_directory == "" {
+                                        ui.label("Not set - To set, launch the wizard with the button below").on_hover_text("Set up an export directory");
+                                    } else {
+                                        ui.label(&self.settings.custom_paths.export_directory).on_hover_text("To change the path, launch the wizard with the button below");
+                                    }
                                 });
-                                if ui.button("Launch export wizard").on_hover_text("Launches the export wizard").clicked() {
+                                if ui.button("Launch export wizard").on_hover_text("Set up an export directory").clicked() {
                                     self.render.view.pages.show_file_picker_page = true;
                                     self.settings.custom_paths.needed_path = Some(NeededPath::Export);
                                     self.render.view.pages.show_settings_page = false;
