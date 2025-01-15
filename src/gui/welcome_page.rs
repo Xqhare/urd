@@ -71,7 +71,8 @@ impl UrdState {
                                 1 => self.setup_step_1(ui),
                                 2 => self.setup_step_2(ui),
                                 3 => self.setup_step_3(ui),
-                                _ => self.setup_step_0(ui),
+                                4 => self.setup_step_4(ui),
+                                _ => self.end_setup(ui),
                             }
                         });
                     });
@@ -86,30 +87,31 @@ impl UrdState {
 
     fn setup_step_0(&mut self, ui: &mut Ui) {
         ui.heading("Text Editor");
-        ui.separator();
-        Sides::new().show(ui, |ui: &mut Ui| {
-            ui.label("Text colour: ");
-        }, |ui: &mut Ui| {
-            if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
-                let save = self.settings.save();
-                if save.is_err() {
-                    self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
-                }
-            };
-        });
-        Sides::new().show(ui, |ui: &mut Ui| {
-            ui.label("Font size: ");
-        }, |ui: &mut Ui| {
-            ui.add(Slider::new(&mut self.settings.font.size, MIN_FONT_SIZE..=MAX_FONT_SIZE));
-        });
-        Sides::new().show(ui, |ui: &mut Ui| {
-            ui.label("Monospace: ");
-        }, |ui: &mut Ui| {
-                if self.settings.font.monospace {
-                    ui.checkbox(&mut self.settings.font.monospace, "Enabled");
-                } else {
-                    ui.checkbox(&mut self.settings.font.monospace, "Disabled");
-                }
+        ui.group(|ui: &mut Ui| {
+            Sides::new().show(ui, |ui: &mut Ui| {
+                ui.label("Text colour: ");
+            }, |ui: &mut Ui| {
+                if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
+                    let save = self.settings.save();
+                    if save.is_err() {
+                        self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                    }
+                };
+            });
+            Sides::new().show(ui, |ui: &mut Ui| {
+                ui.label("Font size: ");
+            }, |ui: &mut Ui| {
+                ui.add(Slider::new(&mut self.settings.font.size, MIN_FONT_SIZE..=MAX_FONT_SIZE));
+            });
+            Sides::new().show(ui, |ui: &mut Ui| {
+                ui.label("Monospace: ");
+            }, |ui: &mut Ui| {
+                    if self.settings.font.monospace {
+                        ui.checkbox(&mut self.settings.font.monospace, "Enabled");
+                    } else {
+                        ui.checkbox(&mut self.settings.font.monospace, "Disabled");
+                    }
+            });
         });
         if ui.button("Back").clicked() {
             self.render.show_setup_wizard = false;
@@ -120,85 +122,87 @@ impl UrdState {
                 self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
             }
             self.state_store.wizard_setup_step = 1;
-            self.state_store.setup_wizard_progress = 0.25;
+            self.state_store.setup_wizard_progress = 0.20;
         }
     }
 
     fn setup_step_1(&mut self, ui: &mut Ui) {
         ui.heading("Security");
-        ui.separator();
-        Sides::new().show(ui, |ui: &mut Ui| {
-            ui.label("New password: ");
-        }, |ui: &mut Ui| {
-            ui.add(TextEdit::singleline(&mut self.settings.password.new_password_input[0]).horizontal_align(Align::Center).password(true));
-        });
-        Sides::new().show(ui, |ui: &mut Ui| {
-            ui.label("Repeat new password: ");
-        }, |ui: &mut Ui| {
-            ui.add(TextEdit::singleline(&mut self.settings.password.new_password_input[1]).horizontal_align(Align::Center).password(true));
-        });
-        if ui.button("Set new password").clicked() {
-            let pw_set = if self.settings.password.password == "" { false } else { true };
-            let mut set_pw_is_okay = false;
-            if self.settings.password.new_password_input[0] == self.settings.password.new_password_input[1] {
-                if pw_set {
-                    if self.settings.password.password == self.settings.password.password_input {
+        ui.group(|ui: &mut Ui| {
+            Sides::new().show(ui, |ui: &mut Ui| {
+                ui.label("New password: ");
+            }, |ui: &mut Ui| {
+                ui.add(TextEdit::singleline(&mut self.settings.password.new_password_input[0]).horizontal_align(Align::Center).password(true));
+            });
+            Sides::new().show(ui, |ui: &mut Ui| {
+                ui.label("Repeat new password: ");
+            }, |ui: &mut Ui| {
+                ui.add(TextEdit::singleline(&mut self.settings.password.new_password_input[1]).horizontal_align(Align::Center).password(true));
+            });
+            if ui.button("Set new password").clicked() {
+                let pw_set = if self.settings.password.password == "" { false } else { true };
+                let mut set_pw_is_okay = false;
+                if self.settings.password.new_password_input[0] == self.settings.password.new_password_input[1] {
+                    if pw_set {
+                        if self.settings.password.password == self.settings.password.password_input {
+                            self.settings.password.password = self.settings.password.new_password_input[0].to_string();
+                            set_pw_is_okay = true;
+                        } else {
+                            self.error = Error::new("Incorrect old password".to_string(), "Setting new password failed.".to_string());
+                        }
+                    } else {
                         self.settings.password.password = self.settings.password.new_password_input[0].to_string();
                         set_pw_is_okay = true;
-                    } else {
-                        self.error = Error::new("Incorrect old password".to_string(), "Setting new password failed.".to_string());
                     }
                 } else {
-                    self.settings.password.password = self.settings.password.new_password_input[0].to_string();
-                    set_pw_is_okay = true;
+                    self.error = Error::new("New password entries do not match".to_string(), "Setting new password failed.".to_string());
                 }
-            } else {
-                self.error = Error::new("New password entries do not match".to_string(), "Setting new password failed.".to_string());
-            }
 
-            if set_pw_is_okay {
-                self.settings.password.password_input = String::new();
-                self.settings.password.new_password_input[0] = String::new();
-                self.settings.password.new_password_input[1] = String::new();
+                if set_pw_is_okay {
+                    self.settings.password.password_input = String::new();
+                    self.settings.password.new_password_input[0] = String::new();
+                    self.settings.password.new_password_input[1] = String::new();
 
-                let save = self.settings.save();
-                if save.is_err() {
-                    self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                    let save = self.settings.save();
+                    if save.is_err() {
+                        self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                    }
                 }
-            }
-            self.state_store.wizard_setup_step = 2;
-            self.state_store.setup_wizard_progress = 0.50;
-        };
+                self.state_store.wizard_setup_step = 2;
+                self.state_store.setup_wizard_progress = 0.40;
+            };
+        });
         if ui.button("Previous").clicked() {
             self.state_store.wizard_setup_step = 0;
             self.state_store.setup_wizard_progress = 0.0;
         }
         if ui.button("Skip").clicked() {
             self.state_store.wizard_setup_step = 2;
-            self.state_store.setup_wizard_progress = 0.50;
+            self.state_store.setup_wizard_progress = 0.40;
         }
     }
 
     fn setup_step_2(&mut self, ui: &mut Ui) {
         ui.heading("Date and time");
-        ui.separator();
-        Sides::new().show(ui, |ui: &mut Ui| {
-            ui.label("Timezone: ");
-        }, |ui: &mut Ui| {
-            ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
-                for tz in self.settings.timezone.all_timezones_str.iter() {
-                    if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.to_string()).clicked() {
-                        let save = self.settings.save();
-                        if save.is_err() {
-                            self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+        ui.group(|ui: &mut Ui| {
+            Sides::new().show(ui, |ui: &mut Ui| {
+                ui.label("Timezone: ");
+            }, |ui: &mut Ui| {
+                ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
+                    for tz in self.settings.timezone.all_timezones_str.iter() {
+                        if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.to_string()).clicked() {
+                            let save = self.settings.save();
+                            if save.is_err() {
+                                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                            }
                         }
                     }
-                }
-            })
+                })
+            });
         });
         if ui.button("Previous").clicked() {
             self.state_store.wizard_setup_step = 1;
-            self.state_store.setup_wizard_progress = 0.25;
+            self.state_store.setup_wizard_progress = 0.20;
         }
         if ui.button("Next").clicked() {
             let save = self.settings.save();
@@ -206,12 +210,12 @@ impl UrdState {
                 self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
             }
             self.state_store.wizard_setup_step = 3;
-            self.state_store.setup_wizard_progress = 0.75;
+            self.state_store.setup_wizard_progress = 0.60;
         }
     }
 
     fn setup_step_3(&mut self, ui: &mut Ui) {
-        ui.label("Aspirations settings");
+        ui.heading("Aspirations settings");
         
         self.render.entities.aspirations = self.construct_aspirations();
         for entry in self.render.entities.aspirations.iter_mut() {
@@ -239,9 +243,9 @@ impl UrdState {
             });
             if ui.button("Previous").clicked() {
                 self.state_store.wizard_setup_step = 2;
-                self.state_store.setup_wizard_progress = 0.50;
+                self.state_store.setup_wizard_progress = 0.40;
             }
-            if ui.button("Finish").clicked() {
+            if ui.button("Next").clicked() {
                 let xff_val = {
                     let mut out = Object::new();
                     out.insert("theme".to_string(), XffValue::from(entry.edit_theme.clone()));
@@ -256,18 +260,22 @@ impl UrdState {
                         break;
                     }
                 }
+                
                 let save = self.journal.save();
                 if save.is_err() {
-                    self.error = Error::new(
-                        save.unwrap_err().to_string(),
-                        "Writing journal to disk failed.".to_string(),
-                    );
+                    self.error = Error::new(save.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
                 }
-                self.state_store.setup_wizard_progress = 1.0;
-                self.render.show_setup_wizard = false;
-                self.state_store.first_run = false;
+
+                self.state_store.wizard_setup_step = 4;
+                self.state_store.setup_wizard_progress = 0.80;
             }
         };
+    }
+
+    fn setup_step_4(&mut self, ui: &mut Ui) {
+        // Stub for the future
+        self.state_store.wizard_setup_step = 5;
+        self.state_store.setup_wizard_progress = 1.0;
     }
 
     fn setup_top_panel(&mut self, ctx: &Context) {
@@ -277,5 +285,37 @@ impl UrdState {
                 ui.add(ProgressBar::new(self.state_store.setup_wizard_progress).fill(Color32::GREEN).desired_height(5.0));
             });
         });
+    }
+
+    fn end_setup(&mut self, ui: &mut Ui) {
+        ui.heading("Final steps");
+        ui.group(|ui: &mut Ui| {
+            ui.label("Add Urd to your start up applications to never miss a day in your journal.");
+            ui.label("Consider adding Urd to your task bar or creating a shortcut.");
+        });
+        if ui.button("Previous").clicked() {
+            self.state_store.wizard_setup_step = 3;
+            self.state_store.setup_wizard_progress = 0.60;
+        }
+        if ui.button("Finish").clicked() {
+            let save_journal = self.journal.save();
+            if save_journal.is_err() {
+                self.error = Error::new(
+                    save_journal.unwrap_err().to_string(),
+                    "Writing journal to disk failed.".to_string(),
+                );
+            }
+
+            let save_settings = self.settings.save();
+            if save_settings.is_err() {
+                self.error = Error::new(
+                    save_settings.unwrap_err().to_string(),
+                    "Writing settings to disk failed.".to_string(),
+                );
+            }
+
+            self.render.show_setup_wizard = false;
+            self.state_store.first_run = false;
+        }
     }
 }
