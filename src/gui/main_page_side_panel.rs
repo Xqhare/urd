@@ -214,6 +214,7 @@ pub fn month_num_to_name(month: u8) -> &'static str {
     }
 }
 
+/// Ignores leap years
 fn month_num_to_days(month: u8) -> u8 {
     debug_assert!(month > 0 && month < 13);
     match month {
