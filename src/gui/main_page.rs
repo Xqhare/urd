@@ -321,10 +321,9 @@ impl UrdState {
                             .current_entry
                             .metadata
                             .insert("mood".to_string(), XffValue::from(mood));
-                        let save = self.journal.save();
-                        if save.is_err() {
+                        if let Err(err) = self.journal.save() {
                             self.error = Error::new(
-                                save.unwrap_err().to_string(),
+                                err.to_string(),
                                 "Writing journal to disk failed.".to_string(),
                             );
                         }
@@ -353,10 +352,9 @@ impl UrdState {
                         self.state_store.new_mood.name.clone(),
                         self.state_store.new_mood.colour.to_array().to_vec(),
                     );
-                    let save = self.journal.save();
-                    if save.is_err() {
+                    if let Err(err) = self.journal.save() {
                         self.error = Error::new(
-                            save.unwrap_err().to_string(),
+                            err.to_string(),
                             "Writing journal to disk failed.".to_string(),
                         );
                     }
@@ -383,10 +381,9 @@ impl UrdState {
                         .on_hover_text("Click to change the text colour")
                         .changed()
                     {
-                        let save = self.settings.save();
-                        if save.is_err() {
+                        if let Err(err) = self.settings.save() {
                             self.error = Error::new(
-                                save.unwrap_err().to_string(),
+                                err.to_string(),
                                 "Writing settings to disk failed.".to_string(),
                             );
                         }
@@ -405,10 +402,9 @@ impl UrdState {
             });
             if ui.button("Save entry").on_hover_text("Save the current entry").clicked() {
                 self.save_entry_to_journal();
-                let save = self.journal.save();
-                if save.is_err() {
+                if let Err(err) = self.journal.save() {
                     self.error = Error::new(
-                        save.unwrap_err().to_string(),
+                        err.to_string(),
                         "Writing journal to disk failed.".to_string(),
                     );
                 }
@@ -443,10 +439,9 @@ impl UrdState {
             }; */
             if ui.button("Reset entry").on_hover_text("Reset the current entry. Deletes all text and leaves the entry empty").clicked() {
                 self.delete_entry_from_journal();
-                let save = self.journal.save();
-                if save.is_err() {
+                if let Err(err) = self.journal.save() {
                     self.error = Error::new(
-                        save.unwrap_err().to_string(),
+                        err.to_string(),
                         "Writing journal to disk failed.".to_string(),
                     );
                 }
@@ -600,10 +595,9 @@ impl UrdState {
                 }
             }
         }
-        let save = self.journal.save();
-        if save.is_err() {
+        if let Err(err) = self.journal.save() {
             self.error = Error::new(
-                save.unwrap_err().to_string(),
+                err.to_string(),
                 "Writing journal to disk failed.".to_string(),
             );
         }
@@ -661,5 +655,11 @@ impl UrdState {
             }
         }
         self.journal.current_entry.text = "".to_string();
+        if let Err(err) = self.journal.save() {
+            self.error = Error::new(
+                err.to_string(),
+                "Writing journal to disk failed.".to_string(),
+            );
+        }
     }
 }

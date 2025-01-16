@@ -39,13 +39,11 @@ impl UrdState {
                                 ui.separator();
                                 if ui.button("Done").on_hover_text("Save, create backup and close file picker").clicked() {
                                     self.render.view.pages.show_file_picker_page = false;
-                                    let pos_err = self.settings.save();
-                                    if pos_err.is_err() {
-                                        self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                    if let Err(err) = self.settings.save() {
+                                        self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                     }
-                                    let pos_err2 = self.journal.create_backup(&self.settings, &self.settings.custom_paths.backup_directory);
-                                    if pos_err2.is_err() {
-                                        self.error = Error::new(pos_err2.unwrap_err().to_string(), "Creating backup failed.".to_string());
+                                    if let Err(err) = self.journal.create_backup(&self.settings, &self.settings.custom_paths.backup_directory) {
+                                        self.error = Error::new(err.to_string(), "Creating backup failed.".to_string());
                                     }
                                 }
                             }
@@ -73,13 +71,11 @@ impl UrdState {
                                 ui.separator();
                                 if ui.button("Done").on_hover_text("Save, export and close file picker").clicked() {
                                     self.render.view.pages.show_file_picker_page = false;
-                                    let pos_err = self.settings.save();
-                                    if pos_err.is_err() {
-                                        self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                    if let Err(err) = self.settings.save() {
+                                        self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                     }
-                                    let pos_err2 = self.journal.export(&self.settings.custom_paths.export_directory);
-                                    if pos_err2.is_err() {
-                                        self.error = Error::new(pos_err2.unwrap_err().to_string(), "Creating backup failed.".to_string());
+                                    if let Err(err) = self.journal.export(&self.settings.custom_paths.export_directory) {
+                                        self.error = Error::new(err.to_string(), "Creating backup failed.".to_string());
                                     }
                                 }
                             }
@@ -107,13 +103,11 @@ impl UrdState {
                                 ui.separator();
                                 if ui.button("Restore from file").on_hover_text("Try to restore from file and close file picker").clicked() {
                                     self.render.view.pages.show_file_picker_page = false;
-                                    let pos_err = self.settings.save();
-                                    if pos_err.is_err() {
-                                        self.error = Error::new(pos_err.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                    if let Err(err) = self.settings.save() {
+                                        self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                     }
-                                    let pos_err2 = self.journal.restore_backup(&self.settings, &self.settings.custom_paths.restore_file);
-                                    if pos_err2.is_err() {
-                                        self.error = Error::new(pos_err2.unwrap_err().to_string(), "Restoring from backup failed.".to_string());
+                                    if let Err(err) = self.journal.restore_backup(&self.settings, &self.settings.custom_paths.restore_file) {
+                                        self.error = Error::new(err.to_string(), "Restoring from backup failed.".to_string());
                                     }
                                 }
                             }

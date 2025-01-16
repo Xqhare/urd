@@ -501,10 +501,9 @@ impl UrdState {
                         if ui.button("Don't show again").on_hover_text("Disables the tips and tricks modal").clicked() {
                             self.settings.tips_and_tricks_at_startup = false;
                             self.render.show_tips_and_tricks = false;
-                            let save_settings = self.settings.save();
-                            if save_settings.is_err() {
+                            if let Err(err) = self.settings.save() {
                                 self.error = Error::new(
-                                    save_settings.unwrap_err().to_string(),
+                                    err.to_string(),
                                     "Writing settings to disk failed.".to_string(),
                                 );
                             }

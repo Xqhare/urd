@@ -47,12 +47,10 @@ impl UrdState {
                                         if but.clicked() {
                                             self.export_moods();
                                             self.export_aspirations();
-                                            let save_settings = self.settings.save();
-                                            let save_journal = self.journal.save();
-                                            if save_settings.is_err() {
-                                                self.error = Error::new(save_settings.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
-                                            } else if save_journal.is_err() {
-                                                self.error = Error::new(save_journal.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
+                                            if let Err(err) = self.settings.save() {
+                                                self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
+                                            } else if let Err(err) = self.journal.save() {
+                                                self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
                                                 self.settings.overwrite_side_panel_width = false;
@@ -66,12 +64,10 @@ impl UrdState {
                                         if but.clicked() {
                                             self.export_moods();
                                             self.export_aspirations();
-                                            let save_settings = self.settings.save();
-                                            let save_journal = self.journal.save();
-                                            if save_settings.is_err() {
-                                                self.error = Error::new(save_settings.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
-                                            } else if save_journal.is_err() {
-                                                self.error = Error::new(save_journal.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
+                                            if let Err(err) = self.settings.save() {
+                                                self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
+                                            } else if let Err(err) = self.journal.save() {
+                                                self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
                                             } else {
                                                 self.settings.overwrite_window_size = false;
                                                 self.render.view.pages.show_settings_page = false;
@@ -86,12 +82,10 @@ impl UrdState {
                                 if ui.button("Restore defaults").on_hover_text("Restores the default settings").clicked() {
                                     self.settings = Settings::default();
                                     self.settings_backup = Some(self.settings.clone());
-                                    let save_settings = self.settings.save();
-                                    let save_journal = self.journal.save();
-                                    if save_settings.is_err() {
-                                        self.error = Error::new(save_settings.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
-                                    } else if save_journal.is_err() {
-                                        self.error = Error::new(save_journal.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
+                                    if let Err(err) = self.settings.save() {
+                                        self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
+                                    } else if let Err(err) = self.journal.save() {
+                                        self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
                                     }
                                 };
                             }).response
@@ -168,9 +162,8 @@ impl UrdState {
                                     ui.label("Text colour: ");
                                 }, |ui: &mut Ui| {
                                     if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
-                                        let save = self.settings.save();
-                                        if save.is_err() {
-                                            self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                        if let Err(err) = self.settings.save() {
+                                            self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                         }
                                     };
                                 });
@@ -235,9 +228,8 @@ impl UrdState {
                                         self.settings.password.new_password_input[0] = String::new();
                                         self.settings.password.new_password_input[1] = String::new();
 
-                                        let save = self.settings.save();
-                                        if save.is_err() {
-                                            self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                        if let Err(err) = self.settings.save() {
+                                            self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                         }
                                     }
                                 };
@@ -247,9 +239,8 @@ impl UrdState {
                                     if but.clicked() {
                                         self.settings.password.password = "".to_string();
                                         self.settings.password.password_input = "".to_string();
-                                        let save = self.settings.save();
-                                        if save.is_err() {
-                                            self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                        if let Err(err) = self.settings.save() {
+                                            self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                         }
                                     }
                                     but
@@ -266,9 +257,8 @@ impl UrdState {
                                     ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
                                         for tz in self.settings.timezone.all_timezones_str.iter() {
                                             if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.to_string()).clicked() {
-                                                let save = self.settings.save();
-                                                if save.is_err() {
-                                                    self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                                                if let Err(err) = self.settings.save() {
+                                                    self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                                 }
                                             }
                                         }
@@ -413,10 +403,9 @@ impl UrdState {
                                             );
                                         } else {
                                             self.journal.moods.insert(self.state_store.new_mood.name.clone(), self.state_store.new_mood.colour.to_array().to_vec());
-                                            let save = self.journal.save();
-                                            if save.is_err() {
+                                            if let Err(err) = self.journal.save() {
                                                 self.error = Error::new(
-                                                    save.unwrap_err().to_string(),
+                                                    err.to_string(),
                                                     "Writing journal to disk failed.".to_string(),
                                                 );
                                             }
@@ -449,10 +438,9 @@ impl UrdState {
                                             ui.visuals_mut().override_text_color = Some(Color32::from_rgb(255, 0, 0));
                                             if ui.button("I understand, proceed").on_hover_text("You have been warned!").clicked() {
                                                 self.journal.moods = default_moods();
-                                                let save = self.journal.save();
-                                                if save.is_err() {
+                                                if let Err(err) = self.journal.save() {
                                                     self.error = Error::new(
-                                                        save.unwrap_err().to_string(),
+                                                        err.to_string(),
                                                         "Writing journal to disk failed.".to_string(),
                                                     );
                                                 }
