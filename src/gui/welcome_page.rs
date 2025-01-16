@@ -3,7 +3,7 @@ use eframe::egui::{Align, CentralPanel, Color32, ComboBox, Context, Grid, Progre
 use horae::TimeZone;
 use nabu::{Object, XffValue};
 
-use crate::{error::Error, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}};
+use crate::{error::Error, paths::APP_DIR, settings::{MAX_FONT_SIZE, MIN_FONT_SIZE}};
 
 use super::UrdState;
 
@@ -39,8 +39,25 @@ impl UrdState {
                                 };
                                 if ui.button("Skip setup").clicked() {
                                     self.state_store.first_run = false;
+                                    // Create basic state on disk
+                                    if let Err(err) = self.settings.save() {
+                                        self.error = Error::new(
+                                            err.to_string(),
+                                            "Writing settings to disk failed.".to_string(),
+                                        );
+                                    }
+                                    if let Err(err) = self.journal.save() {
+                                        self.error = Error::new(
+                                            err.to_string(),
+                                            "Writing journal to disk failed.".to_string(),
+                                        );
+                                    }
                                 }
                                 if ui.button("Exit").clicked() {
+                                    // remove APP_DIR - Next startup should again be a first time
+                                    // start up
+                                    let _ = std::fs::remove_dir_all(APP_DIR);
+                                    // exit process
                                     std::process::exit(0);
                                 };
                             });
@@ -117,9 +134,8 @@ impl UrdState {
             self.render.show_setup_wizard = false;
         }
         if ui.button("Next").clicked() {
-            let save = self.settings.save();
-            if save.is_err() {
-                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+            if let Err(err) = self.settings.save() {
+                self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
             }
             self.state_store.wizard_setup_step = 1;
             self.state_store.setup_wizard_progress = 0.20;
@@ -163,9 +179,8 @@ impl UrdState {
                     self.settings.password.new_password_input[0] = String::new();
                     self.settings.password.new_password_input[1] = String::new();
 
-                    let save = self.settings.save();
-                    if save.is_err() {
-                        self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                    if let Err(err) = self.settings.save() {
+                        self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                     }
                 }
                 self.state_store.wizard_setup_step = 2;
@@ -191,9 +206,8 @@ impl UrdState {
                 ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
                     for tz in self.settings.timezone.all_timezones_str.iter() {
                         if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.to_string()).clicked() {
-                            let save = self.settings.save();
-                            if save.is_err() {
-                                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+                            if let Err(err) = self.settings.save() {
+                                self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                             }
                         }
                     }
@@ -205,9 +219,8 @@ impl UrdState {
             self.state_store.setup_wizard_progress = 0.20;
         }
         if ui.button("Next").clicked() {
-            let save = self.settings.save();
-            if save.is_err() {
-                self.error = Error::new(save.unwrap_err().to_string(), "Writing settings to disk failed.".to_string());
+            if let Err(err) = self.settings.save() {
+                self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
             }
             self.state_store.wizard_setup_step = 3;
             self.state_store.setup_wizard_progress = 0.60;
@@ -261,9 +274,8 @@ impl UrdState {
                     }
                 }
                 
-                let save = self.journal.save();
-                if save.is_err() {
-                    self.error = Error::new(save.unwrap_err().to_string(), "Writing journal to disk failed.".to_string());
+                if let Err(err) = self.journal.save() {
+                    self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
                 }
 
                 self.state_store.wizard_setup_step = 4;
@@ -274,6 +286,7 @@ impl UrdState {
 
     fn setup_step_4(&mut self, ui: &mut Ui) {
         // Stub for the future
+        // TODO: change "Previous" button in end_setup() to go to '4, 0.80'
         self.state_store.wizard_setup_step = 5;
         self.state_store.setup_wizard_progress = 1.0;
     }
@@ -298,31 +311,22 @@ impl UrdState {
                 ui.end_row();
                 ui.label("Consider adding Urd to your task bar or creating a shortcut.");
             });
-            /* ui.vertical(|ui: &mut Ui| {
-                ui.horizontal(|ui: &mut Ui| {
-                    ui.label("Add Urd to your start up applications to never miss a day in your journal.");
-                    ui.add_space(ui.available_width());
-                });
-                ui.label("Consider adding Urd to your task bar or creating a shortcut.");
-            }); */
         });
         if ui.button("Previous").clicked() {
             self.state_store.wizard_setup_step = 3;
             self.state_store.setup_wizard_progress = 0.60;
         }
         if ui.button("Finish").clicked() {
-            let save_journal = self.journal.save();
-            if save_journal.is_err() {
+            if let Err(err) = self.journal.save() {
                 self.error = Error::new(
-                    save_journal.unwrap_err().to_string(),
+                    err.to_string(),
                     "Writing journal to disk failed.".to_string(),
                 );
             }
 
-            let save_settings = self.settings.save();
-            if save_settings.is_err() {
+            if let Err(err) = self.settings.save() {
                 self.error = Error::new(
-                    save_settings.unwrap_err().to_string(),
+                    err.to_string(),
                     "Writing settings to disk failed.".to_string(),
                 );
             }
