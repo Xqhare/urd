@@ -1,6 +1,8 @@
-use eframe::egui::{CentralPanel, Context, Id, ScrollArea, Ui, ViewportBuilder, ViewportId};
+use eframe::egui::{CentralPanel, Context, Grid, Id, ScrollArea, Ui, Vec2, ViewportBuilder, ViewportId};
 
 use super::UrdState;
+
+const PADDING: f32 = 4.0;
 
 impl UrdState {
     pub fn help_viewport_startup(&mut self, ctx: &Context) {
@@ -22,101 +24,117 @@ impl UrdState {
                     CentralPanel::default().show(ctx, |ui: &mut Ui| {
                         ui.vertical_centered_justified(|ui: &mut Ui| {
                             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                                ui.heading("Help");
-                                ui.separator();
                                 ui.group(|ui: &mut Ui| {
-                                    ui.heading("Overview");
-                                    ui.vertical(|ui: &mut Ui| {
-                                        ui.label("Urd is a journaling tool. To get started, move this window next to the main window and lets take a look at that window.");
-                                        ui.label("The main window is split into three parts:");
-                                        ui.indent(Id::new("main_window"), |ui: &mut Ui| {
-                                            ui.label("- Top: The top panel contains buttons:");
-                                            ui.indent(Id::new("top_panel"), |ui: &mut Ui| {
-                                                ui.label("- Urd: Contains several buttons, all related to interacting with the program itself.");
-                                                ui.indent(Id::new("urd_buttons"), |ui: &mut Ui| {
-                                                    ui.label("- Settings: Opens the settings menu");
-                                                    ui.indent(Id::new("settings_buttons"), |ui: &mut Ui| {
-                                                        ui.label("Inside the settings menu you can customise Urd to your needs.");
-                                                        ui.label("I highly recommend you to look through this menu at least once before using Urd.");
+                                    ui.group(|ui: &mut Ui| {
+                                        ui.label("GUI");
+                                        ui.collapsing("Tips and Tricks", |ui: &mut Ui| {
+                                            ui.label("")
+                                        });
+                                        ui.collapsing("Main menu", |ui: &mut Ui| {
+                                            ui.collapsing("Menu: Urd", |ui: &mut Ui| {
+                                                Grid::new("main_menu_urd").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                    ui.label("About");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Opens the about page.");
+                                                        ui.label("Check 'About page' for more information.");
                                                     });
-                                                    ui.label("- About: Opens the about window");
-                                                    ui.label("- Licenses: Opens the licenses window");
-                                                    ui.label("- Help: Opens this help window");
+                                                    ui.end_row();
+
+                                                    ui.label("Exit");
+                                                    ui.label("Exits Urd and saves all unsaved data.");
+                                                    ui.end_row();
+
+                                                    ui.label("Help");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Opens the help page.");
+                                                        ui.label("Check 'Help page' for more information.");
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Licenses");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Opens the licenses page.");
+                                                        ui.label("Check 'Licenses page' for more information.");
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Settings");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Opens the settings page.");
+                                                        ui.label("Check 'Settings page' for more information.");
+                                                    });
+                                                    ui.end_row();
                                                 });
-                                                ui.label("- Journal: Contains several buttons, all related to interacting with the journal.");
-                                                ui.indent(Id::new("journal_buttons"), |ui: &mut Ui| {
-                                                    ui.label("- Search: Opens the search page");
-                                                    ui.label("- Export: Allows you to export the journal into a directory of your choice. All entries will be exported as .txt files");
-                                                    ui.indent(Id::new("export_buttons"), |ui: &mut Ui| {
-                                                        ui.label("Clicking it the first time will open a setup wizard. You can open this wizard any time afterwards inside the settings menu.");
+                                            });
+                                            ui.collapsing("Menu: Journal", |ui: &mut Ui| {
+                                                Grid::new("main_menu_journal").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                    ui.label("Search");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Opens the search page.");
+                                                        ui.label("Check 'Search page' for more information.");
                                                     });
-                                                    ui.label("- Backup: Contains two buttons:");
-                                                    ui.indent(Id::new("backup_buttons"), |ui: &mut Ui| {
-                                                        ui.label("- Create: Backup the journal");
-                                                        ui.indent(Id::new("export_buttons"), |ui: &mut Ui| {
-                                                            ui.label("Clicking it the first time will open a setup wizard. You can open this wizard any time afterwards inside the settings menu.");
+                                                    ui.end_row();
+
+                                                    ui.label("Important days");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Opens the important days page.");
+                                                        ui.label("Check 'Important days page' for more information.");
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Moods");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Opens the moods page.");
+                                                        ui.label("Check 'Moods page' for more information.");
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Export");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Export the entire journal.");
+                                                        ui.label("Launches the export wizard if no export location is set.");
+                                                        ui.label("Check 'Export' under 'Features' for more information.");
+                                                    });
+                                                    ui.end_row();
+                                                });
+                                                ui.collapsing("Backup", |ui: &mut Ui| {
+                                                    Grid::new("main_menu_journal_backup").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                        ui.label("Create");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Creates a backup of the journal.");
+                                                            ui.label("Launches the backup wizard if no backup location is set.");
+                                                            ui.label("Check 'Backups' under 'Features' for more information.");
                                                         });
-                                                        ui.label("- Restore: Restore the journal from a backup");
+                                                        ui.end_row();
+
+                                                        ui.label("Restore");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Restores a journal from a backup of the journal.");
+                                                            ui.label("Check 'Backups' under 'Features' for more information.")
+                                                        });
+                                                        ui.end_row();
                                                     });
                                                 });
-                                                ui.label("- Navigation: Backup navigation buttons");
-                                                ui.indent(Id::new("navigation_buttons"), |ui: &mut Ui| {
-                                                    ui.label("- Go to top level: Navigate to the top level inside the entry browser");
-                                                    ui.label("- Go back one level: Navigate back one level inside the entry browser");
-                                                })
                                             });
-                                            ui.label("- Left side: The side panel contains the entry browser. It is split into two parts stacked on top of each other:");
-                                            ui.indent(Id::new("left_side"), |ui: &mut Ui| {
-                                                ui.label("- Top: The top part represents the current folder.");
-                                                ui.indent(Id::new("top_left_side"), |ui: &mut Ui| {
-                                                    ui.label("There are only 3 levels of folders inside the entry browser.");
-                                                    ui.label("The top level folder contains all years, inside one of them are all months of that year, inside one of them all days of that month.");
-                                                    ui.label("Clicking anywhere inside the top part will take you back one level.");
-                                                });
-                                                ui.label("- Bottom: The bottom part represents the entries inside the current folder.");
-                                                ui.indent(Id::new("bottom_left_side"), |ui: &mut Ui| {
-                                                    ui.label("This will display all entries of the currently selected folder.");
-                                                    ui.label("Clicking on an entry will either open it in the side panel if it is a folder, or the main panel if it is an entry.");
-                                                });
+                                        });
+                                        ui.collapsing("Main page", |ui: &mut Ui| {
+                                            
+                                            ui.collapsing("Side panel", |ui: &mut Ui| {
+
                                             });
-                                            ui.label("- Right side: The right side panel contains the entry editor. It is split into four parts stacked on top of each other:");
-                                            ui.indent(Id::new("right_side"), |ui: &mut Ui| {
-                                                ui.label("- Top: The top part contains all possible interactions with the entry editor.");
-                                                ui.indent(Id::new("top_right_side"), |ui: &mut Ui| {
-                                                    ui.label("- Text colour: Change the text colour");
-                                                    ui.label("- Font size: Change the font size");
-                                                    ui.label("- Monospace: Toggle monospace");
-                                                    ui.label("- Save entry: Save the entry, writes it to the journal and to disk");
-                                                    ui.label("- Reset entry: Resets the entry, meaning that all contents will be deleted, the entry itself will not be deleted");
-                                                    ui.label("- Todays entry: Creates a new entry or opens the existing entry for today");
-                                                });
-                                                ui.label("- Title: The title of the entry. This cannot be changed and is always the date of the entry.");
-                                                ui.label("- Middle: The middle part contains the entry itself inside the entry editor.");
-                                                ui.label("- Bottom: The bottom part contains the entry metadata.");
-                                                ui.indent(Id::new("bottom_metadata"), |ui: &mut Ui| {
-                                                    ui.label("There are 4 types of metadata. All are added into the entry itself. You can click on any one of them to open the search page and search for that tag.");
-                                                    ui.indent(Id::new("metadata"), |ui: &mut Ui| {
-                                                        ui.label("- Project tags: The project tags of the entry. Added by prepending the word with '+'. e.g. +Holiday");
-                                                        ui.label("- Context tags: The context tags of the entry. Added by prepending the word with '@'. e.g. @Work");
-                                                        ui.label("- Special tags: These tags consists of a key:value pair. You can use this to store any information you want. e.g. date_due:2025-03-15");
-                                                        ui.label("- Bespoke tags: Tags for any miscellaneous information. They are added by prepending the word with '#'. e.g. #Tag");
-                                                    });
-                                                });
+                                            ui.collapsing("Entry editor", |ui: &mut Ui| {
+                                                
                                             });
                                         });
                                     });
                                 });
                                 ui.group(|ui: &mut Ui| {
-                                    ui.heading("Password");
-                                    ui.vertical(|ui: &mut Ui| {
-                                        ui.label("Urd can be locked with a password. This can be done after setting a password inside the settings menu.");
-                                        ui.label("Clicking the lock button will lock the entry editor.");
-                                        ui.label("Whether Urd was locked using the button, or just started up, no journal entry will be visible until the correct password is entered.");
-                                        ui.indent(Id::new("usage"), |ui: &mut Ui| {
-                                            ui.label("It is important to note that the password is stored unencrypted on disk. Also the journal is stored unencrypted on disk.");
-                                            ui.label("The password protection can be circumvented by simply removing the settings file.");
-                                            ui.label("This protection is designed to keep honest people honest and protect from accidental data exposure.");
-                                        });
+                                    ui.label("Features");
+                                });
+                                ui.group(|ui: &mut Ui| {
+                                    ui.label("Concepts");
+                                    ui.collapsing("Journal", |ui: &mut Ui| {
+                                        
                                     });
                                 });
                             });
