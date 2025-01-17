@@ -28,7 +28,20 @@ impl UrdState {
                                     ui.group(|ui: &mut Ui| {
                                         ui.label("GUI");
                                         ui.collapsing("Tips and Tricks", |ui: &mut Ui| {
-                                            ui.label("")
+                                            ui.label("For more information on how this works, refer to 'Tips and Tricks' inside the 'Features' section.");
+                                            ui.collapsing("Previous", |ui: &mut Ui| {
+                                                ui.label("Click 'Previous' to go back to the previous tip.");
+                                            });
+                                            ui.collapsing("Next", |ui: &mut Ui| {
+                                                ui.label("Click 'Next' to go back to the next tip.");
+                                            });
+                                            ui.collapsing("Dismiss", |ui: &mut Ui| {
+                                                ui.label("Click 'Dismiss' to close the tips and tricks pop up.");
+                                            });
+                                            ui.collapsing("Don't show again", |ui: &mut Ui| {
+                                                ui.label("Click 'Don't show again' to never have the pop up open again.");
+                                                ui.label("You can renable it in the settings.");
+                                            });
                                         });
                                         ui.collapsing("Main menu", |ui: &mut Ui| {
                                             ui.collapsing("Menu: Urd", |ui: &mut Ui| {
@@ -130,6 +143,33 @@ impl UrdState {
                                 });
                                 ui.group(|ui: &mut Ui| {
                                     ui.label("Features");
+                                    ui.collapsing("Password protection", |ui: &mut Ui| {
+                                        
+                                    });
+                                    ui.collapsing("Backups", |ui: &mut Ui| {
+                                        
+                                    });
+                                    ui.collapsing("Exporting", |ui: &mut Ui| {
+                                        
+                                    });
+                                    ui.collapsing("Tips and Tricks", |ui: &mut Ui| {
+                                        ui.label("For information on the 'GUI' elements check 'Tips and Tricks' under 'GUI'.");
+                                        ui.separator();
+                                        ui.label("Urd can display tips and tricks to help you get started.");
+                                        ui.label("This is enabled by default and can be toggled in the settings.");
+                                    });
+                                    ui.collapsing("Search", |ui: &mut Ui| {
+                                        
+                                    });
+                                    ui.collapsing("Moods", |ui: &mut Ui| {
+                                        
+                                    });
+                                    ui.collapsing("Important days", |ui: &mut Ui| {
+                                        
+                                    });
+                                    ui.collapsing("Tags", |ui: &mut Ui| {
+                                        
+                                    });
                                 });
                                 ui.group(|ui: &mut Ui| {
                                     ui.label("Concepts");
