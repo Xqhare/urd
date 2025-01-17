@@ -42,7 +42,7 @@ A journaling app written in rust.
     - [ ] Tutorials
         - [ ] Main screen
         - [ ] Settings
-    - [ ] Hover text everywhere
+    - [x] Hover text everywhere
     - [x] *Welcome screen*
         - [x] Basic setup wizard
     - [ ] *Update help window*
