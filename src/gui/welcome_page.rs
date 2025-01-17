@@ -146,16 +146,16 @@ impl UrdState {
         ui.heading("Security");
         ui.group(|ui: &mut Ui| {
             Sides::new().show(ui, |ui: &mut Ui| {
-                ui.label("New password: ");
+                ui.label("Password: ");
             }, |ui: &mut Ui| {
                 ui.add(TextEdit::singleline(&mut self.settings.password.new_password_input[0]).horizontal_align(Align::Center).password(true));
             });
             Sides::new().show(ui, |ui: &mut Ui| {
-                ui.label("Repeat new password: ");
+                ui.label("Repeat password: ");
             }, |ui: &mut Ui| {
                 ui.add(TextEdit::singleline(&mut self.settings.password.new_password_input[1]).horizontal_align(Align::Center).password(true));
             });
-            if ui.button("Set new password").clicked() {
+            if ui.button("Set password").clicked() {
                 let pw_set = if self.settings.password.password == "" { false } else { true };
                 let mut set_pw_is_okay = false;
                 if self.settings.password.new_password_input[0] == self.settings.password.new_password_input[1] {
@@ -310,6 +310,13 @@ impl UrdState {
                 });
                 ui.end_row();
                 ui.label("Consider adding Urd to your task bar or creating a shortcut.");
+                ui.end_row();
+                ui.label("Check the settings for even more customisation.");
+                ui.end_row();
+                ui.label("If you have any questions, check the help window.");
+                ui.end_row();
+                ui.label("Have fun!");
+                ui.end_row();
             });
         });
         if ui.button("Previous").clicked() {
