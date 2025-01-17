@@ -505,6 +505,9 @@ impl UrdState {
                                             ui.checkbox(&mut self.settings.tips_and_tricks_at_startup, "Disabled");
                                         }
                                 });
+                                if ui.button("Show tips and tricks").on_hover_text("Launch the tips and tricks pop up").clicked() {
+                                    self.render.show_tips_and_tricks = true;
+                                };
                             }).response
                         });
 
