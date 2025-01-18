@@ -115,7 +115,7 @@ impl UrdState {
                                     ui.add(Slider::new(&mut self.settings.size.side_panel_width, 10.0..=MAX_SIDE_PANEL_WIDTH));
                                 });
                                 Grid::new("window_settings").num_columns(2).show(ui, |ui: &mut Ui| {
-                                    ui.checkbox(&mut self.settings.overwrite_window_size, "Overwrite window Size");
+                                    ui.checkbox(&mut self.settings.overwrite_window_size, "Overwrite window size");
                                     ui.add_enabled(self.settings.overwrite_window_size, |ui: &mut Ui| {
                                         ui.vertical_centered_justified(|ui: &mut Ui| {
                                             let width_txt = ui.add(TextEdit::singleline(&mut self.settings.overwrite_window_size_store[0]).horizontal_align(Align::Center));
@@ -295,7 +295,7 @@ impl UrdState {
                                     });
                                 });
                                 ui.separator();
-                                ui.label("Completed normally file marker").on_hover_text("Used if a month / year has passed. Marks 'Completed' years or months.");
+                                ui.label("Normally completed file marker").on_hover_text("Used if a month / year has passed. Marks 'Completed' years or months.");
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Start: ");
                                 }, |ui: &mut Ui| {
