@@ -579,11 +579,12 @@ impl UrdState {
                                             ui.label("You can click on a cube to open the entry.");
                                         });
                                         ui.collapsing("Important days page", |ui: &mut Ui| {
-                                            
+                                            ui.label("All entries with the 'important' tag are displayed here.");
+                                            ui.label("You can open any entry by clicking on it.");
                                         });
                                         ui.collapsing("File picker dialog", |ui: &mut Ui| {
-                                            
-                                        })
+                                            ui.label("Simply drag and drop the folder or file into the window.")
+                                        });
                                     });
                                 });
                                 ui.group(|ui: &mut Ui| {
