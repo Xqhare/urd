@@ -133,12 +133,113 @@ impl UrdState {
                                         ui.collapsing("Main page", |ui: &mut Ui| {
                                             
                                             ui.collapsing("Side panel", |ui: &mut Ui| {
-
+                                                ui.collapsing("Head", |ui: &mut Ui| {
+                                                    ui.label("The head of the side panel displays the current folder and allows you to navigate to other folders.");
+                                                    ui.label("By clicking on the head you go to the parent folder.");
+                                                    ui.collapsing("All years", |ui: &mut Ui| {
+                                                        ui.label("This is the root folder and is displayed by default.");
+                                                        ui.label("Clicking on the head will do nothing.");
+                                                    });
+                                                    ui.collapsing("Year", |ui: &mut Ui| {
+                                                        ui.label("On this level, you can see your aspirations for the year, if you have set any.");
+                                                        ui.label("Clicking on the head will take you back to the root folder.");
+                                                    });
+                                                    ui.collapsing("Month", |ui: &mut Ui| {
+                                                        ui.label("Clicking on the head will take you back to the year folder.");
+                                                    });
+                                                });
+                                                ui.collapsing("Body", |ui: &mut Ui| {
+                                                    ui.label("The body of the side panel displays the contents of the folder.");
+                                                    ui.label("You can click on any entry shown to open it.");
+                                                });
                                             });
                                             ui.collapsing("Entry editor", |ui: &mut Ui| {
-                                                
+                                                ui.collapsing("Text and entry menu", |ui: &mut Ui| {
+                                                    Grid::new("main_menu_entry_editor_text_and_entry_menu").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                        ui.label("Text Colour");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Changes the colour of the text.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Font Size");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Changes the font size.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Monospace");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Toggles monospace mode.");
+                                                            ui.label("Monospace means that the text is displayed in a fixed width font.");
+                                                            ui.label("Meaning that all letters have the same width.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Save entry");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Saves the entry.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Reset entry");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Resets the entry editor. Only the entry title is kept.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Todays entry");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Shortcut to open todays entry.");
+                                                            ui.label("Use this if you don't want to restart Urd and a new day has begun.");
+                                                        });
+                                                        ui.end_row();
+                                                    })
+                                                });
+                                                ui.collapsing("Title", |ui: &mut Ui| {
+                                                    ui.label("The title of the entry.");
+                                                    ui.label("This is always the date of the entry and cannot be changed.");
+                                                });
+                                                ui.collapsing("Mood and important day", |ui: &mut Ui| {
+                                                    ui.collapsing("Mood", |ui: &mut Ui| {
+                                                        ui.label("You can choose a mood from the dropdown menu.");
+                                                        ui.collapsing("Add mood", |ui: &mut Ui| {
+                                                            ui.label("You can add a new mood by clicking the 'Add mood' button.");
+                                                            ui.label("Now you set the name and Colour of the new mood.");
+                                                            ui.label("It is important to remember that the name must be unique and cannot be changed or deleted later.");
+                                                            ui.label("The colour can be changed later.");
+                                                            ui.label("Confirm by clicking the 'Add mood' button again.");
+                                                        });
+                                                    });
+                                                    ui.collapsing("Important day", |ui: &mut Ui| {
+                                                        ui.label("You can mark this entry as an important day with the checkbox.");
+                                                    });
+                                                });
+                                                ui.collapsing("Text field", |ui: &mut Ui| {
+                                                    ui.label("The text field is where you write the contents of the entry.");
+                                                    ui.label("There are now length limits, and all formatting will be kept.");
+                                                });
+                                                ui.collapsing("Metadata", |ui: &mut Ui| {
+                                                    ui.label("All metadata is displayed below the 'Text field'.");
+                                                    ui.label("You can click on any tag to search for entries with that tag.");
+                                                });
                                             });
                                         });
+                                        ui.collapsing("Settings page", |ui: &mut Ui| {
+                                            
+                                        });
+                                        ui.collapsing("Search page", |ui: &mut Ui| {
+                                            
+                                        });
+                                        ui.collapsing("Moods page", |ui: &mut Ui| {
+                                            
+                                        });
+                                        ui.collapsing("Important days page", |ui: &mut Ui| {
+                                            
+                                        });
+                                        ui.collapsing("File picker dialog", |ui: &mut Ui| {
+                                            
+                                        })
                                     });
                                 });
                                 ui.group(|ui: &mut Ui| {
