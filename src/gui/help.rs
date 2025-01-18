@@ -536,10 +536,47 @@ impl UrdState {
                                             });
                                         });
                                         ui.collapsing("Search page", |ui: &mut Ui| {
-                                            
+                                            ui.collapsing("Search menu", |ui: &mut Ui| {
+                                                Grid::new("search_menu").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                    ui.label("Back");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Go back to home.");
+                                                    });
+                                                    ui.end_row();
+                                                    
+                                                    ui.label("Clear");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Clears the search.");
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Search");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Searches for the query.");
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Search text field");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Enter the query to search for.");
+                                                        ui.label("You can use tag prefixes, but they are not required.");
+                                                        ui.label("Separate elements with commas.")
+                                                    });
+                                                    ui.end_row();
+                                                })
+                                            });
+                                            ui.collapsing("Search results", |ui: &mut Ui| {
+                                                ui.label("Displays the search results.");
+                                                ui.label("If no results are found, nothing will be displayed.");
+                                                ui.label("You can open any entry by clicking on it.");
+                                            });
                                         });
                                         ui.collapsing("Moods page", |ui: &mut Ui| {
-                                            
+                                            ui.label("All moods are displayed at the top of the page.");
+                                            ui.label("They are coloured according to their colour.");
+                                            ui.label("All years are displayed below the moods. ");
+                                            ui.label("Every day with an entry is displayed as a cube coloured in the mood colour.");
+                                            ui.label("You can click on a cube to open the entry.");
                                         });
                                         ui.collapsing("Important days page", |ui: &mut Ui| {
                                             
