@@ -122,6 +122,18 @@ impl UrdState {
                                         }
                                     }
                                 }
+
+                                let bespoke = journal_entry.metadata.get("bespoke_tags");
+                                if bespoke.is_some() {
+                                    let bespoke_ary = bespoke.unwrap().into_array();
+                                    if bespoke_ary.is_some() {
+                                        for bespoke in bespoke_ary.unwrap() {
+                                            if bespoke.into_string().unwrap().contains(token) {
+                                                out = true;
+                                            }
+                                        }
+                                    }
+                                }
                             };
                             out
                         };
