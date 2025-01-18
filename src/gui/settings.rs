@@ -1,5 +1,5 @@
 use eframe::egui::{
-    Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Sides, Slider, TextEdit, Ui,
+    Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Sides, Slider, TextEdit, Ui, Vec2,
 };
 use horae::TimeZone;
 use nabu::{Object, XffValue};
@@ -17,80 +17,85 @@ use super::UrdState;
 impl UrdState {
     pub fn settings_viewport_startup(&mut self, ctx: &Context) {
         SidePanel::left("settings").default_width(self.settings.size.side_panel_width).show(ctx, |ui: &mut Ui| {
+            ui.vertical_centered_justified(|ui: &mut Ui| {
+                ui.add(|ui: &mut Ui| {
+                    ui.scope(|ui: &mut Ui| {
+                        ui.spacing_mut().item_spacing = Vec2::new(2.0, 1.5);
+                        ui.group(|ui: &mut Ui| {
+                            Grid::new("buttons").num_columns(2).show(ui, |ui: &mut Ui| {
+                                ui.add_sized(ui.available_size(), |ui: &mut Ui| {
+                                    let but = ui.button("Cancel").on_hover_text("Revert changes");
+                                    if but.clicked() {
+                                        self.settings = self.settings_backup.clone().unwrap();
+                                    }
+                                    but
+                                });
+                                ui.add_sized(ui.available_size(), |ui: &mut Ui| {
+                                    let but = ui.button("Cancel and Close").on_hover_text("Revert changes and close settings");
+                                    if but.clicked() {
+                                        self.settings = self.settings_backup.clone().unwrap();
+                                        self.state_store.all_moods = Vec::new();
+                                        self.settings.overwrite_window_size = false;
+                                        self.settings.overwrite_side_panel_width = false;
+                                        self.render.view.pages.show_settings_page = false;
+                                    };
+                                    but
+                                });
+                                ui.end_row();
+                                ui.add_sized(ui.available_size(), |ui: &mut Ui| {
+                                    let but = ui.button("Save").on_hover_text("Save changes");
+                                    if but.clicked() {
+                                        self.export_moods();
+                                        self.export_aspirations();
+                                        if let Err(err) = self.settings.save() {
+                                            self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
+                                        } else if let Err(err) = self.journal.save() {
+                                            self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
+                                        } else {
+                                            self.settings.overwrite_window_size = false;
+                                            self.settings.overwrite_side_panel_width = false;
+                                            self.settings_backup = Some(self.settings.clone());
+                                        }
+                                    };
+                                    but
+                                });
+                                ui.add_sized(ui.available_size(), |ui: &mut Ui| {
+                                    let but = ui.button("Save and Close").on_hover_text("Save changes and close settings");
+                                    if but.clicked() {
+                                        self.export_moods();
+                                        self.export_aspirations();
+                                        if let Err(err) = self.settings.save() {
+                                            self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
+                                        } else if let Err(err) = self.journal.save() {
+                                            self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
+                                        } else {
+                                            self.settings.overwrite_window_size = false;
+                                            self.render.view.pages.show_settings_page = false;
+                                            self.settings.overwrite_side_panel_width = false;
+                                            self.settings_backup = None;
+                                            self.state_store.all_moods = Vec::new();
+                                        }
+                                    };
+                                    but
+                                });
+                            });
+                            if ui.button("Restore defaults").on_hover_text("Restores the default settings").clicked() {
+                                self.settings = Settings::default();
+                                self.settings_backup = Some(self.settings.clone());
+                                if let Err(err) = self.settings.save() {
+                                    self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
+                                } else if let Err(err) = self.journal.save() {
+                                    self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
+                                }
+                            };
+                        });
+                    }).response
+                });
+                ui.separator();
+            });
             ScrollArea::vertical().show(ui, |ui: &mut Ui| {
                 ui.group(|ui: &mut Ui| {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
-                        ui.add(|ui: &mut Ui| {
-                            ui.group(|ui: &mut Ui| {
-                                Grid::new("buttons").num_columns(2).show(ui, |ui: &mut Ui| {
-                                    ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        let but = ui.button("Cancel").on_hover_text("Revert changes");
-                                        if but.clicked() {
-                                            self.settings = self.settings_backup.clone().unwrap();
-                                        }
-                                        but
-                                    });
-                                    ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        let but = ui.button("Cancel and Close").on_hover_text("Revert changes and close settings");
-                                        if but.clicked() {
-                                            self.settings = self.settings_backup.clone().unwrap();
-                                            self.state_store.all_moods = Vec::new();
-                                            self.settings.overwrite_window_size = false;
-                                            self.settings.overwrite_side_panel_width = false;
-                                            self.render.view.pages.show_settings_page = false;
-                                        };
-                                        but
-                                    });
-                                    ui.end_row();
-                                    ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        let but = ui.button("Save").on_hover_text("Save changes");
-                                        if but.clicked() {
-                                            self.export_moods();
-                                            self.export_aspirations();
-                                            if let Err(err) = self.settings.save() {
-                                                self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
-                                            } else if let Err(err) = self.journal.save() {
-                                                self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
-                                            } else {
-                                                self.settings.overwrite_window_size = false;
-                                                self.settings.overwrite_side_panel_width = false;
-                                                self.settings_backup = Some(self.settings.clone());
-                                            }
-                                        };
-                                        but
-                                    });
-                                    ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                                        let but = ui.button("Save and Close").on_hover_text("Save changes and close settings");
-                                        if but.clicked() {
-                                            self.export_moods();
-                                            self.export_aspirations();
-                                            if let Err(err) = self.settings.save() {
-                                                self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
-                                            } else if let Err(err) = self.journal.save() {
-                                                self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
-                                            } else {
-                                                self.settings.overwrite_window_size = false;
-                                                self.render.view.pages.show_settings_page = false;
-                                                self.settings.overwrite_side_panel_width = false;
-                                                self.settings_backup = None;
-                                                self.state_store.all_moods = Vec::new();
-                                            }
-                                        };
-                                        but
-                                    });
-                                });
-                                if ui.button("Restore defaults").on_hover_text("Restores the default settings").clicked() {
-                                    self.settings = Settings::default();
-                                    self.settings_backup = Some(self.settings.clone());
-                                    if let Err(err) = self.settings.save() {
-                                        self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
-                                    } else if let Err(err) = self.journal.save() {
-                                        self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
-                                    }
-                                };
-                            }).response
-                        });
-
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
                                 ui.label("Window settings");
