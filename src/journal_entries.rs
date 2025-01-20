@@ -365,7 +365,8 @@ impl Journal {
             }
             let year_folder = year.get_folder().unwrap();
             for month in &year_folder.entries {
-                let month_dir = year_dir.join(format!("{}", month.get_folder().unwrap().name.clone()));
+                let month_dir =
+                    year_dir.join(format!("{}", month.get_folder().unwrap().name.clone()));
                 let pos_err3 = std::fs::create_dir(month_dir.clone());
                 if pos_err3.is_err() {
                     return Err(pos_err3.unwrap_err().to_string());

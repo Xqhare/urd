@@ -1,6 +1,5 @@
 use fortuna::Fortuna;
 
-
 pub struct TipsNTricks {
     pub tips_and_tricks: Vec<TipOrTrick>,
     pub index: usize,
@@ -69,4 +68,3 @@ impl TipOrTrick {
         }
     }
 }
-

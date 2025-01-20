@@ -1,5 +1,6 @@
 use eframe::egui::{
-    Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Sides, Slider, TextEdit, Ui, Vec2,
+    Align, Color32, ComboBox, Context, Grid, ScrollArea, SidePanel, Sides, Slider, TextEdit, Ui,
+    Vec2,
 };
 use horae::TimeZone;
 use nabu::{Object, XffValue};
@@ -506,7 +507,6 @@ impl UrdState {
                                         if self.settings.tips_and_tricks_at_startup {
                                             ui.checkbox(&mut self.settings.tips_and_tricks_at_startup, "Enabled");
                                         } else {
-                                            
                                             ui.checkbox(&mut self.settings.tips_and_tricks_at_startup, "Disabled");
                                         }
                                 });
@@ -526,9 +526,18 @@ impl UrdState {
         for entry in self.render.entities.aspirations.iter() {
             let xff_val = {
                 let mut out = Object::new();
-                out.insert("theme".to_string(), XffValue::from(entry.edit_theme.clone()));
-                out.insert("pledge".to_string(), XffValue::from(entry.edit_pledge.clone()));
-                out.insert("resolutions".to_string(), XffValue::from(entry.edit_resolutions.clone()));
+                out.insert(
+                    "theme".to_string(),
+                    XffValue::from(entry.edit_theme.clone()),
+                );
+                out.insert(
+                    "pledge".to_string(),
+                    XffValue::from(entry.edit_pledge.clone()),
+                );
+                out.insert(
+                    "resolutions".to_string(),
+                    XffValue::from(entry.edit_resolutions.clone()),
+                );
                 XffValue::from(out)
             };
 

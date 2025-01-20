@@ -1,4 +1,6 @@
-use eframe::egui::{CentralPanel, Color32, Context, Grid, Id, ScrollArea, Ui, Vec2, ViewportBuilder, ViewportId};
+use eframe::egui::{
+    CentralPanel, Color32, Context, Grid, ScrollArea, Ui, Vec2, ViewportBuilder, ViewportId,
+};
 
 use super::UrdState;
 
@@ -131,7 +133,6 @@ impl UrdState {
                                             });
                                         });
                                         ui.collapsing("Main page", |ui: &mut Ui| {
-                                            
                                             ui.collapsing("Side panel", |ui: &mut Ui| {
                                                 ui.collapsing("Head", |ui: &mut Ui| {
                                                     ui.label("The head of the side panel displays the current folder and allows you to navigate to other folders.");
@@ -543,7 +544,6 @@ impl UrdState {
                                                         ui.label("Go back to home.");
                                                     });
                                                     ui.end_row();
-                                                    
                                                     ui.label("Clear");
                                                     ui.vertical(|ui: &mut Ui| {
                                                         ui.label("Clears the search.");
@@ -614,7 +614,6 @@ impl UrdState {
                                         ui.collapsing("Removing the password", |ui: &mut Ui| {
                                             ui.collapsing("With password", |ui: &mut Ui| {
                                                 Grid::new("password_protection_removal").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                 
                                                     ui.label("1.");
                                                     ui.label("Head to the settings page, and scroll to the 'Security' section.");
                                                     ui.end_row();
@@ -694,10 +693,8 @@ impl UrdState {
                                         });
                                     });
                                     ui.collapsing("Backups", |ui: &mut Ui| {
-                                        
                                     });
                                     ui.collapsing("Exporting", |ui: &mut Ui| {
-                                        
                                     });
                                     ui.collapsing("Tips and Tricks", |ui: &mut Ui| {
                                         ui.label("For information on the 'GUI' elements check 'Tips and Tricks' under 'GUI'.");
@@ -706,25 +703,19 @@ impl UrdState {
                                         ui.label("This is enabled by default and can be toggled in the settings.");
                                     });
                                     ui.collapsing("Search", |ui: &mut Ui| {
-                                        
                                     });
                                     ui.collapsing("Moods", |ui: &mut Ui| {
-                                        
                                     });
                                     ui.collapsing("Important days", |ui: &mut Ui| {
-                                        
                                     });
                                     ui.collapsing("Tags", |ui: &mut Ui| {
-                                        
                                     });
                                 });
                                 ui.group(|ui: &mut Ui| {
                                     ui.label("Concepts");
                                     ui.collapsing("Journal", |ui: &mut Ui| {
-                                        
                                     });
                                     ui.collapsing("Aspirations", |ui: &mut Ui| {
-                                        
                                     })
                                 });
                             });

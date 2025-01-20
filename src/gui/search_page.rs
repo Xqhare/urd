@@ -16,16 +16,26 @@ impl UrdState {
                     if ui.button("Back").on_hover_text("Go back to home").clicked() {
                         self.render.view.pages.show_search_page = false;
                     };
-                    if ui.button("Clear").on_hover_text("Clear search query").clicked() {
+                    if ui
+                        .button("Clear")
+                        .on_hover_text("Clear search query")
+                        .clicked()
+                    {
                         self.search.query = "".to_string();
                         self.search.results = Vec::new();
                     }
-                    if ui.button("Search").on_hover_text("Search for the query").clicked() {
+                    if ui
+                        .button("Search")
+                        .on_hover_text("Search for the query")
+                        .clicked()
+                    {
                         self.search_current_query();
                     }
                     let t = ui.add(
                         TextEdit::singleline(&mut self.search.query)
-                            .hint_text("Enter search query, separated by commas. Hit enter to search")
+                            .hint_text(
+                                "Enter search query, separated by commas. Hit enter to search",
+                            )
                             .desired_width(f32::INFINITY),
                     );
                     t.request_focus();
@@ -51,11 +61,19 @@ impl UrdState {
                     ui.group(|ui: &mut Ui| {
                         ui.vertical_centered_justified(|ui: &mut Ui| {
                             let mut clicked = false;
-                            if ui.heading(&result.title).on_hover_text("Click to open entry").clicked() {
+                            if ui
+                                .heading(&result.title)
+                                .on_hover_text("Click to open entry")
+                                .clicked()
+                            {
                                 clicked = true;
                             }
                             ui.separator();
-                            if ui.label(&result.text).on_hover_text("Click to open entry").clicked() {
+                            if ui
+                                .label(&result.text)
+                                .on_hover_text("Click to open entry")
+                                .clicked()
+                            {
                                 clicked = true;
                             }
                             if clicked {

@@ -329,7 +329,9 @@ impl UrdState {
                         }
                     };
                 }
-            }).response.on_hover_text("Select the mood of this entry");
+            })
+            .response
+            .on_hover_text("Select the mood of this entry");
         if self.render.view.ui_state.show_add_mood_field {
             ui.text_edit_singleline(&mut self.state_store.new_mood.name)
                 .on_hover_text("Enter the name of the new mood");
@@ -337,7 +339,11 @@ impl UrdState {
             ui.color_edit_button_srgba(&mut self.state_store.new_mood.colour)
                 .on_hover_text("Choose the colour of the new mood");
 
-            if ui.button("Add mood").on_hover_text("Save the custom mood").clicked() {
+            if ui
+                .button("Add mood")
+                .on_hover_text("Save the custom mood")
+                .clicked()
+            {
                 if self
                     .journal
                     .moods
@@ -364,7 +370,11 @@ impl UrdState {
                 }
             };
         } else {
-            if ui.button("Add mood").on_hover_text("Add a custom mood").clicked() {
+            if ui
+                .button("Add mood")
+                .on_hover_text("Add a custom mood")
+                .clicked()
+            {
                 self.render.view.ui_state.show_add_mood_field = true;
                 self.state_store.new_mood.name = "Custom Mood".to_string();
             };
@@ -375,7 +385,8 @@ impl UrdState {
         ui.horizontal(|ui: &mut Ui| {
             ui.group(|ui: &mut Ui| {
                 ui.horizontal(|ui: &mut Ui| {
-                    ui.label("Text Colour: ").on_hover_text("Click to change the text colour");
+                    ui.label("Text Colour: ")
+                        .on_hover_text("Click to change the text colour");
                     if ui
                         .color_edit_button_srgba(&mut self.settings.font.text_colour)
                         .on_hover_text("Click to change the text colour")
@@ -391,16 +402,23 @@ impl UrdState {
                 })
             });
             ui.group(|ui: &mut Ui| {
-                ui.label("Font Size: ").on_hover_text("Drag and drop or enter a number to change the font size");
+                ui.label("Font Size: ")
+                    .on_hover_text("Drag and drop or enter a number to change the font size");
                 ui.add(egui::Slider::new(
                     &mut self.settings.font.size,
                     MIN_FONT_SIZE..=MAX_FONT_SIZE,
-                )).on_hover_text("Drag and drop or enter a number to change the font size");
+                ))
+                .on_hover_text("Drag and drop or enter a number to change the font size");
             });
             ui.group(|ui: &mut Ui| {
-                ui.checkbox(&mut self.settings.font.monospace, "Monospace").on_hover_text("Toggle monospace font");
+                ui.checkbox(&mut self.settings.font.monospace, "Monospace")
+                    .on_hover_text("Toggle monospace font");
             });
-            if ui.button("Save entry").on_hover_text("Save the current entry").clicked() {
+            if ui
+                .button("Save entry")
+                .on_hover_text("Save the current entry")
+                .clicked()
+            {
                 self.save_entry_to_journal();
                 if let Err(err) = self.journal.save() {
                     self.error = Error::new(
@@ -437,7 +455,13 @@ impl UrdState {
                 let next_date = format!("{}-{:02}-{:02}", year, month, next_day);
                 self.journal.current_entry.title = next_date;
             }; */
-            if ui.button("Reset entry").on_hover_text("Reset the current entry. Deletes all text and leaves the entry empty").clicked() {
+            if ui
+                .button("Reset entry")
+                .on_hover_text(
+                    "Reset the current entry. Deletes all text and leaves the entry empty",
+                )
+                .clicked()
+            {
                 self.delete_entry_from_journal();
                 if let Err(err) = self.journal.save() {
                     self.error = Error::new(
@@ -449,7 +473,11 @@ impl UrdState {
             // Fallback option, if urd is kept open for a long time (the date has changed since
             // startup) no new entry will be generated automatically - this will create such a new entry, but
             // only if it does not already exist. This also loads that entry.
-            if ui.button("Todays entry").on_hover_text("Creates a new entry or opens the existing entry for today").clicked() {
+            if ui
+                .button("Todays entry")
+                .on_hover_text("Creates a new entry or opens the existing entry for today")
+                .clicked()
+            {
                 let date_today = {
                     let mut tmp = horae::Utc::now();
                     tmp.with_timezone(self.settings.timezone.timezone);
