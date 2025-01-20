@@ -198,7 +198,6 @@ impl UrdState {
                                                     })
                                                 });
                                                 ui.collapsing("Title", |ui: &mut Ui| {
-                                                    ui.label("The title of the entry.");
                                                     ui.label("This is always the date of the entry and cannot be changed.");
                                                 });
                                                 ui.collapsing("Mood and important day", |ui: &mut Ui| {
@@ -218,11 +217,12 @@ impl UrdState {
                                                 });
                                                 ui.collapsing("Text field", |ui: &mut Ui| {
                                                     ui.label("The text field is where you write the contents of the entry.");
-                                                    ui.label("There are now length limits, and all formatting will be kept.");
+                                                    ui.label("There are no length limits, and all formatting will be kept.");
                                                 });
                                                 ui.collapsing("Metadata", |ui: &mut Ui| {
                                                     ui.label("All metadata is displayed below the 'Text field'.");
                                                     ui.label("You can click on any tag to search for entries with that tag.");
+                                                    ui.label("It is recommended to keep a tags length within 42 characters.");
                                                 });
                                             });
                                         });
@@ -231,12 +231,14 @@ impl UrdState {
                                                 Grid::new("settings_buttons").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                     ui.label("Cancel");
                                                     ui.vertical(|ui: &mut Ui| {
+                                                        ui.colored_label(Color32::RED, "Reverts all settings to the state they were in when the settings page was opened.");
                                                         ui.label("Does not save the settings and restores the previous settings.");
                                                         ui.label("Does not close the settings page.");
                                                     });
                                                     ui.end_row();
                                                     ui.label("Cancel and Close");
                                                     ui.vertical(|ui: &mut Ui| {
+                                                        ui.colored_label(Color32::RED, "Reverts all settings to the state they were in when the settings page was opened.");
                                                         ui.label("Does not save the settings and restores the previous settings.");
                                                         ui.label("Closes the settings page.");
                                                     });
@@ -255,6 +257,7 @@ impl UrdState {
                                                     ui.end_row();
                                                     ui.label("Restore defaults");
                                                     ui.vertical(|ui: &mut Ui| {
+                                                        ui.colored_label(Color32::RED, "Reverts all settings to the default state.");
                                                         ui.label("Restores the default settings.");
                                                         ui.label("Does not close the settings page.");
                                                     });
@@ -377,6 +380,7 @@ impl UrdState {
                                             ui.collapsing("File marker settings", |ui: &mut Ui| {
                                                 ui.collapsing("Current file marker", |ui: &mut Ui| {
                                                     ui.label("The current file marker marks the current year and month.");
+                                                    ui.separator();
                                                     Grid::new("settings_file_marker_currently").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                         ui.label("Start");
                                                         ui.vertical(|ui: &mut Ui| {
@@ -394,6 +398,7 @@ impl UrdState {
                                                 });
                                                 ui.collapsing("Normally completed file marker", |ui: &mut Ui| {
                                                     ui.label("The normally completed file marker marks a year, month that has passed.");
+                                                    ui.separator();
                                                     Grid::new("settings_file_marker_normally").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                         ui.label("Start");
                                                         ui.vertical(|ui: &mut Ui| {
@@ -412,6 +417,7 @@ impl UrdState {
                                                 ui.collapsing("Perfectly completed file marker", |ui: &mut Ui| {
                                                     ui.label("The perfectly completed file marker marks a year where every month has at least one entry.");
                                                     ui.label("The perfectly completed file marker marks a month where every day has an entry.");
+                                                    ui.separator();
                                                     Grid::new("settings_file_marker_perfectly").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                         ui.label("Start");
                                                         ui.vertical(|ui: &mut Ui| {
@@ -584,7 +590,26 @@ impl UrdState {
                                         });
                                         ui.collapsing("File picker dialog", |ui: &mut Ui| {
                                             ui.label("Simply drag and drop the folder or file into the window.");
-                                            ui.label("The backup and export features need folders (or directories). The restore feature needs a backup '.xff' file.");
+                                            ui.separator();
+                                            Grid::new("file_picker").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                ui.label("Backup");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("Needs a folder or directory to put the backup files into.");
+                                                });
+                                                ui.end_row();
+
+                                                ui.label("Export");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("Needs a folder or directory to put the export files into.");
+                                                });
+                                                ui.end_row();
+
+                                                ui.label("Restore");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("Needs a backup '.xff' file to restore the journal from.");
+                                                });
+                                                ui.end_row();
+                                            })
                                         });
                                     });
                                 });
@@ -593,7 +618,7 @@ impl UrdState {
                                     ui.collapsing("Password protection", |ui: &mut Ui| {
                                         ui.label("Urd can be protected with a password.");
                                         ui.label("This is not enabled by default and can be toggled in the settings.");
-                                        ui.label("For more information about setting a password refer to the 'Security' section under 'GUI'.");
+                                        ui.label("For more information about setting a password refer to the 'Security' section under 'GUI' -> 'Settings page'.");
                                         ui.separator();
                                         ui.label("The password protection is only designed to hide the journal contents from accidental exposure to a (technical illiterate) spouse, child or similar.");
                                         ui.separator();
@@ -643,7 +668,7 @@ impl UrdState {
 
                                                         ui.label("2.");
                                                         ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("Delete the 'settings.xff' file. Inside the 'urd_data' folder.");
+                                                            ui.label("Delete the 'settings.xff' file inside the 'urd_data' folder.");
                                                         });
                                                         ui.end_row();
 
@@ -709,6 +734,7 @@ impl UrdState {
                                     ui.collapsing("Important days", |ui: &mut Ui| {
                                     });
                                     ui.collapsing("Tags", |ui: &mut Ui| {
+                                        ui.label("It is recommended to keep a tags length within 42 characters.");
                                     });
                                 });
                                 ui.group(|ui: &mut Ui| {
