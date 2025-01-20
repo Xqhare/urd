@@ -1,4 +1,4 @@
-use eframe::egui::{CentralPanel, Context, Grid, Id, ScrollArea, Ui, Vec2, ViewportBuilder, ViewportId};
+use eframe::egui::{CentralPanel, Color32, Context, Grid, Id, ScrollArea, Ui, Vec2, ViewportBuilder, ViewportId};
 
 use super::UrdState;
 
@@ -583,14 +583,115 @@ impl UrdState {
                                             ui.label("You can open any entry by clicking on it.");
                                         });
                                         ui.collapsing("File picker dialog", |ui: &mut Ui| {
-                                            ui.label("Simply drag and drop the folder or file into the window.")
+                                            ui.label("Simply drag and drop the folder or file into the window.");
+                                            ui.label("The backup and export features need folders (or directories). The restore feature needs a backup '.xff' file.");
                                         });
                                     });
                                 });
                                 ui.group(|ui: &mut Ui| {
                                     ui.label("Features");
                                     ui.collapsing("Password protection", |ui: &mut Ui| {
-                                        
+                                        ui.label("Urd can be protected with a password.");
+                                        ui.label("This is not enabled by default and can be toggled in the settings.");
+                                        ui.label("For more information about setting a password refer to the 'Security' section under 'GUI'.");
+                                        ui.separator();
+                                        ui.label("The password protection is only designed to hide the journal contents from accidental exposure to a (technical illiterate) spouse, child or similar.");
+                                        ui.separator();
+                                        ui.label("It is important to note some technical details.");
+                                        Grid::new("password_protection").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                            ui.label("1.");
+                                            ui.label("The password is saved in plain text.");
+                                            ui.end_row();
+
+                                            ui.label("2.");
+                                            ui.label("The password is not encrypted.");
+                                            ui.end_row();
+
+                                            ui.label("3.");
+                                            ui.label("The password can be easily removed and the journal accessed without it.");
+                                            ui.end_row();
+                                        });
+                                        ui.collapsing("Removing the password", |ui: &mut Ui| {
+                                            ui.collapsing("With password", |ui: &mut Ui| {
+                                                Grid::new("password_protection_removal").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                 
+                                                    ui.label("1.");
+                                                    ui.label("Head to the settings page, and scroll to the 'Security' section.");
+                                                    ui.end_row();
+
+                                                    ui.label("2.");
+                                                    ui.label("Enter the old password.");
+                                                    ui.end_row();
+
+                                                    ui.label("3.");
+                                                    ui.label("Click 'Remove password'");
+                                                    ui.end_row();
+                                                })
+                                            });
+                                            ui.collapsing("Without password", |ui: &mut Ui| {
+                                                ui.collapsing("Recommended way", |ui: &mut Ui| {
+                                                    ui.colored_label(Color32::RED, "WARNING");
+                                                    ui.label("This will revert all settings to their default values.");
+                                                    ui.label("No journal data will be lost.");
+                                                    ui.separator();
+                                                    Grid::new("password_protection_removal_recommended").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                        ui.label("1.");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Navigate to the 'urd_data' folder.");
+                                                            ui.label("You can find it in the same folder as the urd executable.")
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("2.");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Delete the 'settings.xff' file. Inside the 'urd_data' folder.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("3.");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Start 'Urd' again, the password has been removed.");
+                                                            ui.label("All settings will be restored to their default values.");
+                                                        });
+                                                        ui.end_row();
+                                                    });
+                                                });
+                                                ui.collapsing("Alternative way", |ui: &mut Ui| {
+                                                    ui.colored_label(Color32::RED, "WARNING");
+                                                    ui.label("This method requires some technical knowledge.");
+                                                    ui.label("No data whatsoever will be lost.");
+                                                    ui.separator();
+                                                    Grid::new("password_protection_removal_alternative").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                        ui.label("1.");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("You require a program to view binary files.");
+                                                            ui.label("These can be found by searching for 'hex editor' or 'binary editor' online.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("2.");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Navigate to the 'urd_data' folder.");
+                                                            ui.label("You can find it in the same folder as the urd executable.")
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("3.");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Open the 'settings.xff' file inside the 'urd_data' folder with your chosen program.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("4.");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Look for the 'password' keyword in the ascii / utf8 representation of the file.");
+                                                            ui.label("Most editors will have this enabled by default.");
+                                                            ui.label("The text following the 'password' keyword is the password.");
+                                                        })
+                                                    })
+                                                });
+                                            });
+                                        });
                                     });
                                     ui.collapsing("Backups", |ui: &mut Ui| {
                                         
