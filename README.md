@@ -45,6 +45,7 @@ A journaling app written in rust.
     - [x] Hover text everywhere
     - [x] *Welcome screen*
         - [x] Basic setup wizard
+        - [ ] Add first entry to setup wizard
     - [ ] *Update help window*
 - [ ] Contacts
     - [ ] Name
