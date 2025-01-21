@@ -77,7 +77,7 @@ impl UrdState {
                 });
                 ui.separator();
                 ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                    ui.add(
+                    let entry_text = ui.add(
                         TextEdit::multiline(&mut self.journal.current_entry.text)
                             .horizontal_align(Align::LEFT)
                             .lock_focus(true)
@@ -85,7 +85,17 @@ impl UrdState {
                             .font(font.clone())
                             .margin(Margin::same(5.0))
                             .hint_text("Write your journal entry here")
-                    )
+                            .desired_width(f32::INFINITY)
+                    );
+                    if entry_text.changed() {
+                        if let Err(err) = self.journal.save() {
+                            self.error = Error::new(
+                                err.to_string(),
+                                "Writing journal to disk failed.".to_string(),
+                            );
+                        }
+                    }
+                    entry_text
                 });
                 ui.group(|ui: &mut Ui| {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
