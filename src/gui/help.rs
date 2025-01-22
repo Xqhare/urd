@@ -151,44 +151,61 @@ impl UrdState {
                                             });
                                         });
                                         ui.collapsing("Main page", |ui: &mut Ui| {
-                                            ui.collapsing("Side panel", |ui: &mut Ui| {
-                                                ui.collapsing("Head", |ui: &mut Ui| {
-                                                    ui.label("The head of the side panel displays the current folder and allows you to navigate to other folders.");
-                                                    ui.label("By clicking on the head you go to the parent folder.");
-                                                    ui.separator();
-                                                    Grid::new("side_panel_head").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                        ui.label("All years");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("This folder shows all years in the journal.");
-                                                            ui.label("This is the root folder and is displayed by default.");
-                                                            ui.label("Clicking on the head will do nothing.");
-                                                        });
-                                                        ui.end_row();
+                                            Grid::new("main_page").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                ui.label("Side panel");
+                                                Grid::new("side_panel").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                    ui.label("Head");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("The head of the side panel displays the current folder and allows you to navigate to other folders.");
+                                                        ui.label("By clicking on the head you go to the parent folder.");
+                                                        ui.separator();
+                                                        Grid::new("side_panel_head").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                            ui.label("All years");
+                                                            ui.vertical(|ui: &mut Ui| {
+                                                                ui.label("This folder shows all years in the journal.");
+                                                                ui.label("This is the root folder and is displayed by default.");
+                                                                ui.label("Clicking on the head will do nothing.");
+                                                            });
+                                                            ui.end_row();
 
-                                                        ui.label("Year");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("This is the folder for the current year.");
-                                                            ui.label("On this level, you can see your aspirations for the year, if you have set any.");
-                                                            ui.label("See 'Aspirations' under 'Concepts' for more information.");
-                                                            ui.label("Clicking on the head will take you back to the root folder.");
-                                                        });
-                                                        ui.end_row();
+                                                            ui.label("Year");
+                                                            ui.vertical(|ui: &mut Ui| {
+                                                                ui.label("This is the folder for the current year.");
+                                                                ui.label("On this level, you can see your aspirations for the year, if you have set any.");
+                                                                ui.label("See 'Aspirations' under 'Concepts' for more information.");
+                                                                ui.label("Clicking on the head will take you back to the root folder.");
+                                                            });
+                                                            ui.end_row();
 
-                                                        ui.label("Month");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("This is the folder for the current month.");
-                                                            ui.label("Clicking on the head will take you back to the year folder.");
+                                                            ui.label("Month");
+                                                            ui.vertical(|ui: &mut Ui| {
+                                                                ui.label("This is the folder for the current month.");
+                                                                ui.label("Clicking on the head will take you back to the year folder.");
+                                                            });
+                                                            ui.end_row();
                                                         });
-                                                        ui.end_row();
+
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Body");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("The body of the side panel displays the contents of the folder.");
+                                                        ui.label("You can click on any entry shown to open it.");
                                                     });
                                                 });
-                                                ui.collapsing("Body", |ui: &mut Ui| {
-                                                    ui.label("The body of the side panel displays the contents of the folder.");
-                                                    ui.label("You can click on any entry shown to open it.");
-                                                });
+                                                ui.end_row();
                                             });
-                                            ui.collapsing("Entry editor", |ui: &mut Ui| {
-                                                ui.collapsing("Text and entry menu", |ui: &mut Ui| {
+
+                                            // leave empthy, just for spacing
+                                            //ui.label("");
+                                            ui.separator();
+
+                                            Grid::new("entry_editor").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                
+                                                ui.label("Entry editor");
+                                                Grid::new("entry_editor").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                    ui.label("Text and entry menu");
                                                     Grid::new("main_menu_entry_editor_text_and_entry_menu").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                         ui.label("Text Colour");
                                                         ui.vertical(|ui: &mut Ui| {
@@ -210,31 +227,42 @@ impl UrdState {
                                                         });
                                                         ui.end_row();
 
-                                                        ui.label("Save entry");
+                                                        let _ = ui.button("Save entry");
                                                         ui.vertical(|ui: &mut Ui| {
                                                             ui.label("Saves the entry.");
                                                         });
                                                         ui.end_row();
 
-                                                        ui.label("Reset entry");
+                                                        let _ = ui.button("Reset entry");
                                                         ui.vertical(|ui: &mut Ui| {
                                                             ui.label("Resets the entry editor. Only the entry title is kept.");
                                                         });
                                                         ui.end_row();
 
-                                                        ui.label("Todays entry");
+                                                        let _ = ui.button("Todays entry");
                                                         ui.vertical(|ui: &mut Ui| {
                                                             ui.label("Shortcut to open todays entry.");
                                                             ui.label("Use this if you don't want to restart Urd and a new day has begun.");
                                                         });
                                                         ui.end_row();
-                                                    })
-                                                });
-                                                ui.collapsing("Title", |ui: &mut Ui| {
-                                                    ui.label("This is always the date of the entry and cannot be changed.");
-                                                });
-                                                ui.collapsing("Mood and important day", |ui: &mut Ui| {
-                                                    ui.collapsing("Mood", |ui: &mut Ui| {
+
+                                                        let _ = ui.button("Save entry and exit Urd");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Saves the entry and exits Urd.");
+                                                            ui.label("More convenient than saving and navigating through the main menu.");
+                                                        });
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Title");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("This is always the date of the entry and cannot be changed.");
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Mood");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("Selects the mood of the entry.");
                                                         ui.label("You can choose a mood from the dropdown menu.");
                                                         ui.collapsing("Add mood", |ui: &mut Ui| {
                                                             ui.label("You can add a new mood by clicking the 'Add mood' button.");
@@ -244,23 +272,36 @@ impl UrdState {
                                                             ui.label("Confirm by clicking the 'Add mood' button again.");
                                                         });
                                                     });
-                                                    ui.collapsing("Important day", |ui: &mut Ui| {
+                                                    ui.end_row();
+
+                                                    ui.label("Important day");
+                                                    ui.vertical(|ui: &mut Ui| {
                                                         ui.label("You can mark this entry as an important day with the checkbox.");
                                                     });
+                                                    ui.end_row();
+
+                                                    ui.label("Text field");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("The text field is where you write the contents of the entry.");
+                                                        ui.label("There are no length limits, and all formatting will be kept.");
+                                                    });
+                                                    ui.end_row();
+
+                                                    ui.label("Metadata");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("All metadata is displayed below the 'Text field'.");
+                                                        ui.label("You can click on any tag to search for entries with that tag.");
+                                                        ui.label("It is recommended to keep a tags length within 42 characters.");
+                                                        ui.label("For more information about metadata, check 'Tags' under 'Features'.");
+                                                    });
+                                                    ui.end_row();
                                                 });
-                                                ui.collapsing("Text field", |ui: &mut Ui| {
-                                                    ui.label("The text field is where you write the contents of the entry.");
-                                                    ui.label("There are no length limits, and all formatting will be kept.");
-                                                });
-                                                ui.collapsing("Metadata", |ui: &mut Ui| {
-                                                    ui.label("All metadata is displayed below the 'Text field'.");
-                                                    ui.label("You can click on any tag to search for entries with that tag.");
-                                                    ui.label("It is recommended to keep a tags length within 42 characters.");
-                                                });
+                                                ui.end_row();
                                             });
                                         });
                                         ui.collapsing("Settings page", |ui: &mut Ui| {
                                             ui.collapsing("Buttons", |ui: &mut Ui| {
+                                                ui.label("The buttons on the settings page are always visible at the top.");
                                                 Grid::new("settings_buttons").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                     ui.label("Cancel");
                                                     ui.vertical(|ui: &mut Ui| {
