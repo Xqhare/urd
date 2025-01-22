@@ -30,23 +30,38 @@ impl UrdState {
                                     ui.group(|ui: &mut Ui| {
                                         ui.label("GUI");
                                         ui.collapsing("Tips and Tricks", |ui: &mut Ui| {
-                                            ui.label("For more information on how this works, refer to 'Tips and Tricks' inside the 'Features' section.");
-                                            ui.collapsing("Previous", |ui: &mut Ui| {
-                                                ui.label("Click 'Previous' to go back to the previous tip.");
-                                            });
-                                            ui.collapsing("Next", |ui: &mut Ui| {
-                                                ui.label("Click 'Next' to go back to the next tip.");
-                                            });
-                                            ui.collapsing("Dismiss", |ui: &mut Ui| {
-                                                ui.label("Click 'Dismiss' to close the tips and tricks pop up.");
-                                            });
-                                            ui.collapsing("Don't show again", |ui: &mut Ui| {
-                                                ui.label("Click 'Don't show again' to never have the pop up open again.");
-                                                ui.label("You can renable it in the settings.");
+                                            ui.label("For more information check 'Tips and Tricks' inside the 'Features' section.");
+                                            ui.separator();
+                                            Grid::new("settings_tips").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                let _ = ui.button("Previous");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("Go back to the previous tip.");
+                                                });
+                                                ui.end_row();
+                                                let _ = ui.button("Next");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("Go to the next tip.");
+                                                });
+                                                ui.end_row();
+                                                let _ = ui.button("Dismiss");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("Close the tips and tricks pop up.");
+                                                });
+                                                ui.end_row();
+                                                let _ = ui.button("Don't show again");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("Don't show the tips and tricks pop up again.");
+                                                    ui.label("You can renable it in the settings.");
+                                                });
+                                                ui.end_row();
                                             });
                                         });
                                         ui.collapsing("Main menu", |ui: &mut Ui| {
-                                            ui.collapsing("Menu: Urd", |ui: &mut Ui| {
+                                            ui.label("The main menu is the row of buttons at the very top of Urd.");
+                                            ui.separator();
+                                            Grid::new("main_menu").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                
+                                                let _ = ui.button("Urd");
                                                 Grid::new("main_menu_urd").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                     ui.label("About");
                                                     ui.vertical(|ui: &mut Ui| {
@@ -80,27 +95,28 @@ impl UrdState {
                                                     });
                                                     ui.end_row();
                                                 });
-                                            });
-                                            ui.collapsing("Menu: Journal", |ui: &mut Ui| {
+                                                ui.end_row();
+
+                                                let _ = ui.button("Journal");
                                                 Grid::new("main_menu_journal").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                     ui.label("Search");
                                                     ui.vertical(|ui: &mut Ui| {
                                                         ui.label("Opens the search page.");
-                                                        ui.label("Check 'Search page' for more information.");
+                                                        ui.label("Check 'Search page' or 'Search' under 'Features' for more information.");
                                                     });
                                                     ui.end_row();
 
                                                     ui.label("Important days");
                                                     ui.vertical(|ui: &mut Ui| {
                                                         ui.label("Opens the important days page.");
-                                                        ui.label("Check 'Important days page' for more information.");
+                                                        ui.label("Check 'Important days page' or 'Important days' under 'Features' for more information.");
                                                     });
                                                     ui.end_row();
 
                                                     ui.label("Moods");
                                                     ui.vertical(|ui: &mut Ui| {
                                                         ui.label("Opens the moods page.");
-                                                        ui.label("Check 'Moods page' for more information.");
+                                                        ui.label("Check 'Moods page' or 'Moods' under 'Features' for more information.");
                                                     });
                                                     ui.end_row();
 
@@ -111,8 +127,8 @@ impl UrdState {
                                                         ui.label("Check 'Export' under 'Features' for more information.");
                                                     });
                                                     ui.end_row();
-                                                });
-                                                ui.collapsing("Backup", |ui: &mut Ui| {
+
+                                                    ui.label("Backup");
                                                     Grid::new("main_menu_journal_backup").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                         ui.label("Create");
                                                         ui.vertical(|ui: &mut Ui| {
@@ -125,11 +141,13 @@ impl UrdState {
                                                         ui.label("Restore");
                                                         ui.vertical(|ui: &mut Ui| {
                                                             ui.label("Restores a journal from a backup of the journal.");
+                                                            ui.label("Always launches the restore wizard.");
                                                             ui.label("Check 'Backups' under 'Features' for more information.")
                                                         });
                                                         ui.end_row();
                                                     });
                                                 });
+
                                             });
                                         });
                                         ui.collapsing("Main page", |ui: &mut Ui| {
@@ -137,16 +155,31 @@ impl UrdState {
                                                 ui.collapsing("Head", |ui: &mut Ui| {
                                                     ui.label("The head of the side panel displays the current folder and allows you to navigate to other folders.");
                                                     ui.label("By clicking on the head you go to the parent folder.");
-                                                    ui.collapsing("All years", |ui: &mut Ui| {
-                                                        ui.label("This is the root folder and is displayed by default.");
-                                                        ui.label("Clicking on the head will do nothing.");
-                                                    });
-                                                    ui.collapsing("Year", |ui: &mut Ui| {
-                                                        ui.label("On this level, you can see your aspirations for the year, if you have set any.");
-                                                        ui.label("Clicking on the head will take you back to the root folder.");
-                                                    });
-                                                    ui.collapsing("Month", |ui: &mut Ui| {
-                                                        ui.label("Clicking on the head will take you back to the year folder.");
+                                                    ui.separator();
+                                                    Grid::new("side_panel_head").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                        ui.label("All years");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("This folder shows all years in the journal.");
+                                                            ui.label("This is the root folder and is displayed by default.");
+                                                            ui.label("Clicking on the head will do nothing.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Year");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("This is the folder for the current year.");
+                                                            ui.label("On this level, you can see your aspirations for the year, if you have set any.");
+                                                            ui.label("See 'Aspirations' under 'Concepts' for more information.");
+                                                            ui.label("Clicking on the head will take you back to the root folder.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Month");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("This is the folder for the current month.");
+                                                            ui.label("Clicking on the head will take you back to the year folder.");
+                                                        });
+                                                        ui.end_row();
                                                     });
                                                 });
                                                 ui.collapsing("Body", |ui: &mut Ui| {
