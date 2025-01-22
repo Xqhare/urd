@@ -553,6 +553,11 @@ impl UrdState {
                     self.journal.current_entry = new_journal_entry;
                 }
             };
+            if ui.button("Save entry and exit Urd").on_hover_text("Save entry and exit Urd").clicked() {
+                let _ = self.journal.save();
+                let _ = self.settings.save();
+                std::process::exit(0);
+            };
         });
     }
 
