@@ -300,355 +300,432 @@ impl UrdState {
                                             });
                                         });
                                         ui.collapsing("Settings page", |ui: &mut Ui| {
-                                            ui.collapsing("Buttons", |ui: &mut Ui| {
-                                                ui.label("The buttons on the settings page are always visible at the top.");
-                                                Grid::new("settings_buttons").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Cancel");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.colored_label(Color32::RED, "Reverts all settings to the state they were in when the settings page was opened.");
-                                                        ui.label("Does not save the settings and restores the previous settings.");
-                                                        ui.label("Does not close the settings page.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Cancel and Close");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.colored_label(Color32::RED, "Reverts all settings to the state they were in when the settings page was opened.");
-                                                        ui.label("Does not save the settings and restores the previous settings.");
-                                                        ui.label("Closes the settings page.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Save");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Saves the settings.");
-                                                        ui.label("Does not close the settings page.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Save and Close");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Saves the settings.");
-                                                        ui.label("Closes the settings page.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Restore defaults");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.colored_label(Color32::RED, "Reverts all settings to the default state.");
-                                                        ui.label("Restores the default settings.");
-                                                        ui.label("Does not close the settings page.");
-                                                    });
-                                                    ui.end_row();
-                                                });
-                                            });
-                                            ui.collapsing("Window settings", |ui: &mut Ui| {
-                                                Grid::new("settings_window").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Window width");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("The width of the main window.");
-                                                        ui.label("Minimum: 100");
-                                                        ui.label("Maximum: 3000");
-                                                        ui.label("Overwrite min or max with the 'Overwrite window size' button.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Window height");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("The height of the main window.");
-                                                        ui.label("Minimum: 100");
-                                                        ui.label("Maximum: 3000");
-                                                        ui.label("Overwrite min or max with the 'Overwrite window size' button.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Side panel width");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("The width of the side panel.");
-                                                        ui.label("Minimum: 10");
-                                                        ui.label("Maximum: 2000");
-                                                        ui.label("Overwrite min or max with the 'Overwrite side panel width' button.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Overwrite window size");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Click the checkbox to enable the text fields.");
-                                                        ui.label("You can enter any number you choose into the text fields.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Overwrite side panel width");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Click the checkbox to enable the text field.");
-                                                        ui.label("You can enter any number you choose into the text field.");
-                                                    });
-                                                    ui.end_row();
-                                                });
-                                            });
-                                            ui.collapsing("Font settings", |ui: &mut Ui| {
-                                                Grid::new("settings_font").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Text colour");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("The colour of the text.");
-                                                        ui.label("Is automatically applied as soon as you choose a new colour.");
-                                                    });
-                                                    ui.end_row();
-
-                                                    ui.label("Font size");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("The size of the font.");
-                                                        ui.label("Minimum: 2");
-                                                        ui.label("Maximum: 100");
-                                                    });
-                                                    ui.end_row();
-
-                                                    ui.label("Monospace");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Toggle monospace on or off.");
-                                                    });
-                                                    ui.end_row();
-                                                });
-                                            });
-                                            ui.collapsing("Security", |ui: &mut Ui| {
-                                                Grid::new("settings_security").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Old password");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Enter your old password.");
-                                                        ui.label("This text field is only enabled if a password has been set.");
-                                                    });
-                                                    ui.end_row();
-
-                                                    ui.label("New password");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Enter your new password.");
-                                                        ui.label("This text field is always enabled.");
-                                                    });
-                                                    ui.end_row();
-
-                                                    ui.label("Repeat new password");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Repeat your new password.");
-                                                        ui.label("This text field is always enabled.");
-                                                    });
-                                                    ui.end_row();
-
-                                                    ui.label("Set new password");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Save the new password.");
-                                                        ui.label("You will be required to unlock the program with the new password.");
-                                                    });
-                                                    ui.end_row();
-
-                                                    ui.label("Remove password");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("To enable, enter the old password. No new password is required.");
-                                                        ui.label("Remove the password.");
-                                                    });
-                                                    ui.end_row();
-                                                })
-                                            });
-                                            ui.collapsing("Date settings", |ui: &mut Ui| {
-                                                Grid::new("settings_date").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Timezone");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("The timezone used by Urd.");
-                                                        ui.label("Urd does not support automatic daylight saving.");
-                                                        ui.label("This means that you have to change the timezone manually when daylight saving is active.");
-                                                    });
-                                                    ui.end_row();
-                                                })
-                                            });
-                                            ui.collapsing("File marker settings", |ui: &mut Ui| {
-                                                ui.collapsing("Current file marker", |ui: &mut Ui| {
-                                                    ui.label("The current file marker marks the current year and month.");
+                                            Grid::new("settings_page").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                ui.label("Buttons");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("The buttons on the settings page are always visible at the top.");
                                                     ui.separator();
-                                                    Grid::new("settings_file_marker_currently").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                        ui.label("Start");
+                                                    Grid::new("settings_buttons").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                        let _ = ui.button("Cancel");
                                                         ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The start of the file marker.");
-                                                            ui.label("You can use as many characters as you like.");
+                                                            ui.colored_label(Color32::RED, "Reverts all settings to the state they were in when the settings page was opened.");
+                                                            ui.label("Does not save the settings and restores the previous settings.");
+                                                            ui.label("Does not close the settings page.");
                                                         });
                                                         ui.end_row();
-                                                        ui.label("End");
+                                                        let _ = ui.button("Cancel and Close");
                                                         ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The end of the file marker.");
-                                                            ui.label("You can use as many characters as you like.");
+                                                            ui.colored_label(Color32::RED, "Reverts all settings to the state they were in when the settings page was opened.");
+                                                            ui.label("Does not save the settings and restores the previous settings.");
+                                                            ui.label("Closes the settings page.");
                                                         });
                                                         ui.end_row();
-                                                    })
-                                                });
-                                                ui.collapsing("Normally completed file marker", |ui: &mut Ui| {
-                                                    ui.label("The normally completed file marker marks a year, month that has passed.");
-                                                    ui.separator();
-                                                    Grid::new("settings_file_marker_normally").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                        ui.label("Start");
+                                                        let _ = ui.button("Save");
                                                         ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The start of the file marker.");
-                                                            ui.label("You can use as many characters as you like.");
+                                                            ui.label("Saves the settings.");
+                                                            ui.label("Does not close the settings page.");
                                                         });
                                                         ui.end_row();
-                                                        ui.label("End");
+                                                        let _ = ui.button("Save and Close");
                                                         ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The end of the file marker.");
-                                                            ui.label("You can use as many characters as you like.");
+                                                            ui.label("Saves the settings.");
+                                                            ui.label("Closes the settings page.");
                                                         });
                                                         ui.end_row();
-                                                    })
-                                                });
-                                                ui.collapsing("Perfectly completed file marker", |ui: &mut Ui| {
-                                                    ui.label("The perfectly completed file marker marks a year where every month has at least one entry.");
-                                                    ui.label("The perfectly completed file marker marks a month where every day has an entry.");
-                                                    ui.separator();
-                                                    Grid::new("settings_file_marker_perfectly").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                        ui.label("Start");
+                                                        let _ = ui.button("Restore defaults");
                                                         ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The start of the file marker.");
-                                                            ui.label("You can use as many characters as you like.");
+                                                            ui.colored_label(Color32::RED, "Reverts all settings to the default state.");
+                                                            ui.label("Restores the default settings.");
+                                                            ui.label("Does not close the settings page.");
                                                         });
                                                         ui.end_row();
-                                                        ui.label("End");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The end of the file marker.");
-                                                            ui.label("You can use as many characters as you like.");
-                                                        });
-                                                        ui.end_row();
-                                                    })
-                                                });
-                                            });
-                                            ui.collapsing("Backup settings", |ui: &mut Ui| {
-                                                Grid::new("settings_backup").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Path");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("The location where the backups are stored.");
                                                     });
-                                                    ui.end_row();
+                                                });
+                                                ui.end_row();
 
-                                                    ui.label("Automatic backup");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Automatically create a backup of the journal on every startup.");
-                                                        ui.label("For more information check 'Backups' under 'Features'");
-                                                    });
-                                                    ui.end_row();
+                                                ui.label("Settings");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    Grid::new("settings").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                        ui.label("Window");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_window").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Window width");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The width of the main window.");
+                                                                    ui.label("Minimum: 100");
+                                                                    ui.label("Maximum: 3000");
+                                                                    ui.label("Overwrite min or max with the 'Overwrite window size' button.");
+                                                                });
+                                                                ui.end_row();
+                                                                ui.label("Window height");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The height of the main window.");
+                                                                    ui.label("Minimum: 100");
+                                                                    ui.label("Maximum: 3000");
+                                                                    ui.label("Overwrite min or max with the 'Overwrite window size' button.");
+                                                                });
+                                                                ui.end_row();
+                                                                ui.label("Side panel width");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The width of the side panel.");
+                                                                    ui.label("Minimum: 10");
+                                                                    ui.label("Maximum: 2000");
+                                                                    ui.label("Overwrite min or max with the 'Overwrite side panel width' button.");
+                                                                });
+                                                                ui.end_row();
+                                                                ui.label("Overwrite window size");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Click the checkbox to enable the text fields.");
+                                                                    ui.label("You can enter any number you choose into the text fields.");
+                                                                });
+                                                                ui.end_row();
+                                                                ui.label("Overwrite side panel width");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Click the checkbox to enable the text field.");
+                                                                    ui.label("You can enter any number you choose into the text field.");
+                                                                });
+                                                                ui.end_row();
+                                                            });
+                                                        });
+                                                        ui.end_row();
 
-                                                    ui.label("Launch backup wizard");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Launches the backup wizard to set a backup location.");
-                                                    });
-                                                    ui.end_row();
-                                                })
-                                            });
-                                            ui.collapsing("Export settings", |ui: &mut Ui| {
-                                                Grid::new("settings_export").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Path");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("The location where the export will be stored.");
-                                                    });
-                                                    ui.end_row();
+                                                        ui.label("Font");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_font").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Text colour");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The colour of the text.");
+                                                                    ui.label("Is automatically applied as soon as you choose a new colour.");
+                                                                });
+                                                                ui.end_row();
 
-                                                    ui.label("Launch export wizard");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Launches the export wizard to set an export location.");
+                                                                ui.label("Font size");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The size of the font.");
+                                                                    ui.label("Minimum: 2");
+                                                                    ui.label("Maximum: 100");
+                                                                });
+                                                                ui.end_row();
+
+                                                                ui.label("Monospace");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Toggle monospace on or off.");
+                                                                });
+                                                                ui.end_row();
+                                                            });
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Security");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_security").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Old password");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Enter your old password.");
+                                                                    ui.label("This text field is only enabled if a password has been set.");
+                                                                });
+                                                                ui.end_row();
+
+                                                                ui.label("New password");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Enter your new password.");
+                                                                    ui.label("This text field is always enabled.");
+                                                                });
+                                                                ui.end_row();
+
+                                                                ui.label("Repeat new password");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Repeat your new password.");
+                                                                    ui.label("This text field is always enabled.");
+                                                                });
+                                                                ui.end_row();
+
+                                                                let _ = ui.button("Set new password");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Save the new password.");
+                                                                    ui.label("You will be required to unlock the program with the new password.");
+                                                                });
+                                                                ui.end_row();
+
+                                                                let _ = ui.button("Remove password");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("To enable, enter the old password. No new password is required.");
+                                                                    ui.label("Remove the password.");
+                                                                });
+                                                                ui.end_row();
+                                                            });
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Date");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_date").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Timezone");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The timezone used by Urd.");
+                                                                    ui.label("Urd does not support automatic daylight saving.");
+                                                                    ui.label("This means that you have to change the timezone manually when daylight saving is active.");
+                                                                });
+                                                                ui.end_row();
+                                                            })
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("File marker");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_file_marker").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Current file marker");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The current file marker marks the current year and month.");
+                                                                    ui.separator();
+                                                                    Grid::new("settings_file_marker_currently").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                        ui.label("Start");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The start of the file marker.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                        ui.label("End");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The end of the file marker.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                    })
+                                                                });
+                                                                ui.end_row();
+
+                                                                ui.label("Normally completed file marker");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The normally completed file marker marks a year, month that has passed.");
+                                                                    ui.separator();
+                                                                    Grid::new("settings_file_marker_normally").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                        ui.label("Start");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The start of the file marker.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                        ui.label("End");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The end of the file marker.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                    })
+                                                                });
+                                                                ui.end_row();
+
+                                                                ui.label("Perfectly completed file marker");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The perfectly completed file marker marks a year where every month has at least one entry.");
+                                                                    ui.label("The perfectly completed file marker marks a month where every day has an entry.");
+                                                                    ui.separator();
+                                                                    Grid::new("settings_file_marker_perfectly").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                        ui.label("Start");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The start of the file marker.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                        ui.label("End");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The end of the file marker.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                    })
+                                                                });
+                                                            })
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Backup");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_backup").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Path");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The location where the backups are stored.");
+                                                                });
+                                                                ui.end_row();
+
+                                                                ui.label("Automatic backup");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Automatically create a backup of the journal on every startup.");
+                                                                    ui.label("For more information check 'Backups' under 'Features'");
+                                                                });
+                                                                ui.end_row();
+
+                                                                let _ = ui.button("Launch backup wizard");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Launches the backup wizard to set a backup location.");
+                                                                });
+                                                                ui.end_row();
+                                                            })
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Export");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_export").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Path");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The location where the export will be stored.");
+                                                                });
+                                                                ui.end_row();
+
+                                                                let _ = ui.button("Launch export wizard");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Launches the export wizard to set an export location.");
+                                                                });
+                                                                ui.end_row();
+                                                            })
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Mood");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_mood").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Create mood");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    Grid::new("settings_mood_create").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                        ui.label("Mood name");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The name of the mood.");
+                                                                            ui.label("The name must be unique and cannot be changed later.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                        ui.label("Mood colour");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The color of the mood.");
+                                                                            ui.label("Does not need to be unique and can be changed later.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                        let _ = ui.button("Add mood");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("Adds the mood to the journal.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                    })
+                                                                });
+                                                                ui.end_row();
+
+                                                                ui.label("All moods");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Lists all moods in the journal.");
+                                                                    ui.label("You can change the colour of any mood here.");
+                                                                });
+                                                                ui.end_row();
+
+                                                                let _ = ui.button("Restore default moods");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Restores the default moods.");
+                                                                    ui.separator();
+                                                                    ui.colored_label(Color32::RED, "This can be destructive!");
+                                                                    ui.label("If any custom moods have been used in the journal, this will corrupt it.");
+                                                                    ui.label("The entire journal will be corrupted, not only the entries with custom moods.");
+                                                                });
+                                                                ui.end_row();
+                                                            })
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Aspirations");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("By clicking on 'Show all years', you can edit aspirations for all years exsistant in the journal.");
+                                                            ui.label("By default only the current year is displayed.");
+                                                            Grid::new("settings_aspiration").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Theme");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The theme of the year.");
+                                                                    ui.label("Should only be a word, maybe a few.");
+                                                                    ui.label("For more information check 'Aspirations' under 'Concepts'.");
+                                                                });
+                                                                ui.end_row();
+                                                                ui.label("Pledge");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The pledge of the year.");
+                                                                    ui.label("Should only be a short sentence.");
+                                                                    ui.label("For more information check 'Aspirations' under 'Concepts'.");
+                                                                });
+                                                                ui.end_row();
+                                                                ui.label("Resolutions");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The resolutions of the year.");
+                                                                    ui.label("Add as many as you like by using the 'Add resolution' button.");
+                                                                });
+                                                                ui.end_row();
+
+                                                                let _ = ui.button("New resolution");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Adds a new resolution.");
+                                                                    ui.label("You can add as many as you like.");
+                                                                });
+                                                            })
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Tips and Tricks");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            Grid::new("settings_tips").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                ui.label("Show tips and tricks at startup");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Toggle showing tips and tricks at startup.");
+                                                                });
+                                                                ui.end_row();
+                                                                let _ = ui.button("Show tips and tricks");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("Launch the tips and tricks pop up.");
+                                                                });
+                                                                ui.end_row();
+                                                            })
+                                                        });
                                                     });
-                                                    ui.end_row();
-                                                })
-                                            });
-                                            ui.collapsing("Mood settings", |ui: &mut Ui| {
-                                                ui.collapsing("Create mood", |ui: &mut Ui| {
-                                                    Grid::new("settings_mood_create").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                        ui.label("Mood name");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The name of the mood.");
-                                                            ui.label("The name must be unique and cannot be changed later.");
-                                                            ui.label("You can use as many characters as you like.");
-                                                        });
-                                                        ui.end_row();
-                                                        ui.label("Mood colour");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The color of the mood.");
-                                                            ui.label("Does not need to be unique and can be changed later.");
-                                                        });
-                                                        ui.end_row();
-                                                        ui.label("Add mood");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("Adds the mood to the journal.");
-                                                        });
-                                                        ui.end_row();
-                                                    })
                                                 });
-                                                ui.collapsing("All moods", |ui: &mut Ui| {
-                                                    ui.label("Lists all moods in the journal.");
-                                                    ui.label("You can change the colour of any mood here.");
-                                                });
-                                            });
-                                            ui.collapsing("Aspirations settings", |ui: &mut Ui| {
-                                                ui.label("By clicking on 'Show all years', you can edit aspirations for all years exsistant in the journal.");
-                                                ui.label("By default only the current year is displayed.");
-                                                ui.collapsing("Aspirations of a year", |ui: &mut Ui| {
-                                                    Grid::new("settings_aspiration").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                        ui.label("Theme");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The theme of the year.");
-                                                            ui.label("Should only be a word, maybe a few.");
-                                                            ui.label("For more information check 'Aspirations' under 'Concepts'.");
-                                                        });
-                                                        ui.end_row();
-                                                        ui.label("Pledge");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The pledge of the year.");
-                                                            ui.label("Should only be a short sentence.");
-                                                            ui.label("For more information check 'Aspirations' under 'Concepts'.");
-                                                        });
-                                                        ui.end_row();
-                                                        ui.label("Resolutions");
-                                                        ui.vertical(|ui: &mut Ui| {
-                                                            ui.label("The resolutions of the year.");
-                                                            ui.label("Add as many as you like by using the 'Add resolution' button.");
-                                                        });
-                                                        ui.end_row();
-                                                    })
-                                                })
-                                            });
-                                            ui.collapsing("Tips and Tricks settings", |ui: &mut Ui| {
-                                                Grid::new("settings_tips").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Show tips and tricks at startup");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Toggle showing tips and tricks at startup.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Show tips and tricks");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Launch the tips and tricks pop up.");
-                                                    });
-                                                    ui.end_row();
-                                                })
                                             });
                                         });
                                         ui.collapsing("Search page", |ui: &mut Ui| {
-                                            ui.collapsing("Search menu", |ui: &mut Ui| {
-                                                Grid::new("search_menu").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                    ui.label("Back");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Go back to home.");
-                                                    });
-                                                    ui.end_row();
-                                                    ui.label("Clear");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Clears the search.");
-                                                    });
-                                                    ui.end_row();
+                                            Grid::new("search_page").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                ui.label("Search menu");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    Grid::new("search_menu").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                        let _ = ui.button("Back");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Go back to home.");
+                                                        });
+                                                        ui.end_row();
 
-                                                    ui.label("Search");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Searches for the query.");
-                                                    });
-                                                    ui.end_row();
+                                                        let _ = ui.button("Clear");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Clears the search.");
+                                                        });
+                                                        ui.end_row();
 
-                                                    ui.label("Search text field");
-                                                    ui.vertical(|ui: &mut Ui| {
-                                                        ui.label("Enter the query to search for.");
-                                                        ui.label("You can use tag prefixes, but they are not required.");
-                                                        ui.label("Separate elements with commas.")
-                                                    });
-                                                    ui.end_row();
-                                                })
-                                            });
-                                            ui.collapsing("Search results", |ui: &mut Ui| {
-                                                ui.label("Displays the search results.");
-                                                ui.label("If no results are found, nothing will be displayed.");
-                                                ui.label("You can open any entry by clicking on it.");
+                                                        let _ = ui.button("Search");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Searches for the query.");
+                                                        });
+                                                        ui.end_row();
+
+                                                        ui.label("Search text field");
+                                                        ui.vertical(|ui: &mut Ui| {
+                                                            ui.label("Enter the query to search for.");
+                                                            ui.label("You can use tag prefixes, but they are not required.");
+                                                            ui.label("Separate elements with commas.")
+                                                        });
+                                                        ui.end_row();
+                                                    })
+                                                });
+                                                ui.end_row();
+
+                                                ui.label("Search results");
+                                                ui.vertical(|ui: &mut Ui| {
+                                                    ui.label("Displays the search results.");
+                                                    ui.label("If no results are found, nothing will be displayed.");
+                                                    ui.label("You can open any entry by clicking on it.");
+                                                });
+                                                ui.end_row();
                                             });
                                         });
                                         ui.collapsing("Moods page", |ui: &mut Ui| {
