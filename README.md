@@ -33,19 +33,20 @@ A journaling app written in rust.
 
 *marker* for required features in next release
 
+- [ ] *Edit journal page*
+    - [ ] *Deleting a journal entry*
+    - [ ] *Creating a custom journal entry*
 - [ ] User onboarding
     - [x] First run detection
     - [x] *Tips and Tricks modal*
         - [x] Backend
         - [x] GUI
         - [x] Tips and Tricks
-    - [ ] Tutorials
-        - [ ] Main screen
-        - [ ] Settings
     - [x] Hover text everywhere
     - [x] *Welcome screen*
-        - [x] Basic setup wizard
-        - [ ] Add first entry to setup wizard
+        - [x] Basic setup-wizard
+        - [ ] Add first entry to setup-wizard
+        - [ ] Add open help page to setup-wizard
     - [ ] *Update help window*
 - [ ] Contacts
     - [ ] Name
