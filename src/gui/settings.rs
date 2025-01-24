@@ -490,7 +490,7 @@ impl UrdState {
                                                 ui.add(TextEdit::singleline(resolution).horizontal_align(Align::Center).hint_text("Go to the gym")).on_hover_text("Enter one resolution per line.");
                                             }
                                         });
-                                        if ui.button("Add resolution").on_hover_text("You can create as many resolutions as you want").clicked() {
+                                        if ui.button("New resolution").on_hover_text("You can create as many resolutions as you want").clicked() {
                                             entry.edit_resolutions.push("".to_string());
                                         }
                                     });
