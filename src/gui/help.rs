@@ -787,8 +787,12 @@ impl UrdState {
                                             ui.label("The password can be easily removed and the journal accessed without it.");
                                             ui.end_row();
                                         });
-                                        ui.collapsing("Removing the password", |ui: &mut Ui| {
-                                            ui.collapsing("With password", |ui: &mut Ui| {
+                                        ui.separator();
+                                        ui.separator();
+                                        ui.label("Removing the password");
+                                        Grid::new("password_protection_removal").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                            ui.label("With password");
+                                            ui.vertical(|ui: &mut Ui| {
                                                 Grid::new("password_protection_removal").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                     ui.label("1.");
                                                     ui.label("Head to the settings page, and scroll to the 'Security' section.");
@@ -803,8 +807,12 @@ impl UrdState {
                                                     ui.end_row();
                                                 })
                                             });
-                                            ui.collapsing("Without password", |ui: &mut Ui| {
-                                                ui.collapsing("Recommended way", |ui: &mut Ui| {
+                                            ui.end_row();
+
+                                            ui.label("Without password");
+                                            Grid::new("password_protection_removal_without_password").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                ui.label("Recommended way");
+                                                ui.vertical(|ui: &mut Ui| {
                                                     ui.colored_label(Color32::RED, "WARNING");
                                                     ui.label("This will revert all settings to their default values.");
                                                     ui.label("No journal data will be lost.");
@@ -831,7 +839,10 @@ impl UrdState {
                                                         ui.end_row();
                                                     });
                                                 });
-                                                ui.collapsing("Alternative way", |ui: &mut Ui| {
+                                                ui.end_row();
+
+                                                ui.label("Alternative way");
+                                                ui.vertical(|ui: &mut Ui| {
                                                     ui.colored_label(Color32::RED, "WARNING");
                                                     ui.label("This method requires some technical knowledge.");
                                                     ui.label("No data whatsoever will be lost.");
@@ -865,24 +876,79 @@ impl UrdState {
                                                         })
                                                     })
                                                 });
+
                                             });
                                         });
                                     });
                                     ui.collapsing("Backups", |ui: &mut Ui| {
+                                        ui.label("Urd can create backups of the journal.");
+                                        ui.label("To do so, you need to set a backup location.");
+                                        ui.label("This is done by clicking on 'Backup' inside the 'Journal' menu, or by launching the backup wizard via the settings page.");
+                                        ui.label("The backup wizard will also allow you to activate automatic backups. This can also be configured in the settings page.");
+                                        ui.label("Automatic backups will create a backup of the journal on every startup.");
+                                        ui.label("Please note that backups are created with the current date, meaning that they will be overwritten if a backup is made on the same day.");
+                                        ui.separator();
+                                        ui.label("To restore a journal from a backup, navigate to the 'Journal' menu and click on 'Restore'.");
+                                        ui.label("This will launch the restore wizard.");
+                                        ui.label("Now all you need to do is to drag and drop the backup file into the restore wizard window.");
                                     });
                                     ui.collapsing("Exporting", |ui: &mut Ui| {
+                                        ui.label("Urd can export the journal into a folder structure.");
+                                        ui.label("This can be useful if you want to change your journaling app.");
+                                        ui.separator();
+                                        ui.label("The structure is as follows:");
+                                        Grid::new("export_structure").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                            ui.label("1.");
+                                            ui.vertical(|ui: &mut Ui| {
+                                                ui.label("A folder containing the journal.");
+                                            });
+                                            ui.end_row();
+
+                                            ui.label("2.");
+                                            ui.vertical(|ui: &mut Ui| {
+                                                ui.label("Inside the first folder you find a folder for each year.");
+                                            });
+                                            ui.end_row();
+
+                                            ui.label("3.");
+                                            ui.vertical(|ui: &mut Ui| {
+                                                ui.label("Inside each year folder you find a folder for each month.");
+                                            });
+                                            ui.end_row();
+
+                                            ui.label("4.");
+                                            ui.vertical(|ui: &mut Ui| {
+                                                ui.label("Inside each month folder you find a '.txt' file for each entry.");
+                                                ui.label("The file name will be the date of the entry.");
+                                            });
+                                            ui.end_row();
+                                        })
                                     });
                                     ui.collapsing("Tips and Tricks", |ui: &mut Ui| {
                                         ui.label("For information on the 'GUI' elements check 'Tips and Tricks' under 'GUI'.");
                                         ui.separator();
-                                        ui.label("Urd can display tips and tricks to help you get started.");
+                                        ui.label("Urd displays tips and tricks at startup to help you get started.");
                                         ui.label("This is enabled by default and can be toggled in the settings.");
+                                        ui.label("The tip shown at startup is random.")
                                     });
                                     ui.collapsing("Search", |ui: &mut Ui| {
+                                        ui.label("Urd can search the journal.");
+                                        ui.label("This is done by clicking on 'Search' inside the 'Journal' menu or by clicking on a tag below the main text field (if a tag is used in the entry).");
+                                        ui.label("Text search is case sensitive.");
+                                        ui.label("You do not need to type the tag prefix.");
+                                        ui.label("Search terms are separated by commas.");
+                                        ui.label("Every search result is clickable, to open the entry.");
                                     });
                                     ui.collapsing("Moods", |ui: &mut Ui| {
+                                        ui.label("Urd can track moods.");
+                                        ui.label("Moods are a way to track your mood over time.");
+                                        ui.label("You can add custom moods to Urd, and set one for each entry.");
+                                        ui.label("To take a look at how your mood has developed over time, click on 'Moods' inside the 'Journal' menu.");
+                                        ui.label("For more information on moods check 'Moods page' under 'GUI'.");
                                     });
                                     ui.collapsing("Important days", |ui: &mut Ui| {
+                                        ui.label("Urd can track important days and show them to you.");
+                                        ui.label("For more information on important days check 'Important days page' under 'GUI'.");
                                     });
                                     ui.collapsing("Tags", |ui: &mut Ui| {
                                         ui.label("It is recommended to keep a tags length within 42 characters.");
