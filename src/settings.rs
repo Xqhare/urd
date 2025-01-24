@@ -211,6 +211,7 @@ pub struct Gui {
     pub file_marker_currently: FileMarker,
     pub file_marker_perfectly: FileMarker,
     pub file_marker_normally: FileMarker,
+    pub day_marker_important: FileMarker,
 }
 
 impl Default for Gui {
@@ -219,6 +220,7 @@ impl Default for Gui {
             file_marker_currently: FileMarker::new("|".to_string(), "|".to_string()),
             file_marker_perfectly: FileMarker::new("«".to_string(), "»".to_string()),
             file_marker_normally: FileMarker::new("<".to_string(), ">".to_string()),
+            day_marker_important: FileMarker::new("!".to_string(), "!".to_string()),
         }
     }
 }
@@ -238,35 +240,42 @@ impl Gui {
             "file_marker_normally",
             self.file_marker_normally.serialize(),
         );
+        serialized.insert(
+            "day_marker_important",
+            self.day_marker_important.serialize(),
+        );
         XffValue::from(serialized)
     }
 
     pub fn deserialize(serialized: &XffValue) -> Self {
+        let obj = serialized.into_object().unwrap();
         let file_marker_currently = FileMarker::deserialize(
-            &serialized
-                .into_object()
-                .unwrap()
+            &obj
                 .get("file_marker_currently")
                 .unwrap(),
         );
         let file_marker_perfectly = FileMarker::deserialize(
-            &serialized
-                .into_object()
-                .unwrap()
+            &obj
                 .get("file_marker_perfectly")
                 .unwrap(),
         );
         let file_marker_normally = FileMarker::deserialize(
-            &serialized
-                .into_object()
-                .unwrap()
+            &obj
                 .get("file_marker_normally")
                 .unwrap(),
         );
+        let day_marker_important = {
+            if let Some(v) = obj.get("day_marker_important") {
+                FileMarker::deserialize(&v)
+            } else {
+                FileMarker::new("!".to_string(), "!".to_string())
+            }
+        };
         Self {
             file_marker_currently,
             file_marker_perfectly,
             file_marker_normally,
+            day_marker_important,
         }
     }
 }

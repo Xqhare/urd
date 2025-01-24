@@ -133,17 +133,27 @@ impl UrdState {
                         for n in &mut month_folder.entries {
                             debug_assert!(n.is_journal_entry());
                             let entry = n.get_journal_entry().unwrap();
+                            let title = {
+                                let mut word_store = entry.title.clone();
+                                if let Some(bool) = entry.metadata.get("important_day") {
+                                    if bool.into_boolean().unwrap() {
+                                        word_store = format!("{} {} {}", self.settings.gui.day_marker_important.start, word_store, self.settings.gui.day_marker_important.end);
+                                    }
+                                }
+                                word_store
+                            };
                             let body = {
                                 let tmp = entry.text.clone();
                                 let mut word_store = tmp.split_whitespace().take(25).collect::<Vec<&str>>();
                                 if word_store.len() < tmp.split_whitespace().count() {
                                     word_store.push("...");
                                 }
+                                
                                 word_store.join(" ")
                             };
                             ui.vertical_centered_justified(|ui: &mut Ui| {
                                 ui.group(|ui: &mut Ui| {
-                                    if ui.label(entry.title.as_str()).on_hover_text("Date of the entry. Click to open").clicked() {
+                                    if ui.label(title.as_str()).on_hover_text("Date of the entry. Click to open").clicked() {
                                         self.journal.current_entry = entry.clone();
                                     };
                                     ui.group(|ui: &mut Ui| {

@@ -536,6 +536,27 @@ impl UrdState {
                                                                         ui.end_row();
                                                                     })
                                                                 });
+
+                                                                ui.label("Important day marker");
+                                                                ui.vertical(|ui: &mut Ui| {
+                                                                    ui.label("The important day marker marks a day that is important to you.");
+                                                                    ui.separator();
+                                                                    Grid::new("settings_file_marker_important").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                                                        ui.label("Start");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The start of the file marker.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                        ui.label("End");
+                                                                        ui.vertical(|ui: &mut Ui| {
+                                                                            ui.label("The end of the file marker.");
+                                                                            ui.label("You can use as many characters as you like.");
+                                                                        });
+                                                                        ui.end_row();
+                                                                    })
+                                                                });
+                                                                ui.end_row();
                                                             })
                                                         });
                                                         ui.end_row();

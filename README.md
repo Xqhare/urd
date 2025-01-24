@@ -33,6 +33,7 @@ A journaling app written in rust.
 
 *marker* for required features in next release
 
+- [x] Display important day in journal browser
 - [ ] *Edit journal page*
     - [ ] *Deleting a journal entry*
     - [ ] *Creating a custom journal entry*

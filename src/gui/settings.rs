@@ -333,6 +333,25 @@ impl UrdState {
                                         ui.label(display_txt);
                                     });
                                 });
+                                ui.separator();
+                                ui.label("Important day marker");
+                                Sides::new().show(ui, |ui: &mut Ui| {
+                                    ui.label("Start: ");
+                                }, |ui: &mut Ui| {
+                                    ui.add(TextEdit::singleline(&mut self.settings.gui.day_marker_important.start).horizontal_align(Align::Center));
+                                });
+                                Sides::new().show(ui, |ui: &mut Ui| {
+                                    ui.label("End: ");
+                                }, |ui: &mut Ui| {
+                                    ui.add(TextEdit::singleline(&mut self.settings.gui.day_marker_important.end).horizontal_align(Align::Center));
+                                });
+                                ui.vertical_centered_justified(|ui: &mut Ui| {
+                                    ui.group(|ui: &mut Ui| {
+                                        ui.label("Example: ");
+                                        let display_txt = format!("{} {} {}", self.settings.gui.day_marker_important.start, horae::Utc::now().date(), self.settings.gui.day_marker_important.end);
+                                        ui.label(display_txt);
+                                    });
+                                });
                             }).response
                         });
 
