@@ -978,8 +978,43 @@ impl UrdState {
                                 ui.group(|ui: &mut Ui| {
                                     ui.label("Concepts");
                                     ui.collapsing("Journal", |ui: &mut Ui| {
+                                        ui.label("The journal is structured as a three tiered folder structure.");
+                                        ui.label("The root folder is called 'Journal'.");
+                                        ui.label("Inside the root folder you find a folder for each year.");
+                                        ui.label("Inside each year folder you find a folder for each month.");
+                                        ui.label("Inside each month folder you find a '.txt' file for each entry.");
+                                        ui.label("The file name will be the date of the entry.");
+                                        ui.label("There is also metadata associated with each entry, such as tags and mood.");
                                     });
                                     ui.collapsing("Aspirations", |ui: &mut Ui| {
+                                        ui.label("Aspirations are a way to track your aspirations over time.");
+                                        ui.label("You can add custom aspirations to Urd, and set them for each year.");
+                                        ui.separator();
+                                        ui.label("There are three types of aspirations:");
+                                        Grid::new("aspiration_types").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                            ui.label("Theme");
+                                            ui.vertical(|ui: &mut Ui| {
+                                                ui.label("You can set a theme for the year, such as 'progress' or 'improvement'.");
+                                                ui.label("Temes are often only one word, but can be longer.");
+                                            });
+                                            ui.end_row();
+
+                                            ui.label("Pledge");
+                                            ui.vertical(|ui: &mut Ui| {
+                                                ui.label("You can also think of it as the goal for the year.");
+                                                ui.label("Should only be a short sentence.");
+                                            });
+                                            ui.end_row();
+
+                                            ui.label("Resolutions");
+                                            ui.vertical(|ui: &mut Ui| {
+                                                ui.label("This is the most known aspiration type.");
+                                                ui.label("You can set any number of resolutions for the year.");
+                                                ui.label("Some examples could be 'I will write a blog post every week', 'I will improve my code', etc.");
+                                                ui.label("Should only be a short sentence.");
+                                            });
+                                            ui.end_row();
+                                        })
                                     })
                                 });
                             });
