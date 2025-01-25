@@ -48,7 +48,7 @@ A journaling app written in rust.
         - [x] Basic setup-wizard
         - [ ] Add first entry to setup-wizard
         - [ ] Add open help page to setup-wizard
-    - [ ] *Update help window*
+    - [x] *Update help window*
 - [ ] Contacts
     - [ ] Name
     - [ ] With text field for free form input? / key value pairs of custom metadata?
