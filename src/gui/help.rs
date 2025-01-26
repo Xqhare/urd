@@ -193,16 +193,16 @@ impl UrdState {
                                                         ui.label("The body of the side panel displays the contents of the folder.");
                                                         ui.label("You can click on any entry shown to open it.");
                                                     });
+                                                    ui.end_row();
+
+                                                    ui.label("Alternative uses");
+                                                    ui.vertical(|ui: &mut Ui| {
+                                                        ui.label("The side panel is also used to display the settings page.");
+                                                    });
+                                                    ui.end_row();
                                                 });
                                                 ui.end_row();
-                                            });
 
-                                            // leave empthy, just for spacing
-                                            //ui.label("");
-                                            ui.separator();
-
-                                            Grid::new("entry_editor").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                
                                                 ui.label("Entry editor");
                                                 Grid::new("entry_editor").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                     ui.label("Text and entry menu");
@@ -495,6 +495,7 @@ impl UrdState {
                                                                 });
                                                                 ui.end_row();
 
+
                                                                 ui.label("Normally completed file marker");
                                                                 ui.vertical(|ui: &mut Ui| {
                                                                     ui.label("The normally completed file marker marks a year, month that has passed.");
@@ -536,6 +537,7 @@ impl UrdState {
                                                                         ui.end_row();
                                                                     })
                                                                 });
+                                                                ui.end_row();
 
                                                                 ui.label("Important day marker");
                                                                 ui.vertical(|ui: &mut Ui| {
@@ -809,8 +811,9 @@ impl UrdState {
                                             ui.end_row();
                                         });
                                         ui.separator();
-                                        ui.separator();
-                                        ui.label("Removing the password");
+                                        ui.vertical_centered_justified(|ui: &mut Ui| {
+                                            ui.label("Removing the password");
+                                        });
                                         Grid::new("password_protection_removal").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                             ui.label("With password");
                                             ui.vertical(|ui: &mut Ui| {
@@ -972,7 +975,34 @@ impl UrdState {
                                         ui.label("For more information on important days check 'Important days page' under 'GUI'.");
                                     });
                                     ui.collapsing("Tags", |ui: &mut Ui| {
+                                        ui.label("Urd can track tags across the journal.");
                                         ui.label("It is recommended to keep a tags length within 42 characters.");
+                                        ui.label("No whitespace (spaces, tabs or new lines) is allowed in tags.");
+                                        ui.label("You can of course use camelCase, snake_case or any other naming convention in tags.");
+                                        ui.separator();
+                                        ui.label("There are four types of tags.");
+                                        ui.label("Each tag, with the exception of special tags, has a specific prefix.");
+                                        Grid::new("tag_prefixes").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
+                                            ui.label("Project");
+                                            ui.label("+");
+                                            ui.end_row();
+                                            ui.label("Context");
+                                            ui.label("@");
+                                            ui.end_row();
+                                            ui.label("Bespoke");
+                                            ui.label("#");
+                                            ui.end_row();
+                                        });
+                                        ui.separator();
+                                        ui.vertical_centered_justified(|ui: &mut Ui| {
+                                            ui.label("Special tags");
+                                        });
+                                        ui.label("Special tags work a bit differently to the other types of tags.");
+                                        ui.label("Special tags are used to store custom data.");
+                                        ui.label("Special tags are not prefixed, but are added by creating a key-value pair with `{key}:{value}`.");
+                                        ui.label("Special tags are only searched by their key.");
+                                        ui.label("An example of a special tag would be `{location:home}`.");
+                                        ui.label("Or you can use it to track the status of a project over time with `{project_name:in-progress}` changing to `{project_name:completed}` in a later entry.");
                                     });
                                 });
                                 ui.group(|ui: &mut Ui| {
@@ -982,8 +1012,8 @@ impl UrdState {
                                         ui.label("The root folder is called 'Journal'.");
                                         ui.label("Inside the root folder you find a folder for each year.");
                                         ui.label("Inside each year folder you find a folder for each month.");
-                                        ui.label("Inside each month folder you find a '.txt' file for each entry.");
-                                        ui.label("The file name will be the date of the entry.");
+                                        ui.label("Inside each month folder you find all entries for that month.");
+                                        ui.label("The entry title is the date of the entry.");
                                         ui.label("There is also metadata associated with each entry, such as tags and mood.");
                                     });
                                     ui.collapsing("Aspirations", |ui: &mut Ui| {
