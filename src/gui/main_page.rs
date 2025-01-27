@@ -26,6 +26,12 @@ impl UrdState {
     }
 
     fn main_central_panel(&mut self, ctx: &egui::Context) {
+        CentralPanel::default().show(ctx, |ui: &mut Ui| {
+            self.main_inside_panel(ui);
+        });
+    }
+
+    pub fn main_inside_panel(&mut self, ui: &mut Ui) {
         let font = {
             if self.settings.font.monospace {
                 FontId::monospace(self.settings.font.size)
@@ -33,265 +39,263 @@ impl UrdState {
                 FontId::proportional(self.settings.font.size)
             }
         };
-        CentralPanel::default().show(ctx, |ui: &mut Ui| {
-            self.central_panel_menu(ui);
+        self.central_panel_menu(ui);
+        ui.separator();
+        ScrollArea::vertical().show(ui, |ui: &mut Ui| {
+            ui.vertical_centered_justified(|ui: &mut Ui| {
+                //DEBUG LEAVE FOR LATER
+                //ui.add(TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center));
+                ui.heading(&self.journal.current_entry.title).on_hover_text("The title of this entry. It is the date of the entry and cannot be changed");
+            });
             ui.separator();
-            ScrollArea::vertical().show(ui, |ui: &mut Ui| {
-                ui.vertical_centered_justified(|ui: &mut Ui| {
-                    //DEBUG LEAVE FOR LATER
-                    //ui.add(TextEdit::singleline(&mut self.journal.current_entry.title).horizontal_align(Align::Center));
-                    ui.heading(&self.journal.current_entry.title).on_hover_text("The title of this entry. It is the date of the entry and cannot be changed");
-                });
+            ui.horizontal(|ui: &mut Ui| {
+                if !self.render.view.ui_state.show_add_mood_field {
+                    ui.add_space(ui.available_width() / 3.95);
+                }
+                self.mood(ui);
                 ui.separator();
-                ui.horizontal(|ui: &mut Ui| {
-                    if !self.render.view.ui_state.show_add_mood_field {
-                        ui.add_space(ui.available_width() / 3.95);
-                    }
-                    self.mood(ui);
-                    ui.separator();
-                    // Again hacky, but saves me from declaring another state field
-                    let mut tmp_bool = self
-                        .journal
+                // Again hacky, but saves me from declaring another state field
+                let mut tmp_bool = self
+                    .journal
+                    .current_entry
+                    .metadata
+                    .get_mut("important_day")
+                    .unwrap()
+                    .into_boolean()
+                    .unwrap();
+                if ui.checkbox(&mut tmp_bool, "Important Day").on_hover_text("Mark this day as important to find it easier").changed() {
+                    self.journal
                         .current_entry
                         .metadata
-                        .get_mut("important_day")
-                        .unwrap()
-                        .into_boolean()
-                        .unwrap();
-                    if ui.checkbox(&mut tmp_bool, "Important Day").on_hover_text("Mark this day as important to find it easier").changed() {
+                        .insert("important_day".to_string(), XffValue::from(tmp_bool));
+                    println!(
+                        "{}",
                         self.journal
                             .current_entry
                             .metadata
-                            .insert("important_day".to_string(), XffValue::from(tmp_bool));
-                        println!(
-                            "{}",
-                            self.journal
-                                .current_entry
-                                .metadata
-                                .get("important_day")
-                                .unwrap()
-                                .into_boolean()
-                                .unwrap()
+                            .get("important_day")
+                            .unwrap()
+                            .into_boolean()
+                            .unwrap()
+                    );
+                }
+            });
+            ui.separator();
+            ui.add_sized(ui.available_size(), |ui: &mut Ui| {
+                let entry_text = ui.add(
+                    TextEdit::multiline(&mut self.journal.current_entry.text)
+                        .horizontal_align(Align::LEFT)
+                        .lock_focus(true)
+                        .text_color(self.settings.font.text_colour)
+                        .font(font.clone())
+                        .margin(Margin::same(5.0))
+                        .hint_text("Write your journal entry here")
+                        .desired_width(f32::INFINITY)
+                );
+                if entry_text.changed() {
+                    if let Err(err) = self.journal.save() {
+                        self.error = Error::new(
+                            err.to_string(),
+                            "Writing journal to disk failed.".to_string(),
                         );
                     }
-                });
-                ui.separator();
-                ui.add_sized(ui.available_size(), |ui: &mut Ui| {
-                    let entry_text = ui.add(
-                        TextEdit::multiline(&mut self.journal.current_entry.text)
-                            .horizontal_align(Align::LEFT)
-                            .lock_focus(true)
-                            .text_color(self.settings.font.text_colour)
-                            .font(font.clone())
-                            .margin(Margin::same(5.0))
-                            .hint_text("Write your journal entry here")
-                            .desired_width(f32::INFINITY)
-                    );
-                    if entry_text.changed() {
-                        if let Err(err) = self.journal.save() {
-                            self.error = Error::new(
-                                err.to_string(),
-                                "Writing journal to disk failed.".to_string(),
-                            );
-                        }
-                    }
-                    entry_text
-                });
-                ui.group(|ui: &mut Ui| {
-                    ui.vertical_centered_justified(|ui: &mut Ui| {
-                        ui.heading("Metadata").on_hover_text("The metadata of this entry; Project tags, Context tags, Special tags and Bespoke tags");
-                        ui.horizontal(|ui: &mut Ui| {
-                            let tmp_project_tags = {
-                                let bind = self
-                                    .journal
-                                    .current_entry
-                                    .metadata
-                                    .get("project_tags")
-                                    .unwrap()
-                                    .into_array();
-                                if bind.is_none() {
-                                    vec![]
-                                } else {
-                                    bind.unwrap().into_vec()
-                                }
-                            };
-                            let project_tags_as_txt = tmp_project_tags
-                                .iter()
-                                .map(|tag| tag.into_string().unwrap())
-                                .collect::<Vec<String>>();
-                            ui.add_sized(
-                                [ui.available_width(), ui.available_height()],
-                                |ui: &mut Ui| {
-                                    ui.group(|ui: &mut Ui| {
-                                        ui.vertical(|ui: &mut Ui| {
-                                            ui.heading("Project Tags").on_hover_text("The project tags of this entry. They are added by prepending the word with `+`");
-                                            if project_tags_as_txt.len() == 0 {
-                                                ui.label("Add with `+{tag}`");
-                                            } else {
-                                                for tag in project_tags_as_txt {
-                                                    ui.group(|ui: &mut Ui| {
-                                                        if ui.label(&tag).on_hover_text("Click to search").clicked() {
-                                                            self.search.query =
-                                                                format!("{}, ", tag);
-                                                            self.search_current_query();
-                                                            self.render
-                                                                .view
-                                                                .pages
-                                                                .show_search_page = true;
-                                                        }
-                                                    });
-                                                }
+                }
+                entry_text
+            });
+            ui.group(|ui: &mut Ui| {
+                ui.vertical_centered_justified(|ui: &mut Ui| {
+                    ui.heading("Metadata").on_hover_text("The metadata of this entry; Project tags, Context tags, Special tags and Bespoke tags");
+                    ui.horizontal(|ui: &mut Ui| {
+                        let tmp_project_tags = {
+                            let bind = self
+                                .journal
+                                .current_entry
+                                .metadata
+                                .get("project_tags")
+                                .unwrap()
+                                .into_array();
+                            if bind.is_none() {
+                                vec![]
+                            } else {
+                                bind.unwrap().into_vec()
+                            }
+                        };
+                        let project_tags_as_txt = tmp_project_tags
+                            .iter()
+                            .map(|tag| tag.into_string().unwrap())
+                            .collect::<Vec<String>>();
+                        ui.add_sized(
+                            [ui.available_width(), ui.available_height()],
+                            |ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.vertical(|ui: &mut Ui| {
+                                        ui.heading("Project Tags").on_hover_text("The project tags of this entry. They are added by prepending the word with `+`");
+                                        if project_tags_as_txt.len() == 0 {
+                                            ui.label("Add with `+{tag}`");
+                                        } else {
+                                            for tag in project_tags_as_txt {
+                                                ui.group(|ui: &mut Ui| {
+                                                    if ui.label(&tag).on_hover_text("Click to search").clicked() {
+                                                        self.search.query =
+                                                            format!("{}, ", tag);
+                                                        self.search_current_query();
+                                                        self.render
+                                                            .view
+                                                            .pages
+                                                            .show_search_page = true;
+                                                    }
+                                                });
                                             }
-                                        })
+                                        }
                                     })
-                                    .response
-                                },
-                            );
-
-                            let tmp_context_tags = {
-                                let bind = self
-                                    .journal
-                                    .current_entry
-                                    .metadata
-                                    .get("context_tags")
-                                    .unwrap()
-                                    .into_array();
-                                if bind.is_none() {
-                                    vec![]
-                                } else {
-                                    bind.unwrap().into_vec()
-                                }
-                            };
-                            let context_tags_as_txt = tmp_context_tags
-                                .iter()
-                                .map(|tag| tag.into_string().unwrap())
-                                .collect::<Vec<String>>();
-                            ui.add_sized(
-                                [ui.available_width() * 1.95, ui.available_height()],
-                                |ui: &mut Ui| {
-                                    ui.group(|ui: &mut Ui| {
-                                        ui.vertical(|ui: &mut Ui| {
-                                            ui.heading("Context Tags").on_hover_text("The context tags of this entry. They are added by prepending the word with `@`");
-                                            if context_tags_as_txt.len() == 0 {
-                                                ui.label("Add with `@{tag}`");
-                                            } else {
-                                                for tag in context_tags_as_txt {
-                                                    ui.group(|ui: &mut Ui| {
-                                                        if ui.label(&tag).on_hover_text("Click to search").clicked() {
-                                                            self.search.query =
-                                                                format!("{}, ", tag);
-                                                            self.search_current_query();
-                                                            self.render
-                                                                .view
-                                                                .pages
-                                                                .show_search_page = true;
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        });
-                                    })
-                                    .response
-                                },
-                            );
-                        });
-
-                        ui.horizontal(|ui: &mut Ui| {
-                            let tmp_special_tags = {
-                                let bind = self
-                                    .journal
-                                    .current_entry
-                                    .metadata
-                                    .get("special_tags")
-                                    .unwrap()
-                                    .into_object();
-                                if bind.is_none() {
-                                    Object::new()
-                                } else {
-                                    bind.unwrap()
-                                }
-                            };
-                            let special_tags_as_txt = tmp_special_tags
-                                .iter()
-                                .map(|(key, value)| {
-                                    format!("{}:{}", key, value.into_string().unwrap())
                                 })
-                                .collect::<Vec<String>>();
-                            ui.add_sized(
-                                [ui.available_width(), ui.available_height()],
-                                |ui: &mut Ui| {
-                                    ui.group(|ui: &mut Ui| {
-                                        ui.vertical(|ui: &mut Ui| {
-                                            ui.heading("Special Tags").on_hover_text("The special tags of this entry. They are added by prepending the word with `{key}:{value}`");
-                                            if special_tags_as_txt.len() == 0 {
-                                                ui.label("Add with `{key}:{value}`");
-                                            } else {
-                                                for tag in special_tags_as_txt {
-                                                    ui.group(|ui: &mut Ui| {
-                                                        if ui.label(&tag).on_hover_text("Click to search key").clicked() {
-                                                            self.search.query =
-                                                                format!("{}, ", tag.split(":").next().unwrap());
-                                                            self.search_current_query();
-                                                            self.render
-                                                                .view
-                                                                .pages
-                                                                .show_search_page = true;
-                                                        }
-                                                    });
-                                                }
+                                .response
+                            },
+                        );
+
+                        let tmp_context_tags = {
+                            let bind = self
+                                .journal
+                                .current_entry
+                                .metadata
+                                .get("context_tags")
+                                .unwrap()
+                                .into_array();
+                            if bind.is_none() {
+                                vec![]
+                            } else {
+                                bind.unwrap().into_vec()
+                            }
+                        };
+                        let context_tags_as_txt = tmp_context_tags
+                            .iter()
+                            .map(|tag| tag.into_string().unwrap())
+                            .collect::<Vec<String>>();
+                        ui.add_sized(
+                            [ui.available_width() * 1.95, ui.available_height()],
+                            |ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.vertical(|ui: &mut Ui| {
+                                        ui.heading("Context Tags").on_hover_text("The context tags of this entry. They are added by prepending the word with `@`");
+                                        if context_tags_as_txt.len() == 0 {
+                                            ui.label("Add with `@{tag}`");
+                                        } else {
+                                            for tag in context_tags_as_txt {
+                                                ui.group(|ui: &mut Ui| {
+                                                    if ui.label(&tag).on_hover_text("Click to search").clicked() {
+                                                        self.search.query =
+                                                            format!("{}, ", tag);
+                                                        self.search_current_query();
+                                                        self.render
+                                                            .view
+                                                            .pages
+                                                            .show_search_page = true;
+                                                    }
+                                                });
                                             }
-                                        });
-                                    })
-                                    .response
-                                },
-                            );
-                            let tmp_bespoke_tags = {
-                                let bind = self
-                                    .journal
-                                    .current_entry
-                                    .metadata
-                                    .get("bespoke_tags")
-                                    .unwrap()
-                                    .into_array();
-                                if bind.is_none() {
-                                    vec![]
-                                } else {
-                                    bind.unwrap().into_vec()
-                                }
-                            };
-                            let bespoke_tags_as_txt = tmp_bespoke_tags
-                                .iter()
-                                .map(|tag| tag.into_string().unwrap())
-                                .collect::<Vec<String>>();
-                            ui.add_sized(
-                                [ui.available_width() * 1.95, ui.available_height()],
-                                |ui: &mut Ui| {
-                                    ui.group(|ui: &mut Ui| {
-                                        ui.vertical(|ui: &mut Ui| {
-                                            ui.heading("Bespoke Tags").on_hover_text("The bespoke tags of this entry. They are added by prepending the word with `#{value}`");
-                                            if bespoke_tags_as_txt.len() == 0 {
-                                                ui.label("Add with `#{value}`");
-                                            } else {
-                                                for tag in bespoke_tags_as_txt {
-                                                    ui.group(|ui: &mut Ui| {
-                                                        if ui.label(&tag).on_hover_text("Click to search").clicked() {
-                                                            self.search.query =
-                                                                format!("{}, ", tag);
-                                                            self.search_current_query();
-                                                            self.render
-                                                                .view
-                                                                .pages
-                                                                .show_search_page = true;
-                                                        }
-                                                    });
-                                                }
+                                        }
+                                    });
+                                })
+                                .response
+                            },
+                        );
+                    });
+
+                    ui.horizontal(|ui: &mut Ui| {
+                        let tmp_special_tags = {
+                            let bind = self
+                                .journal
+                                .current_entry
+                                .metadata
+                                .get("special_tags")
+                                .unwrap()
+                                .into_object();
+                            if bind.is_none() {
+                                Object::new()
+                            } else {
+                                bind.unwrap()
+                            }
+                        };
+                        let special_tags_as_txt = tmp_special_tags
+                            .iter()
+                            .map(|(key, value)| {
+                                format!("{}:{}", key, value.into_string().unwrap())
+                            })
+                            .collect::<Vec<String>>();
+                        ui.add_sized(
+                            [ui.available_width(), ui.available_height()],
+                            |ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.vertical(|ui: &mut Ui| {
+                                        ui.heading("Special Tags").on_hover_text("The special tags of this entry. They are added by prepending the word with `{key}:{value}`");
+                                        if special_tags_as_txt.len() == 0 {
+                                            ui.label("Add with `{key}:{value}`");
+                                        } else {
+                                            for tag in special_tags_as_txt {
+                                                ui.group(|ui: &mut Ui| {
+                                                    if ui.label(&tag).on_hover_text("Click to search key").clicked() {
+                                                        self.search.query =
+                                                            format!("{}, ", tag.split(":").next().unwrap());
+                                                        self.search_current_query();
+                                                        self.render
+                                                            .view
+                                                            .pages
+                                                            .show_search_page = true;
+                                                    }
+                                                });
                                             }
-                                        });
-                                    })
-                                    .response
-                                },
-                            );
-                        });
+                                        }
+                                    });
+                                })
+                                .response
+                            },
+                        );
+                        let tmp_bespoke_tags = {
+                            let bind = self
+                                .journal
+                                .current_entry
+                                .metadata
+                                .get("bespoke_tags")
+                                .unwrap()
+                                .into_array();
+                            if bind.is_none() {
+                                vec![]
+                            } else {
+                                bind.unwrap().into_vec()
+                            }
+                        };
+                        let bespoke_tags_as_txt = tmp_bespoke_tags
+                            .iter()
+                            .map(|tag| tag.into_string().unwrap())
+                            .collect::<Vec<String>>();
+                        ui.add_sized(
+                            [ui.available_width() * 1.95, ui.available_height()],
+                            |ui: &mut Ui| {
+                                ui.group(|ui: &mut Ui| {
+                                    ui.vertical(|ui: &mut Ui| {
+                                        ui.heading("Bespoke Tags").on_hover_text("The bespoke tags of this entry. They are added by prepending the word with `#{value}`");
+                                        if bespoke_tags_as_txt.len() == 0 {
+                                            ui.label("Add with `#{value}`");
+                                        } else {
+                                            for tag in bespoke_tags_as_txt {
+                                                ui.group(|ui: &mut Ui| {
+                                                    if ui.label(&tag).on_hover_text("Click to search").clicked() {
+                                                        self.search.query =
+                                                            format!("{}, ", tag);
+                                                        self.search_current_query();
+                                                        self.render
+                                                            .view
+                                                            .pages
+                                                            .show_search_page = true;
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                })
+                                .response
+                            },
+                        );
                     });
                 });
             });
