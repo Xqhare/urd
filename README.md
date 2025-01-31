@@ -3,6 +3,7 @@ A journaling app written in rust.
 
 ## Name
 `Urd` is named after one of the Norns from Norse mythology spinning the threads of fate at the foot of Yggdrasil. `Urd` is responsible for shaping destiny and is responsible for the past.
+This association of `Urd` with the past is fitting for a journaling app.
 
 ## Features
 
@@ -24,6 +25,9 @@ A journaling app written in rust.
         - The classic year resolutions
         - As many as you want!
         - No you cannot mark them completed, you won't finish them anyway!
+- Guided first start setup
+- Tips and Tricks pop up
+- Extensive documentation inside the `Help` menu
 - Cross-platform
     - Linux (Native)
     - Windows (Tested at each release)
@@ -33,22 +37,13 @@ A journaling app written in rust.
 
 *marker* for required features in next release
 
-- [x] Display important day in journal browser
-- [ ] *Edit journal page*
-    - [ ] *Deleting a journal entry*
-    - [ ] *Creating a custom journal entry*
+- [ ] Edit journal page
+    - [ ] Deleting a journal entry
+    - [ ] Creating a custom journal entry
 - [ ] User onboarding
-    - [x] First run detection
-    - [x] *Tips and Tricks modal*
-        - [x] Backend
-        - [x] GUI
-        - [x] Tips and Tricks
-    - [x] Hover text everywhere
-    - [x] *Welcome screen*
-        - [x] Basic setup-wizard
+    - [ ] Welcome screen
         - [ ] Add first entry to setup-wizard
         - [ ] Add open help page to setup-wizard
-    - [x] *Update help window*
 - [ ] Contacts
     - [ ] Name
     - [ ] With text field for free form input? / key value pairs of custom metadata?
@@ -59,46 +54,45 @@ A journaling app written in rust.
     - [ ] Contacts in settings / own contacts page
     - [ ] Searchable contacts list
     - [ ] Searchable journal for entries with contacts
-- [x] *Proper page change using the main menu (clear all and show home)*
+
+## Issues preventing a stable release
+
+- Creating a new viewport will crash the app if it's not supported by the device
+    - Should only be an issue if web deployed or on mobile devices
+- max tag length is 46 characters, more starts to break the Metadata UI, below the entry text field
 
 ## Install
 I do not guarantee that any released binary will work on your device.
+
+Binaries (executables) are provided [here](https://github.com/xqhare/urd/releases).
+
+Please note that binaries are only supplied starting with version `0.7`.
+
+Put the executable in any location you like.
+`Urd` will generate a directory called `urd_data` in the same directory as the binary.
+This directory will store all your data, including your journal entries and settings.
 
 ### Linux
 Build from source, or download the binary from the latest [release](https://github.com/xqhare/urd/releases). (If I can be arsed to do it)
 
 > [!NOTE]
 > Linux binaries are only guaranteed to be compiled at release time.
-> (from 0.4.2 onwards)
-
-Put the binary in any location you like.
-`Urd` will generate a directory called `urd_data` in the same directory as the binary.
-This directory will store all your data, including your journal entries and settings.
 
 ### Windows
 Download the executable from the latest [release](https://github.com/xqhare/urd/releases).
 
 > [!NOTE]
-> Windows binaries are only compiled at release time, and are not built for every version.
-> (from 0.4.2 onwards)
+> Windows binaries are only compiled at release time.
 
 > [!IMPORTANT]
 > When compiling from source, make sure to use the `--release` flag.
-> Without this flag a `cmd` window will be generated whenever `Urd` is run.
-
-Put the executable in any location you like.
-`Urd` will generate a directory called `urd_data` in the same directory as the binary.
-This directory will store all your data, including your journal entries and settings.
+> Without this flag a `cmd` window will be shown whenever `Urd` is run.
 
 ### macOS
 Build from source.
 
 > [!IMPORTANT]
 > While I never tested compiling `Urd` on macOS, there is no reason to assume it wouldn't work.
-
-Put the binary in any location you like.
-`Urd` will generate a directory called `urd_data` in the same directory as the binary.
-This directory will store all your data, including your journal entries and settings.
 
 ### Building from source
 
@@ -107,28 +101,6 @@ This directory will store all your data, including your journal entries and sett
 3. Run `cargo build --release` or `cargo build -r`
 4. Locate the binary / executable in the `target/release` directory
 5. Copy and paste the binary / executable to your desired location
-
-## Issues preventing a stable release
-
-- Creating a new viewport will crash the app if it's not supported by the device
-- max tag length is 46 characters, more starts to break the Metadata UI, below the entry text field
-- Better user onboarding
-    - On hover text for everything
-    - Detection of first run is implemented
-        - Opens `Help` window only currently
-    - Open Modal `Welcome`
-        - Extremely short explanation
-            - All your entries are displayed in the side-bar
-            - You can click on them to edit them
-                - That will open them in the central panel
-        - Direct them to the `Settings` menu
-        - Button `Take me to the settings menu`
-        - Button `Got it - don't show again`
-    - Onboarding in the `Settings` menu
-        - Instead of main window display a panel with text and button for `next`
-        - explain settings page in detail
-
-
 
 ## Password protection
 
