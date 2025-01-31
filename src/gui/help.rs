@@ -60,7 +60,6 @@ impl UrdState {
                                             ui.label("The main menu is the row of buttons at the very top of Urd.");
                                             ui.separator();
                                             Grid::new("main_menu").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
-                                                
                                                 let _ = ui.button("Urd");
                                                 Grid::new("main_menu_urd").num_columns(2).striped(true).spacing(Vec2::new(ui.spacing().item_spacing.x + PADDING, ui.spacing().item_spacing.y * PADDING)).show(ui, |ui: &mut Ui| {
                                                     ui.label("About");

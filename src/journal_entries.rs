@@ -361,8 +361,7 @@ impl Journal {
             }
             let year_folder = year.get_folder().unwrap();
             for month in &year_folder.entries {
-                let month_dir =
-                    year_dir.join(month.get_folder().unwrap().name.clone());
+                let month_dir = year_dir.join(month.get_folder().unwrap().name.clone());
                 if let Err(e) = std::fs::create_dir(month_dir.clone()) {
                     return Err(e.to_string());
                 }
@@ -412,7 +411,7 @@ impl Journal {
             };
             let tmp = format!("{date}-urd-journal-backup.xff");
             let tmp_dir = Path::new(backup_dir);
-            
+
             tmp_dir.join(tmp)
         };
         if file_name.exists() {

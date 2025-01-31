@@ -480,24 +480,31 @@ impl UrdState {
                         });
                         if (self.render.view.pages.show_important_days_page
                             || self.render.view.pages.show_mood_page
-                            || self.render.view.pages.show_search_page || self.render.view.pages.show_settings_page) && ui
+                            || self.render.view.pages.show_search_page
+                            || self.render.view.pages.show_settings_page)
+                            && ui
                                 .button("Back to Home")
                                 .on_hover_text("Closes the current page")
-                                .clicked() {
+                                .clicked()
+                        {
                             self.clear_ui();
                         }
-                        if !self.settings.password.password.is_empty() && ui
+                        if !self.settings.password.password.is_empty()
+                            && ui
                                 .button("Lock Urd")
                                 .on_hover_text(
                                     "Locks Urd - You will need to enter your password to unlock",
                                 )
-                                .clicked() {
+                                .clicked()
+                        {
                             self.settings.password.unlocked_with_password = false;
                         }
-                        if self.render.view.pages.show_file_picker_page && ui
+                        if self.render.view.pages.show_file_picker_page
+                            && ui
                                 .button("Exit file picker")
                                 .on_hover_text("Closes the file picker")
-                                .clicked() {
+                                .clicked()
+                        {
                             self.render.view.pages.show_file_picker_page = false;
                             self.clear_ui();
                         }
@@ -563,8 +570,7 @@ impl UrdState {
                                 .clicked()
                             {
                                 let tmp = self.state_store.tips_and_tricks.index.saturating_add(1);
-                                if tmp < self.state_store.tips_and_tricks.tips_and_tricks.len()
-                                {
+                                if tmp < self.state_store.tips_and_tricks.tips_and_tricks.len() {
                                     self.state_store.tips_and_tricks.index = tmp;
                                 } else {
                                     self.state_store.tips_and_tricks.index = 0;

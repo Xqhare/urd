@@ -148,7 +148,6 @@ impl UrdState {
                                 if word_store.len() < tmp.split_whitespace().count() {
                                     word_store.push("...");
                                 }
-                                
                                 word_store.join(" ")
                             };
                             ui.vertical_centered_justified(|ui: &mut Ui| {

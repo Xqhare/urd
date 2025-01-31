@@ -249,21 +249,12 @@ impl Gui {
 
     pub fn deserialize(serialized: &XffValue) -> Self {
         let obj = serialized.into_object().unwrap();
-        let file_marker_currently = FileMarker::deserialize(
-            obj
-                .get("file_marker_currently")
-                .unwrap(),
-        );
-        let file_marker_perfectly = FileMarker::deserialize(
-            obj
-                .get("file_marker_perfectly")
-                .unwrap(),
-        );
-        let file_marker_normally = FileMarker::deserialize(
-            obj
-                .get("file_marker_normally")
-                .unwrap(),
-        );
+        let file_marker_currently =
+            FileMarker::deserialize(obj.get("file_marker_currently").unwrap());
+        let file_marker_perfectly =
+            FileMarker::deserialize(obj.get("file_marker_perfectly").unwrap());
+        let file_marker_normally =
+            FileMarker::deserialize(obj.get("file_marker_normally").unwrap());
         let day_marker_important = {
             if let Some(v) = obj.get("day_marker_important") {
                 FileMarker::deserialize(v)
@@ -317,15 +308,13 @@ impl FileMarker {
     }
 }
 
-#[derive(Clone, Debug)]
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Password {
     pub password: String,
     pub password_input: String,
     pub new_password_input: [String; 2],
     pub unlocked_with_password: bool,
 }
-
 
 impl Password {
     pub fn new(password: String) -> Self {

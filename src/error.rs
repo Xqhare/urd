@@ -1,5 +1,4 @@
-#[derive(Clone, Debug)]
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Error {
     pub show_error: bool,
     pub error_context: Option<String>,
@@ -27,4 +26,3 @@ impl Error {
         }
     }
 }
-

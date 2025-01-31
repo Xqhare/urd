@@ -50,14 +50,12 @@ pub struct Entities {
     pub aspirations: Vec<Aspirations>,
 }
 
-
 #[derive(Default)]
 pub struct View {
     pub viewports: Viewports,
     pub pages: Pages,
     pub ui_state: UiState,
 }
-
 
 impl View {
     pub fn startup_default() -> Self {
@@ -74,7 +72,6 @@ pub struct UiState {
     pub show_add_mood_field: bool,
     pub show_destructive_action_confirmation: bool,
 }
-
 
 pub struct Aspirations {
     pub year: String,
@@ -114,7 +111,6 @@ pub struct Pages {
     pub show_important_days_page: bool,
     pub show_mood_page: bool,
 }
-
 
 pub struct Viewports {
     pub show_about_viewport: Arc<AtomicBool>,
