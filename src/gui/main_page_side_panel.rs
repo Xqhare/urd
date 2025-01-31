@@ -54,7 +54,7 @@ impl UrdState {
                             ui.add_space(22.5);
                         } else {
                             let aspirations = aspir.into_object().unwrap();
-                            if aspirations.len() == 0 {
+                            if aspirations.is_empty() {
                                 ui.add_space(22.5);
                                 if ui.heading(year.to_string()).on_hover_text("Click to go back").clicked() {
                                     self.go_back_one_level();
@@ -64,7 +64,7 @@ impl UrdState {
                                 let theme = aspirations.get("theme").unwrap().into_string().unwrap();
                                 let pledge = aspirations.get("pledge").unwrap().into_string().unwrap();
                                 let asps = aspirations.get("resolutions").unwrap().into_array().unwrap();
-                                if theme == "" && pledge == "" && asps.len() == 0 {
+                                if theme.is_empty() && pledge.is_empty() && asps.is_empty() {
                                     ui.add_space(22.5);
                                     if ui.heading(year.to_string()).on_hover_text("Click to go back").clicked() {
                                         self.go_back_one_level();
@@ -72,7 +72,7 @@ impl UrdState {
                                     ui.add_space(22.5);
                                 } else {
                                     ui.add_space(2.5);
-                                    if ui.heading(format!("{}", year.to_string())).on_hover_text("Click to go back").clicked() {
+                                    if ui.heading(format!("{}", year)).on_hover_text("Click to go back").clicked() {
                                         self.go_back_one_level();
                                     }
                                     ui.add_space(2.5);
@@ -121,7 +121,7 @@ impl UrdState {
                 ShowFolder::Month(year, month) => {
                     ui.vertical_centered_justified(|ui: &mut Ui| {
                         ui.add_space(22.5);
-                            if ui.heading(format!("{} {}", month_num_to_name(month), year.to_string())).on_hover_text("Click to go back").clicked() {
+                            if ui.heading(format!("{} {}", month_num_to_name(month), year)).on_hover_text("Click to go back").clicked() {
                                 self.go_back_one_level();
                             }
                         ui.add_space(22.5);

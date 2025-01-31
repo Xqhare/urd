@@ -181,7 +181,7 @@ impl UrdState {
 fn tokenize_search_query(query: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for thing in query.trim().split(",") {
-        if thing.len() != 0 {
+        if !thing.is_empty() {
             out.push(thing.trim().to_string());
         }
     }

@@ -130,7 +130,7 @@ impl UrdState {
                                 ui.group(|ui: &mut Ui| {
                                     ui.vertical(|ui: &mut Ui| {
                                         ui.heading("Project Tags").on_hover_text("The project tags of this entry. They are added by prepending the word with `+`");
-                                        if project_tags_as_txt.len() == 0 {
+                                        if project_tags_as_txt.is_empty() {
                                             ui.label("Add with `+{tag}`");
                                         } else {
                                             for tag in project_tags_as_txt {
@@ -177,7 +177,7 @@ impl UrdState {
                                 ui.group(|ui: &mut Ui| {
                                     ui.vertical(|ui: &mut Ui| {
                                         ui.heading("Context Tags").on_hover_text("The context tags of this entry. They are added by prepending the word with `@`");
-                                        if context_tags_as_txt.len() == 0 {
+                                        if context_tags_as_txt.is_empty() {
                                             ui.label("Add with `@{tag}`");
                                         } else {
                                             for tag in context_tags_as_txt {
@@ -228,7 +228,7 @@ impl UrdState {
                                 ui.group(|ui: &mut Ui| {
                                     ui.vertical(|ui: &mut Ui| {
                                         ui.heading("Special Tags").on_hover_text("The special tags of this entry. They are added by prepending the word with `{key}:{value}`");
-                                        if special_tags_as_txt.len() == 0 {
+                                        if special_tags_as_txt.is_empty() {
                                             ui.label("Add with `{key}:{value}`");
                                         } else {
                                             for tag in special_tags_as_txt {
@@ -274,7 +274,7 @@ impl UrdState {
                                 ui.group(|ui: &mut Ui| {
                                     ui.vertical(|ui: &mut Ui| {
                                         ui.heading("Bespoke Tags").on_hover_text("The bespoke tags of this entry. They are added by prepending the word with `#{value}`");
-                                        if bespoke_tags_as_txt.len() == 0 {
+                                        if bespoke_tags_as_txt.is_empty() {
                                             ui.label("Add with `#{value}`");
                                         } else {
                                             for tag in bespoke_tags_as_txt {

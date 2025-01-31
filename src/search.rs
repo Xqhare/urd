@@ -1,15 +1,8 @@
 use crate::journal_entries::JournalEntry;
 
+#[derive(Default)]
 pub struct Search {
     pub query: String,
     pub results: Vec<JournalEntry>,
 }
 
-impl Default for Search {
-    fn default() -> Self {
-        Self {
-            query: String::new(),
-            results: Vec::new(),
-        }
-    }
-}

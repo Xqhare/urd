@@ -110,12 +110,12 @@ impl Settings {
                 }
             }
         };
-        let size = SizeSettings::deserialize(&deserialized.get("size").unwrap());
-        let font = FontSettings::deserialize(&deserialized.get("font").unwrap());
+        let size = SizeSettings::deserialize(deserialized.get("size").unwrap());
+        let font = FontSettings::deserialize(deserialized.get("font").unwrap());
         let tz = TimeZone::from(deserialized.get("timezone").unwrap().into_string().unwrap());
         let password = deserialized.get("password").unwrap().into_string().unwrap();
-        let gui = Gui::deserialize(&deserialized.get("gui").unwrap());
-        let custom_paths = CustomPaths::deserialize(&deserialized.get("custom_paths").unwrap());
+        let gui = Gui::deserialize(deserialized.get("gui").unwrap());
+        let custom_paths = CustomPaths::deserialize(deserialized.get("custom_paths").unwrap());
         let automatic_backups = deserialized
             .get("automatic_backups")
             .unwrap()
@@ -250,23 +250,23 @@ impl Gui {
     pub fn deserialize(serialized: &XffValue) -> Self {
         let obj = serialized.into_object().unwrap();
         let file_marker_currently = FileMarker::deserialize(
-            &obj
+            obj
                 .get("file_marker_currently")
                 .unwrap(),
         );
         let file_marker_perfectly = FileMarker::deserialize(
-            &obj
+            obj
                 .get("file_marker_perfectly")
                 .unwrap(),
         );
         let file_marker_normally = FileMarker::deserialize(
-            &obj
+            obj
                 .get("file_marker_normally")
                 .unwrap(),
         );
         let day_marker_important = {
             if let Some(v) = obj.get("day_marker_important") {
-                FileMarker::deserialize(&v)
+                FileMarker::deserialize(v)
             } else {
                 FileMarker::new("!".to_string(), "!".to_string())
             }
@@ -318,6 +318,7 @@ impl FileMarker {
 }
 
 #[derive(Clone, Debug)]
+#[derive(Default)]
 pub struct Password {
     pub password: String,
     pub password_input: String,
@@ -325,16 +326,6 @@ pub struct Password {
     pub unlocked_with_password: bool,
 }
 
-impl Default for Password {
-    fn default() -> Self {
-        Self {
-            password: String::new(),
-            password_input: String::new(),
-            new_password_input: [String::new(), String::new()],
-            unlocked_with_password: false,
-        }
-    }
-}
 
 impl Password {
     pub fn new(password: String) -> Self {

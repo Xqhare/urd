@@ -32,7 +32,7 @@ impl UrdState {
                                     self.error = Error::new("Provided a file, not a directory!".to_string(), "Invalid path".to_string());
                                 }
                             }
-                            if self.settings.custom_paths.backup_directory != "" {
+                            if !self.settings.custom_paths.backup_directory.is_empty() {
                                 ui.separator();
                                 ui.label("Backup path: ");
                                 ui.label(self.settings.custom_paths.backup_directory.clone());
@@ -64,7 +64,7 @@ impl UrdState {
                                     self.error = Error::new("Provided a file, not a directory!".to_string(), "Invalid path".to_string());
                                 }
                             }
-                            if self.settings.custom_paths.export_directory != "" {
+                            if !self.settings.custom_paths.export_directory.is_empty() {
                                 ui.separator();
                                 ui.label("Export path: ");
                                 ui.label(self.settings.custom_paths.export_directory.clone());
@@ -96,7 +96,7 @@ impl UrdState {
                                     self.error = Error::new("Provided a directory, not a file!".to_string(), "Invalid path".to_string());
                                 }
                             }
-                            if self.settings.custom_paths.restore_file != "" {
+                            if !self.settings.custom_paths.restore_file.is_empty() {
                                 ui.separator();
                                 ui.label("Restore file: ");
                                 ui.label(self.settings.custom_paths.restore_file.clone());

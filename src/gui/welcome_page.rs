@@ -201,11 +201,7 @@ impl UrdState {
                 },
             );
             if ui.button("Set password").clicked() {
-                let pw_set = if self.settings.password.password == "" {
-                    false
-                } else {
-                    true
-                };
+                let pw_set = !self.settings.password.password.is_empty();
                 let mut set_pw_is_okay = false;
                 if self.settings.password.new_password_input[0]
                     == self.settings.password.new_password_input[1]
@@ -315,7 +311,7 @@ impl UrdState {
         self.render.entities.aspirations = self.construct_aspirations();
         for entry in self.render.entities.aspirations.iter_mut() {
             ui.group(|ui: &mut Ui| {
-                ui.label(format!("{}", entry.year));
+                ui.label(entry.year.to_string());
                 Sides::new().show(
                     ui,
                     |ui: &mut Ui| {

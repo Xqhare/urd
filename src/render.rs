@@ -43,37 +43,21 @@ impl Render {
     }
 }
 
+#[derive(Default)]
 pub struct Entities {
     pub important_day_entries: Vec<JournalEntry>,
     pub mood_entries: Vec<JournalEntry>,
     pub aspirations: Vec<Aspirations>,
 }
 
-impl Default for Entities {
-    fn default() -> Self {
-        Entities {
-            important_day_entries: Vec::new(),
-            mood_entries: Vec::new(),
-            aspirations: Vec::new(),
-        }
-    }
-}
 
+#[derive(Default)]
 pub struct View {
     pub viewports: Viewports,
     pub pages: Pages,
     pub ui_state: UiState,
 }
 
-impl Default for View {
-    fn default() -> Self {
-        View {
-            viewports: Viewports::default(),
-            pages: Pages::default(),
-            ui_state: UiState::default(),
-        }
-    }
-}
 
 impl View {
     pub fn startup_default() -> Self {
@@ -85,19 +69,12 @@ impl View {
     }
 }
 
+#[derive(Default)]
 pub struct UiState {
     pub show_add_mood_field: bool,
     pub show_destructive_action_confirmation: bool,
 }
 
-impl Default for UiState {
-    fn default() -> Self {
-        UiState {
-            show_add_mood_field: false,
-            show_destructive_action_confirmation: false,
-        }
-    }
-}
 
 pub struct Aspirations {
     pub year: String,
@@ -117,6 +94,7 @@ impl Default for Aspirations {
     }
 }
 
+#[derive(Default)]
 pub struct Pages {
     pub show_settings_page: bool,
     pub show_search_page: bool,
@@ -125,17 +103,6 @@ pub struct Pages {
     pub show_mood_page: bool,
 }
 
-impl Default for Pages {
-    fn default() -> Self {
-        Pages {
-            show_settings_page: false,
-            show_search_page: false,
-            show_file_picker_page: false,
-            show_important_days_page: false,
-            show_mood_page: false,
-        }
-    }
-}
 
 pub struct Viewports {
     pub show_about_viewport: Arc<AtomicBool>,

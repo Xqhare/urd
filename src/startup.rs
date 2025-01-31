@@ -49,7 +49,7 @@ pub fn startup_appstate() -> StartupState {
             if journal.is_err() {
                 // first recoverable error; everything is fine
                 let fallback_journal = Journal::new(&tmp_settings);
-                return StartupState {
+                StartupState {
                     settings: tmp_settings,
                     journal: fallback_journal,
                     error: Error::new(
@@ -58,7 +58,7 @@ pub fn startup_appstate() -> StartupState {
                     ),
                     first_run: false,
                     show_tips_and_tricks: false,
-                };
+                }
             } else {
                 StartupState {
                     show_tips_and_tricks: tmp_settings.tips_and_tricks_at_startup,

@@ -192,7 +192,7 @@ impl UrdState {
 
                         ui.add(|ui: &mut Ui| {
                             ui.group(|ui: &mut Ui| {
-                                let pw_set = if self.settings.password.password == "" { false } else { true };
+                                let pw_set = !self.settings.password.password.is_empty();
                                 ui.label("Security");
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Old password: ");
@@ -239,7 +239,7 @@ impl UrdState {
                                         }
                                     }
                                 };
-                                let remove_pw_allowed = if self.settings.password.password_input == self.settings.password.password && pw_set { true } else { false };
+                                let remove_pw_allowed = self.settings.password.password_input == self.settings.password.password && pw_set;
                                 ui.add_enabled(remove_pw_allowed, |ui: &mut Ui| {
                                     let but = ui.button("Remove password");
                                     if but.clicked() {
@@ -361,7 +361,7 @@ impl UrdState {
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Path: ");
                                 }, |ui: &mut Ui| {
-                                    if &self.settings.custom_paths.backup_directory == "" {
+                                    if self.settings.custom_paths.backup_directory.is_empty() {
                                         ui.label("Not set - To set, launch the wizard with the button below").on_hover_text("Set up a backup directory");
                                     } else {
                                         ui.label(&self.settings.custom_paths.backup_directory).on_hover_text("To change the path, launch the wizard with the button below");
@@ -391,7 +391,7 @@ impl UrdState {
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Path: ");
                                 }, |ui: &mut Ui| {
-                                    if &self.settings.custom_paths.export_directory == "" {
+                                    if self.settings.custom_paths.export_directory.is_empty() {
                                         ui.label("Not set - To set, launch the wizard with the button below").on_hover_text("Set up an export directory");
                                     } else {
                                         ui.label(&self.settings.custom_paths.export_directory).on_hover_text("To change the path, launch the wizard with the button below");
@@ -443,7 +443,7 @@ impl UrdState {
                                 ui.group(|ui: &mut Ui| {
                                     ui.label("All moods");
                                     for mood in self.state_store.all_moods.iter_mut() {
-                                        if mood.name != "" {
+                                        if !mood.name.is_empty() {
                                             Sides::new().show(ui, |ui: &mut Ui| {
                                                 ui.label(&mood.name);
                                             }, |ui: &mut Ui| {
@@ -492,7 +492,7 @@ impl UrdState {
                                 });
                                 for entry in self.render.entities.aspirations.iter_mut() {
                                     ui.group(|ui: &mut Ui| {
-                                        ui.label(format!("{}", entry.year));
+                                        ui.label(entry.year.to_string());
                                         Sides::new().show(ui, |ui: &mut Ui| {
                                             ui.label("Theme: ");
                                         }, |ui: &mut Ui| {

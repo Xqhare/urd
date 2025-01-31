@@ -366,7 +366,7 @@ impl Journal {
             let year_folder = year.get_folder().unwrap();
             for month in &year_folder.entries {
                 let month_dir =
-                    year_dir.join(format!("{}", month.get_folder().unwrap().name.clone()));
+                    year_dir.join(&month.get_folder().unwrap().name.clone());
                 let pos_err3 = std::fs::create_dir(month_dir.clone());
                 if pos_err3.is_err() {
                     return Err(pos_err3.unwrap_err().to_string());
@@ -394,8 +394,7 @@ impl Journal {
                             .get("important_day")
                             .unwrap()
                             .into_boolean()
-                            .unwrap()
-                            .to_string(),
+                            .unwrap(),
                         entry.get_journal_entry().unwrap().text
                     );
                     let pos_err4 = std::fs::write(entry_file.clone(), text);
@@ -419,8 +418,8 @@ impl Journal {
             };
             let tmp = format!("{date}-urd-journal-backup.xff");
             let tmp_dir = Path::new(backup_dir);
-            let out = tmp_dir.join(tmp);
-            out
+            
+            tmp_dir.join(tmp)
         };
         if file_name.exists() {
             let pos_err = std::fs::remove_file(file_name.clone());
@@ -439,7 +438,7 @@ impl Journal {
         let data = nabu::serde::read(file_name);
         match data {
             Ok(d) => {
-                *self = Journal::deserialize(&d, &settings);
+                *self = Journal::deserialize(&d, settings);
                 Ok(())
             }
             Err(e) => Err(e.to_string()),

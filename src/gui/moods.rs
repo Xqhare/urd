@@ -31,13 +31,13 @@ impl UrdState {
                 for year in &self.journal.entries {
                     ui.group(|ui: &mut Ui| {
                         ui.vertical_centered_justified(|ui: &mut Ui| {
-                            ui.heading(format!("{}", year.get_folder().unwrap().name));
+                            ui.heading(year.get_folder().unwrap().name.to_string());
                             ui.label("01. <-- | --> 31.");
                         });
                         for month in &year.get_folder().unwrap().entries {
                             ui.horizontal(|ui: &mut Ui| {
                                 Sides::new().show(ui, |ui: &mut Ui| {
-                                    ui.label(format!("{}", month_num_to_name(month.get_folder().unwrap().name.parse().expect("Failed to parse month, month is not a number (u8)"))));
+                                    ui.label(month_num_to_name(month.get_folder().unwrap().name.parse().expect("Failed to parse month, month is not a number (u8)")).to_string());
                                 }, |ui: &mut Ui| {
                                     for day in &month.get_folder().unwrap().entries {
                                         let entry = day.get_journal_entry().unwrap();

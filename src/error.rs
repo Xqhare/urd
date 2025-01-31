@@ -1,4 +1,5 @@
 #[derive(Clone, Debug)]
+#[derive(Default)]
 pub struct Error {
     pub show_error: bool,
     pub error_context: Option<String>,
@@ -27,12 +28,3 @@ impl Error {
     }
 }
 
-impl Default for Error {
-    fn default() -> Self {
-        Self {
-            show_error: false,
-            error_message: None,
-            error_context: None,
-        }
-    }
-}

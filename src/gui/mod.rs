@@ -98,14 +98,12 @@ impl App for UrdState {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         if self.state_store.first_run {
             self.welcome_page(ctx);
+        } else if !self.settings.password.password.is_empty()
+            && !self.settings.password.unlocked_with_password
+        {
+            self.protected_mode(ctx);
         } else {
-            if self.settings.password.password != ""
-                && !self.settings.password.unlocked_with_password
-            {
-                self.protected_mode(ctx);
-            } else {
-                self.normal_mode(ctx);
-            }
+            self.normal_mode(ctx);
         }
     }
 }
@@ -170,14 +168,12 @@ impl UrdState {
             self.important_days_page(ctx);
         } else if self.render.view.pages.show_mood_page {
             self.moods_page(ctx);
+        } else if self.render.view.pages.show_search_page {
+            self.search_page(ctx);
+        } else if self.render.view.pages.show_file_picker_page {
+            self.file_picker(ctx);
         } else {
-            if self.render.view.pages.show_search_page {
-                self.search_page(ctx);
-            } else if self.render.view.pages.show_file_picker_page {
-                self.file_picker(ctx);
-            } else {
-                self.main_page(ctx);
-            }
+            self.main_page(ctx);
         }
 
         if self
@@ -428,7 +424,7 @@ impl UrdState {
                                 .on_hover_text("Exports the journal to a file")
                                 .clicked()
                             {
-                                if self.settings.custom_paths.export_directory != "" {
+                                if !self.settings.custom_paths.export_directory.is_empty() {
                                     let pos_err = self
                                         .journal
                                         .export(&self.settings.custom_paths.export_directory);
@@ -451,7 +447,7 @@ impl UrdState {
                                     .on_hover_text("Creates a backup of the journal")
                                     .clicked()
                                 {
-                                    if self.settings.custom_paths.backup_directory != "" {
+                                    if !self.settings.custom_paths.backup_directory.is_empty() {
                                         // Backup already set up
                                         let pos_err = self.journal.create_backup(
                                             &self.settings,
@@ -483,39 +479,28 @@ impl UrdState {
                                 }
                             });
                         });
-                        if self.render.view.pages.show_important_days_page
+                        if (self.render.view.pages.show_important_days_page
                             || self.render.view.pages.show_mood_page
-                            || self.render.view.pages.show_search_page
-                            || self.render.view.pages.show_settings_page
-                        {
-                            if ui
+                            || self.render.view.pages.show_search_page || self.render.view.pages.show_settings_page) && ui
                                 .button("Back to Home")
                                 .on_hover_text("Closes the current page")
-                                .clicked()
-                            {
-                                self.clear_ui();
-                            }
+                                .clicked() {
+                            self.clear_ui();
                         }
-                        if self.settings.password.password != "" {
-                            if ui
+                        if !self.settings.password.password.is_empty() && ui
                                 .button("Lock Urd")
                                 .on_hover_text(
                                     "Locks Urd - You will need to enter your password to unlock",
                                 )
-                                .clicked()
-                            {
-                                self.settings.password.unlocked_with_password = false;
-                            }
+                                .clicked() {
+                            self.settings.password.unlocked_with_password = false;
                         }
-                        if self.render.view.pages.show_file_picker_page {
-                            if ui
+                        if self.render.view.pages.show_file_picker_page && ui
                                 .button("Exit file picker")
                                 .on_hover_text("Closes the file picker")
-                                .clicked()
-                            {
-                                self.render.view.pages.show_file_picker_page = false;
-                                self.clear_ui();
-                            };
+                                .clicked() {
+                            self.render.view.pages.show_file_picker_page = false;
+                            self.clear_ui();
                         }
                     })
                     .response
@@ -579,7 +564,7 @@ impl UrdState {
                                 .clicked()
                             {
                                 let tmp = self.state_store.tips_and_tricks.index.saturating_add(1);
-                                if tmp <= self.state_store.tips_and_tricks.tips_and_tricks.len() - 1
+                                if tmp < self.state_store.tips_and_tricks.tips_and_tricks.len()
                                 {
                                     self.state_store.tips_and_tricks.index = tmp;
                                 } else {
