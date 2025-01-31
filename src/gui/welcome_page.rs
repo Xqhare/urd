@@ -401,7 +401,7 @@ impl UrdState {
         }
     }
 
-    fn setup_step_4(&mut self, ui: &mut Ui) {
+    fn setup_step_4(&mut self, _ui: &mut Ui) {
         // Stub for the future
         // TODO: change "Previous" button in end_setup() to go to '4, 0.80'
         self.state_store.wizard_setup_step = 5;
