@@ -383,15 +383,13 @@ impl UrdState {
                     self.render.view.ui_state.show_add_mood_field = false;
                 }
             };
-        } else {
-            if ui
-                .button("Add mood")
-                .on_hover_text("Add a custom mood")
-                .clicked()
-            {
-                self.render.view.ui_state.show_add_mood_field = true;
-                self.state_store.new_mood.name = "Custom Mood".to_string();
-            };
+        } else if ui
+            .button("Add mood")
+            .on_hover_text("Add a custom mood")
+            .clicked()
+        {
+            self.render.view.ui_state.show_add_mood_field = true;
+            self.state_store.new_mood.name = "Custom Mood".to_string();
         };
     }
 
