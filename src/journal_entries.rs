@@ -1,7 +1,6 @@
 use std::{
     collections::{BTreeMap, VecDeque},
     path::Path,
-    usize,
 };
 
 use nabu::{Array, Object, XffValue};
@@ -346,30 +345,26 @@ impl Journal {
         let urd_dir = this_dir.join("Urd-Journal/");
         // Clean up of possible previous export
         if urd_dir.exists() {
-            let pos_err0 = std::fs::remove_dir_all(urd_dir.clone());
-            if pos_err0.is_err() {
-                return Err(pos_err0.unwrap_err().to_string());
+            if let Err(e) = std::fs::create_dir(urd_dir.clone()) {
+                return Err(e.to_string());
             }
         }
 
         // Export
-        let pos_err1 = std::fs::create_dir(urd_dir.clone());
-        if pos_err1.is_err() {
-            return Err(pos_err1.unwrap_err().to_string());
+        if let Err(e) = std::fs::create_dir(urd_dir.clone()) {
+            return Err(e.to_string());
         }
         for year in &self.entries {
             let year_dir = urd_dir.join(format!("{}/", year.get_folder().unwrap().name.clone()));
-            let pos_err2 = std::fs::create_dir(year_dir.clone());
-            if pos_err2.is_err() {
-                return Err(pos_err2.unwrap_err().to_string());
+            if let Err(e) = std::fs::create_dir(year_dir.clone()) {
+                return Err(e.to_string());
             }
             let year_folder = year.get_folder().unwrap();
             for month in &year_folder.entries {
                 let month_dir =
                     year_dir.join(month.get_folder().unwrap().name.clone());
-                let pos_err3 = std::fs::create_dir(month_dir.clone());
-                if pos_err3.is_err() {
-                    return Err(pos_err3.unwrap_err().to_string());
+                if let Err(e) = std::fs::create_dir(month_dir.clone()) {
+                    return Err(e.to_string());
                 }
                 let month_folder = month.get_folder().unwrap();
                 for entry in &month_folder.entries {
@@ -397,9 +392,8 @@ impl Journal {
                             .unwrap(),
                         entry.get_journal_entry().unwrap().text
                     );
-                    let pos_err4 = std::fs::write(entry_file.clone(), text);
-                    if pos_err4.is_err() {
-                        return Err(pos_err4.unwrap_err().to_string());
+                    if let Err(e) = std::fs::write(entry_file.clone(), text) {
+                        return Err(e.to_string());
                     }
                 }
             }
@@ -422,15 +416,14 @@ impl Journal {
             tmp_dir.join(tmp)
         };
         if file_name.exists() {
-            let pos_err = std::fs::remove_file(file_name.clone());
-            if pos_err.is_err() {
-                return Err(pos_err.unwrap_err().to_string());
+            if let Err(e) = std::fs::remove_file(file_name.clone()) {
+                return Err(e.to_string());
             }
         }
-        let out = nabu::serde::write(file_name, serialized);
-        match out {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e.to_string()),
+        if let Err(e) = nabu::serde::write(file_name.clone(), serialized) {
+            Err(e.to_string())
+        } else {
+            Ok(())
         }
     }
 

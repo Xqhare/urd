@@ -94,6 +94,18 @@ impl Default for Aspirations {
     }
 }
 
+impl Aspirations {
+    /// Takes in a year and returns a new Aspirations struct
+    pub fn new(year: String) -> Self {
+        Aspirations {
+            year,
+            edit_theme: "".to_string(),
+            edit_pledge: "".to_string(),
+            edit_resolutions: Vec::new(),
+        }
+    }
+}
+
 #[derive(Default)]
 pub struct Pages {
     pub show_settings_page: bool,

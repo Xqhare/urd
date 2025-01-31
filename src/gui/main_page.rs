@@ -114,10 +114,10 @@ impl UrdState {
                                 .get("project_tags")
                                 .unwrap()
                                 .into_array();
-                            if bind.is_none() {
-                                vec![]
+                            if let Some(tags) = bind {
+                                tags.into_vec()
                             } else {
-                                bind.unwrap().into_vec()
+                                vec![]
                             }
                         };
                         let project_tags_as_txt = tmp_project_tags
@@ -161,10 +161,10 @@ impl UrdState {
                                 .get("context_tags")
                                 .unwrap()
                                 .into_array();
-                            if bind.is_none() {
-                                vec![]
+                            if let Some(tags) = bind {
+                                tags.into_vec()
                             } else {
-                                bind.unwrap().into_vec()
+                                vec![]
                             }
                         };
                         let context_tags_as_txt = tmp_context_tags
@@ -210,10 +210,10 @@ impl UrdState {
                                 .get("special_tags")
                                 .unwrap()
                                 .into_object();
-                            if bind.is_none() {
-                                Object::new()
+                            if let Some(bind) = bind {
+                                bind
                             } else {
-                                bind.unwrap()
+                                Object::new()
                             }
                         };
                         let special_tags_as_txt = tmp_special_tags
@@ -258,10 +258,10 @@ impl UrdState {
                                 .get("bespoke_tags")
                                 .unwrap()
                                 .into_array();
-                            if bind.is_none() {
-                                vec![]
+                            if let Some(tags) = bind {
+                                tags.into_vec()
                             } else {
-                                bind.unwrap().into_vec()
+                                vec![]
                             }
                         };
                         let bespoke_tags_as_txt = tmp_bespoke_tags
@@ -631,8 +631,8 @@ impl UrdState {
                         .push_front(EntryType::JournalEntry(self.journal.current_entry.clone()));
                 } else {
                     let day_entry = day_search.unwrap().get_journal_entry_mut();
-                    if day_entry.is_some() {
-                        day_entry.unwrap().overwrite(
+                    if let Some(entry) = day_entry {
+                        entry.overwrite(
                             self.journal.current_entry.text.clone(),
                             self.journal.current_entry.metadata.clone(),
                         );
@@ -690,12 +690,8 @@ impl UrdState {
                 let actual_entry = month_folder.entries.iter_mut().find(|entry| {
                     entry.get_journal_entry().unwrap().title == self.journal.current_entry.title
                 });
-                if actual_entry.is_some() {
-                    actual_entry
-                        .unwrap()
-                        .get_journal_entry_mut()
-                        .unwrap()
-                        .reset();
+                if let Some(entry) = actual_entry {
+                    entry.get_journal_entry_mut().unwrap().reset();
                 }
             }
         }

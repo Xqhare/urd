@@ -15,6 +15,7 @@ pub struct StartupState {
     pub show_tips_and_tricks: bool,
 }
 
+#[allow(clippy::unnecessary_unwrap)]
 pub fn startup_appstate() -> StartupState {
     if Path::new(APP_DIR).exists() {
         let settings = startup_settings();

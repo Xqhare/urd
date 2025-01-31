@@ -100,8 +100,6 @@ impl UrdState {
                             let mut out = false;
                             if journal_entry.title.contains(token) {
                                 out = true;
-                            } else if journal_entry.text.contains(token) {
-                                out = true;
                             } else {
                                 let proj = journal_entry.metadata.get("projects");
                                 if proj.is_some() {

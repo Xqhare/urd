@@ -2,7 +2,7 @@ use crate::{
     error::Error,
     journal_entries::Journal,
     moods::Mood,
-    render::{Aspirations, Render},
+    render::{self, Aspirations, Render},
     search::Search,
     settings::{NeededPath, Settings},
     startup::StartupState,
@@ -249,6 +249,7 @@ impl UrdState {
         out
     }
 
+    //#[allow(clippy::field_reassign_with_default)]
     fn construct_aspirations(&self) -> Vec<Aspirations> {
         let mut out: Vec<Aspirations> = Vec::new();
         if self.render.edit_all_aspirations {
@@ -257,9 +258,7 @@ impl UrdState {
                 let year_str = year_folder.name.clone();
                 let aspirations = year_folder.aspirations.clone();
                 if aspirations.is_null() {
-                    let mut tmp = Aspirations::default();
-                    tmp.year = year_str;
-                    out.push(tmp);
+                    out.push(Aspirations::new(year_str));
                 } else {
                     let obj = aspirations.into_object().unwrap();
                     let theme = obj.get("theme").unwrap().into_string().unwrap();
@@ -272,11 +271,12 @@ impl UrdState {
                         }
                         res_out
                     };
-                    let mut tmp = Aspirations::default();
-                    tmp.year = year_str;
-                    tmp.edit_theme = theme;
-                    tmp.edit_pledge = pledge;
-                    tmp.edit_resolutions = resulutions;
+                    let tmp = render::Aspirations {
+                        year: year_str,
+                        edit_theme: theme,
+                        edit_pledge: pledge,
+                        edit_resolutions: resulutions,
+                    };
                     out.push(tmp);
                 }
             }
@@ -286,9 +286,7 @@ impl UrdState {
             let year_str = year_folder.name.clone();
             let aspirations = year_folder.aspirations.clone();
             if aspirations.is_null() {
-                let mut tmp = Aspirations::default();
-                tmp.year = year_str;
-                out.push(tmp);
+                out.push(Aspirations::new(year_str));
             } else {
                 let obj = aspirations.into_object().unwrap();
                 let theme = obj.get("theme").unwrap().into_string().unwrap();
@@ -301,11 +299,12 @@ impl UrdState {
                     }
                     res_out
                 };
-                let mut tmp = Aspirations::default();
-                tmp.year = year_str;
-                tmp.edit_theme = theme;
-                tmp.edit_pledge = pledge;
-                tmp.edit_resolutions = resulutions;
+                let tmp = render::Aspirations {
+                    year: year_str,
+                    edit_theme: theme,
+                    edit_pledge: pledge,
+                    edit_resolutions: resulutions,
+                };
                 out.push(tmp);
             }
         }
