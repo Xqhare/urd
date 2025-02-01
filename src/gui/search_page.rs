@@ -150,6 +150,13 @@ impl UrdState {
                                         }
                                     }
                                 }
+
+                                // Only for optimisation, if a tag is found, don't bother checking the text
+                                if !out {
+                                    if journal_entry.text.contains(token) {
+                                        out = true;
+                                    }
+                                }
                             };
                             out
                         };
