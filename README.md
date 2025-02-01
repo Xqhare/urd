@@ -1,6 +1,8 @@
 # `Urd`
 A journaling app written in rust.
 
+![Urds main screen](pictures/5_urd_mainscreen_usage.png)
+
 ## Name
 `Urd` is named after one of the Norns from Norse mythology spinning the threads of fate at the foot of Yggdrasil. `Urd` is responsible for shaping destiny and is responsible for the past.
 This association of `Urd` with the past is fitting for a journaling app.
@@ -112,6 +114,8 @@ There are major issues with password protection:
 - Journal data is not encrypted.
 - The password is stored as is, only lightly obfuscated, and could be recovered by an attacker.
     - This makes it also possible to retrieve the password should it be lost.
+
+![Urds lock screen](pictures/2_urd_lockscreen.png)
 
 ### Help, I forgot the password!
 
