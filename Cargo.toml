@@ -1,7 +1,7 @@
 [package]
 name = "urd"
 version = "0.7.0"
-edition = "2021"
+edition = "2024"
 authors = ["Xqhare"]
 license = "EPL-2.0 OR MIT"
 
