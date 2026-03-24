@@ -7,9 +7,9 @@ use nabu::{Object, XffValue};
 
 use crate::{
     error::Error,
-    moods::{default_moods, Mood},
+    moods::{Mood, default_moods},
     settings::{
-        NeededPath, Settings, MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE,
+        MAX_FONT_SIZE, MAX_SIDE_PANEL_WIDTH, MAX_WINDOW_SIZE, MIN_FONT_SIZE, NeededPath, Settings,
     },
 };
 

@@ -1,5 +1,5 @@
 use eframe::egui::Color32;
-use nabu::{tvec_to_xff_value, Object, XffValue};
+use nabu::{Object, XffValue, tvec_to_xff_value};
 
 pub struct Mood {
     pub name: String,

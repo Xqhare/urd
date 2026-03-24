@@ -106,7 +106,7 @@ impl Settings {
                     return Err(std::io::Error::new(
                         std::io::ErrorKind::Other,
                         e.to_string(),
-                    ))
+                    ));
                 }
             }
         };
