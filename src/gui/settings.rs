@@ -470,11 +470,9 @@ impl UrdState {
                                             self.render.view.ui_state.show_destructive_action_confirmation = false;
                                         }
                                     });
-                                } else {
-                                    if ui.button("Restore default moods").on_hover_text("Restores the default moods - this action is destructive").clicked() {
-                                        self.render.view.ui_state.show_destructive_action_confirmation = true;
-                                                                            }
-                                }
+                                } else if ui.button("Restore default moods").on_hover_text("Restores the default moods - this action is destructive").clicked() {
+                                self.render.view.ui_state.show_destructive_action_confirmation = true;
+                                                                    }
                             }).response
                         });
 
