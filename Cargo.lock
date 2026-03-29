@@ -1811,7 +1811,7 @@ dependencies = [
 [[package]]
 name = "nabu"
 version = "3.0.0"
-source = "git+https://github.com/xqhare/nabu#b49e98e8caaab31a8b4035b02eb0849afc9aca85"
+source = "git+https://github.com/xqhare/nabu#422c46073e055d1bb64ba326a9d7888c3868442c"
 dependencies = [
  "athena",
 ]
