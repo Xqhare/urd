@@ -9,9 +9,9 @@ impl Error {
     /// Create a new error with a message to be displayed and set `show_error` to true
     ///
     /// param msg: The error message to be displayed
-    /// param msg_ctx: The context of the error
+    /// param `msg_ctx`: The context of the error
     ///
-    /// Msg_ctx is shown first, and is supposed to give the error needed context.
+    /// `Msg_ctx` is shown first, and is supposed to give the error needed context.
     /// Example:
     ///
     /// Instead of only showing "Permission denied", show "Journal cant be read: Permission

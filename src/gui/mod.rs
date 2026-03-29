@@ -11,7 +11,7 @@ use crate::{
 use eframe::{
     egui::{CentralPanel, Ui},
     epaint::Vec2,
-    *,
+    egui, App, NativeOptions, run_native,
 };
 use egui::{Align, Color32, Id, Modal, TextEdit, TopBottomPanel};
 
@@ -137,14 +137,14 @@ impl UrdState {
                                             == self.settings.password.password_input
                                         {
                                             self.settings.password.unlocked_with_password = true;
-                                            self.settings.password.password_input = "".to_string();
+                                            self.settings.password.password_input = String::new();
                                             self.error = Error::default();
                                         } else {
                                             self.error = Error::new(
                                                 "Incorrect password".to_string(),
                                                 "Unlocking Urd failed.".to_string(),
                                             );
-                                            self.settings.password.password_input = "".to_string();
+                                            self.settings.password.password_input = String::new();
                                         }
                                     } else {
                                         self.error = Error::default();
@@ -152,7 +152,7 @@ impl UrdState {
                                 }
                                 if self.error.show_error {
                                     self.error_modal(ui);
-                                };
+                                }
                             });
                         });
                     });
@@ -207,7 +207,7 @@ impl UrdState {
 
     fn construct_moods(&self) -> Vec<Mood> {
         let mut out: Vec<Mood> = Vec::new();
-        for (mood, col_ary) in self.journal.moods.iter() {
+        for (mood, col_ary) in &self.journal.moods {
             let (r, g, b, a) = {
                 let ary = col_ary.into_array().unwrap().into_vec();
                 (
@@ -253,7 +253,7 @@ impl UrdState {
     fn construct_aspirations(&self) -> Vec<Aspirations> {
         let mut out: Vec<Aspirations> = Vec::new();
         if self.render.edit_all_aspirations {
-            for year in self.journal.entries.iter() {
+            for year in &self.journal.entries {
                 let year_folder = year.get_folder().unwrap();
                 let year_str = year_folder.name.clone();
                 let aspirations = year_folder.aspirations.clone();
@@ -377,7 +377,7 @@ impl UrdState {
                                 let _ = self.journal.save();
                                 let _ = self.settings.save();
                                 std::process::exit(0);
-                            };
+                            }
                         });
                         ui.menu_button("Journal", |ui: &mut Ui| {
                             if ui
@@ -423,21 +423,21 @@ impl UrdState {
                                 .on_hover_text("Exports the journal to a file")
                                 .clicked()
                             {
-                                if !self.settings.custom_paths.export_directory.is_empty() {
+                                if self.settings.custom_paths.export_directory.is_empty() {
+                                    self.settings.custom_paths.needed_path =
+                                        Some(NeededPath::Export);
+                                    self.clear_ui();
+                                    self.render.view.pages.show_file_picker_page = true;
+                                } else {
                                     let pos_err = self
                                         .journal
                                         .export(&self.settings.custom_paths.export_directory);
                                     if pos_err.is_err() {
                                         self.error = Error::new(
-                                            pos_err.unwrap_err().to_string(),
+                                            pos_err.unwrap_err().clone(),
                                             "Writing journal export to disk failed.".to_string(),
                                         );
                                     }
-                                } else {
-                                    self.settings.custom_paths.needed_path =
-                                        Some(NeededPath::Export);
-                                    self.clear_ui();
-                                    self.render.view.pages.show_file_picker_page = true;
                                 }
                             }
                             ui.menu_button("Backup", |ui: &mut Ui| {
@@ -446,7 +446,12 @@ impl UrdState {
                                     .on_hover_text("Creates a backup of the journal")
                                     .clicked()
                                 {
-                                    if !self.settings.custom_paths.backup_directory.is_empty() {
+                                    if self.settings.custom_paths.backup_directory.is_empty() {
+                                        self.settings.custom_paths.needed_path =
+                                            Some(NeededPath::Backup);
+                                        self.clear_ui();
+                                        self.render.view.pages.show_file_picker_page = true;
+                                    } else {
                                         // Backup already set up
                                         let pos_err = self.journal.create_backup(
                                             &self.settings,
@@ -454,16 +459,11 @@ impl UrdState {
                                         );
                                         if pos_err.is_err() {
                                             self.error = Error::new(
-                                                pos_err.unwrap_err().to_string(),
+                                                pos_err.unwrap_err().clone(),
                                                 "Writing journal backup to disk failed."
                                                     .to_string(),
                                             );
                                         }
-                                    } else {
-                                        self.settings.custom_paths.needed_path =
-                                            Some(NeededPath::Backup);
-                                        self.clear_ui();
-                                        self.render.view.pages.show_file_picker_page = true;
                                     }
                                 }
                                 if ui
@@ -514,7 +514,7 @@ impl UrdState {
                 ui.add_space(ui.available_width() / 2.5);
                 if self.error.show_error {
                     self.error_modal(ui);
-                };
+                }
                 if self.render.show_tips_and_tricks {
                     self.tips_and_tricks_modal(ui);
                 }

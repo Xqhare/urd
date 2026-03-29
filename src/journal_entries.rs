@@ -108,7 +108,7 @@ impl Folder {
         out.insert("aspirations", self.aspirations.clone());
         out.insert(
             "entries",
-            XffValue::Array(self.entries.iter().map(|e| e.serialize()).collect()),
+            XffValue::Array(self.entries.iter().map(EntryType::serialize).collect()),
         );
         out
     }
@@ -181,7 +181,7 @@ impl Journal {
         let serialized = self.serialize();
         let out = nabu::serde::write(JOURNAL_FILE, serialized);
         match out {
-            Ok(_) => Ok(()),
+            Ok(()) => Ok(()),
             Err(e) => Err(e.to_string()),
         }
     }
@@ -198,7 +198,7 @@ impl Journal {
         let mut serialized = Object::new();
         let entries = {
             let mut out = Array::new();
-            for entry in self.entries.iter() {
+            for entry in &self.entries {
                 out.push(entry.serialize());
             }
             out
@@ -344,11 +344,10 @@ impl Journal {
         let this_dir = Path::new(export_dir);
         let urd_dir = this_dir.join("Urd-Journal/");
         // Clean up of possible previous export
-        if urd_dir.exists() {
-            if let Err(e) = std::fs::create_dir(urd_dir.clone()) {
+        if urd_dir.exists()
+            && let Err(e) = std::fs::create_dir(urd_dir.clone()) {
                 return Err(e.to_string());
             }
-        }
 
         // Export
         if let Err(e) = std::fs::create_dir(urd_dir.clone()) {
@@ -414,11 +413,10 @@ impl Journal {
 
             tmp_dir.join(tmp)
         };
-        if file_name.exists() {
-            if let Err(e) = std::fs::remove_file(file_name.clone()) {
+        if file_name.exists()
+            && let Err(e) = std::fs::remove_file(file_name.clone()) {
                 return Err(e.to_string());
             }
-        }
         if let Err(e) = nabu::serde::write(file_name.clone(), serialized) {
             Err(e.to_string())
         } else {
@@ -474,7 +472,7 @@ impl JournalEntry {
             out.insert("context_tags".to_string(), XffValue::Array(Array::new()));
             out.insert("special_tags".to_string(), XffValue::from(Object::new()));
             out.insert("bespoke_tags".to_string(), XffValue::Array(Array::new()));
-            out.insert("mood".to_string(), XffValue::String("".to_string()));
+            out.insert("mood".to_string(), XffValue::String(String::new()));
             out.insert("important_day".to_string(), XffValue::Boolean(false));
             out
         };
@@ -556,7 +554,7 @@ impl JournalEntry {
             out.insert("context_tags".to_string(), XffValue::Array(Array::new()));
             out.insert("special_tags".to_string(), XffValue::from(Object::new()));
             out.insert("bespoke_tags".to_string(), XffValue::Array(Array::new()));
-            out.insert("mood".to_string(), XffValue::String("".to_string()));
+            out.insert("mood".to_string(), XffValue::String(String::new()));
             out.insert("important_day".to_string(), XffValue::Boolean(false));
             out
         };
@@ -574,17 +572,17 @@ fn deserialize_entry_metadata(text: String) -> BTreeMap<String, XffValue> {
 
     for word in text.split_whitespace() {
         // Check if a word starts with + or @, or has a : wrapped in it
-        if word.starts_with("+") && word.len() > 1 {
+        if word.starts_with('+') && word.len() > 1 {
             // Project tag
             project_tags.push(XffValue::String(word.to_string()));
-        } else if word.starts_with("@") && word.len() > 1 {
+        } else if word.starts_with('@') && word.len() > 1 {
             // Context tag
             context_tags.push(XffValue::String(word.to_string()));
-        } else if word.contains(":") && !word.starts_with(":") && !word.ends_with(":") {
+        } else if word.contains(':') && !word.starts_with(':') && !word.ends_with(':') {
             // Special tag
-            let (key, value) = word.split_once(":").unwrap();
+            let (key, value) = word.split_once(':').unwrap();
             special_tags.insert(key.to_string(), XffValue::String(value.to_string()));
-        } else if word.starts_with("#") && word.len() > 1 {
+        } else if word.starts_with('#') && word.len() > 1 {
             // User Tag
             bespoke_tags.push(XffValue::String(word.to_string()));
         }

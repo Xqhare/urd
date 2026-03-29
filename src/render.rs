@@ -73,6 +73,7 @@ pub struct UiState {
     pub show_destructive_action_confirmation: bool,
 }
 
+#[derive(Default)]
 pub struct Aspirations {
     pub year: String,
     pub edit_theme: String,
@@ -80,24 +81,14 @@ pub struct Aspirations {
     pub edit_resolutions: Vec<String>,
 }
 
-impl Default for Aspirations {
-    fn default() -> Self {
-        Aspirations {
-            year: "".to_string(),
-            edit_theme: "".to_string(),
-            edit_pledge: "".to_string(),
-            edit_resolutions: Vec::new(),
-        }
-    }
-}
 
 impl Aspirations {
     /// Takes in a year and returns a new Aspirations struct
     pub fn new(year: String) -> Self {
         Aspirations {
             year,
-            edit_theme: "".to_string(),
-            edit_pledge: "".to_string(),
+            edit_theme: String::new(),
+            edit_pledge: String::new(),
             edit_resolutions: Vec::new(),
         }
     }

@@ -15,13 +15,13 @@ impl UrdState {
                 ui.horizontal(|ui: &mut Ui| {
                     if ui.button("Back").on_hover_text("Go back to home").clicked() {
                         self.render.view.pages.show_search_page = false;
-                    };
+                    }
                     if ui
                         .button("Clear")
                         .on_hover_text("Clear search query")
                         .clicked()
                     {
-                        self.search.query = "".to_string();
+                        self.search.query = String::new();
                         self.search.results = Vec::new();
                     }
                     if ui
@@ -129,7 +129,7 @@ impl UrdState {
                                 if special.is_some() {
                                     let special_obj = special.unwrap().into_object();
                                     if special_obj.is_some() {
-                                        for (key, value) in special_obj.unwrap().iter() {
+                                        for (key, value) in &special_obj.unwrap() {
                                             if key.contains(token)
                                                 || value.into_string().unwrap().contains(token)
                                             {
@@ -152,12 +152,11 @@ impl UrdState {
                                 }
 
                                 // Only for optimisation, if a tag is found, don't bother checking the text
-                                if !out {
-                                    if journal_entry.text.contains(token) {
+                                if !out
+                                    && journal_entry.text.contains(token) {
                                         out = true;
                                     }
-                                }
-                            };
+                            }
                             out
                         };
                         if token_found {
@@ -172,9 +171,8 @@ impl UrdState {
                             };
                             if entry_already_in_results {
                                 continue;
-                            } else {
-                                self.search.results.push(journal_entry.clone());
                             }
+                            self.search.results.push(journal_entry.clone());
                         }
                     }
                 }
@@ -185,7 +183,7 @@ impl UrdState {
 
 fn tokenize_search_query(query: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
-    for thing in query.trim().split(",") {
+    for thing in query.trim().split(',') {
         if !thing.is_empty() {
             out.push(thing.trim().to_string());
         }

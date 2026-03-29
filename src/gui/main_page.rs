@@ -1,6 +1,6 @@
 use eframe::{
     egui::{CentralPanel, Ui},
-    *,
+    egui, App,
 };
 use egui::{Align, ComboBox, FontId, Margin, ScrollArea, TextEdit};
 use nabu::{Object, XffValue};
@@ -92,14 +92,13 @@ impl UrdState {
                         .hint_text("Write your journal entry here")
                         .desired_width(f32::INFINITY)
                 );
-                if entry_text.changed() {
-                    if let Err(err) = self.journal.save() {
+                if entry_text.changed()
+                    && let Err(err) = self.journal.save() {
                         self.error = Error::new(
-                            err.to_string(),
+                            err.clone(),
                             "Writing journal to disk failed.".to_string(),
                         );
                     }
-                }
                 entry_text
             });
             ui.group(|ui: &mut Ui| {
@@ -137,7 +136,7 @@ impl UrdState {
                                                 ui.group(|ui: &mut Ui| {
                                                     if ui.label(&tag).on_hover_text("Click to search").clicked() {
                                                         self.search.query =
-                                                            format!("{}, ", tag);
+                                                            format!("{tag}, ");
                                                         self.search_current_query();
                                                         self.render
                                                             .view
@@ -184,7 +183,7 @@ impl UrdState {
                                                 ui.group(|ui: &mut Ui| {
                                                     if ui.label(&tag).on_hover_text("Click to search").clicked() {
                                                         self.search.query =
-                                                            format!("{}, ", tag);
+                                                            format!("{tag}, ");
                                                         self.search_current_query();
                                                         self.render
                                                             .view
@@ -235,7 +234,7 @@ impl UrdState {
                                                 ui.group(|ui: &mut Ui| {
                                                     if ui.label(&tag).on_hover_text("Click to search key").clicked() {
                                                         self.search.query =
-                                                            format!("{}, ", tag.split(":").next().unwrap());
+                                                            format!("{}, ", tag.split(':').next().unwrap());
                                                         self.search_current_query();
                                                         self.render
                                                             .view
@@ -281,7 +280,7 @@ impl UrdState {
                                                 ui.group(|ui: &mut Ui| {
                                                     if ui.label(&tag).on_hover_text("Click to search").clicked() {
                                                         self.search.query =
-                                                            format!("{}, ", tag);
+                                                            format!("{tag}, ");
                                                         self.search_current_query();
                                                         self.render
                                                             .view
@@ -314,7 +313,7 @@ impl UrdState {
                     .unwrap(),
             )
             .show_ui(ui, |ui: &mut Ui| {
-                for (mood, _) in self.journal.moods.iter() {
+                for (mood, _) in &self.journal.moods {
                     // Hacky af, I know - but hey I can save here too!
                     if ui
                         .selectable_value(
@@ -326,7 +325,7 @@ impl UrdState {
                                 .unwrap()
                                 .into_string()
                                 .unwrap(),
-                            mood.to_string(),
+                            mood.clone(),
                             mood,
                         )
                         .changed()
@@ -337,11 +336,11 @@ impl UrdState {
                             .insert("mood".to_string(), XffValue::from(mood));
                         if let Err(err) = self.journal.save() {
                             self.error = Error::new(
-                                err.to_string(),
+                                err.clone(),
                                 "Writing journal to disk failed.".to_string(),
                             );
                         }
-                    };
+                    }
                 }
             })
             .response
@@ -374,7 +373,7 @@ impl UrdState {
                     );
                     if let Err(err) = self.journal.save() {
                         self.error = Error::new(
-                            err.to_string(),
+                            err.clone(),
                             "Writing journal to disk failed.".to_string(),
                         );
                     }
@@ -382,7 +381,7 @@ impl UrdState {
                     self.state_store.new_mood = Mood::default();
                     self.render.view.ui_state.show_add_mood_field = false;
                 }
-            };
+            }
         } else if ui
             .button("Add mood")
             .on_hover_text("Add a custom mood")
@@ -390,7 +389,7 @@ impl UrdState {
         {
             self.render.view.ui_state.show_add_mood_field = true;
             self.state_store.new_mood.name = "Custom Mood".to_string();
-        };
+        }
     }
 
     fn central_panel_menu(&mut self, ui: &mut Ui) {
@@ -403,14 +402,12 @@ impl UrdState {
                         .color_edit_button_srgba(&mut self.settings.font.text_colour)
                         .on_hover_text("Click to change the text colour")
                         .changed()
-                    {
-                        if let Err(err) = self.settings.save() {
+                        && let Err(err) = self.settings.save() {
                             self.error = Error::new(
                                 err.to_string(),
                                 "Writing settings to disk failed.".to_string(),
                             );
                         }
-                    };
                 })
             });
             ui.group(|ui: &mut Ui| {
@@ -434,11 +431,11 @@ impl UrdState {
                 self.save_entry_to_journal();
                 if let Err(err) = self.journal.save() {
                     self.error = Error::new(
-                        err.to_string(),
+                        err.clone(),
                         "Writing journal to disk failed.".to_string(),
                     );
                 }
-            };
+            }
             //DEBUG LEAVE FOR LATER
             /* if ui.button("Debug Create").clicked() {
                 let date_split = self.journal.current_entry.title.split("-").collect::<Vec<&str>>();
@@ -477,11 +474,11 @@ impl UrdState {
                 self.delete_entry_from_journal();
                 if let Err(err) = self.journal.save() {
                     self.error = Error::new(
-                        err.to_string(),
+                        err.clone(),
                         "Writing journal to disk failed.".to_string(),
                     );
                 }
-            };
+            }
             // Fallback option, if urd is kept open for a long time (the date has changed since
             // startup) no new entry will be generated automatically - this will create such a new entry, but
             // only if it does not already exist. This also loads that entry.
@@ -554,7 +551,7 @@ impl UrdState {
                         .push_front(EntryType::Folder(new_year_folder));
                     self.journal.current_entry = new_journal_entry;
                 }
-            };
+            }
             if ui
                 .button("Save entry and exit Urd")
                 .on_hover_text("Save entry and exit Urd")
@@ -563,7 +560,7 @@ impl UrdState {
                 let _ = self.journal.save();
                 let _ = self.settings.save();
                 std::process::exit(0);
-            };
+            }
         });
     }
 
@@ -646,7 +643,7 @@ impl UrdState {
         }
         if let Err(err) = self.journal.save() {
             self.error = Error::new(
-                err.to_string(),
+                err.clone(),
                 "Writing journal to disk failed.".to_string(),
             );
         }
@@ -699,10 +696,10 @@ impl UrdState {
                 }
             }
         }
-        self.journal.current_entry.text = "".to_string();
+        self.journal.current_entry.text = String::new();
         if let Err(err) = self.journal.save() {
             self.error = Error::new(
-                err.to_string(),
+                err.clone(),
                 "Writing journal to disk failed.".to_string(),
             );
         }
