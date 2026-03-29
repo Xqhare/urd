@@ -72,13 +72,13 @@ impl UrdState {
                                     ui.add_space(22.5);
                                 } else {
                                     ui.add_space(2.5);
-                                    if ui.heading(format!("{}", year)).on_hover_text("Click to go back").clicked() {
+                                    if ui.heading(format!("{year}")).on_hover_text("Click to go back").clicked() {
                                         self.go_back_one_level();
                                     }
                                     ui.add_space(2.5);
-                                    ui.label(format!("The year of {}", theme)).on_hover_text("Your theme for this year");
+                                    ui.label(format!("The year of {theme}")).on_hover_text("Your theme for this year");
                                     ui.add_space(2.5);
-                                    ui.label(format!("This year I pledge to {}", pledge)).on_hover_text("Your pledge for this year");
+                                    ui.label(format!("This year I pledge to {pledge}")).on_hover_text("Your pledge for this year");
                                     ui.add_space(2.5);
                                     ui.collapsing("New years resolutions", |ui: &mut Ui| {
                                         for aspiration in asps {
@@ -135,11 +135,10 @@ impl UrdState {
                             let entry = n.get_journal_entry().unwrap();
                             let title = {
                                 let mut word_store = entry.title.clone();
-                                if let Some(bool) = entry.metadata.get("important_day") {
-                                    if bool.into_boolean().unwrap() {
+                                if let Some(bool) = entry.metadata.get("important_day")
+                                    && bool.into_boolean().unwrap() {
                                         word_store = format!("{} {} {}", self.settings.gui.day_marker_important.start, word_store, self.settings.gui.day_marker_important.end);
                                     }
-                                }
                                 word_store
                             };
                             let body = {
@@ -154,18 +153,18 @@ impl UrdState {
                                 ui.group(|ui: &mut Ui| {
                                     if ui.label(title.as_str()).on_hover_text("Date of the entry. Click to open").clicked() {
                                         self.journal.current_entry = entry.clone();
-                                    };
+                                    }
                                     ui.group(|ui: &mut Ui| {
                                         if ui.label(body).on_hover_text("Click to open").clicked() {
                                             self.journal.current_entry = entry.clone();
-                                        };
+                                        }
                                     });
                                 });
                             });
                         };
                     });
                 }
-            };
+            }
         });
     }
 

@@ -39,7 +39,7 @@ impl UrdState {
                                         self.settings.overwrite_window_size = false;
                                         self.settings.overwrite_side_panel_width = false;
                                         self.render.view.pages.show_settings_page = false;
-                                    };
+                                    }
                                     but
                                 });
                                 ui.end_row();
@@ -51,13 +51,13 @@ impl UrdState {
                                         if let Err(err) = self.settings.save() {
                                             self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                         } else if let Err(err) = self.journal.save() {
-                                            self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
+                                            self.error = Error::new(err.clone(), "Writing journal to disk failed.".to_string());
                                         } else {
                                             self.settings.overwrite_window_size = false;
                                             self.settings.overwrite_side_panel_width = false;
                                             self.settings_backup = Some(self.settings.clone());
                                         }
-                                    };
+                                    }
                                     but
                                 });
                                 ui.add_sized(ui.available_size(), |ui: &mut Ui| {
@@ -68,7 +68,7 @@ impl UrdState {
                                         if let Err(err) = self.settings.save() {
                                             self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                         } else if let Err(err) = self.journal.save() {
-                                            self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
+                                            self.error = Error::new(err.clone(), "Writing journal to disk failed.".to_string());
                                         } else {
                                             self.settings.overwrite_window_size = false;
                                             self.render.view.pages.show_settings_page = false;
@@ -76,7 +76,7 @@ impl UrdState {
                                             self.settings_backup = None;
                                             self.state_store.all_moods = Vec::new();
                                         }
-                                    };
+                                    }
                                     but
                                 });
                             });
@@ -86,9 +86,9 @@ impl UrdState {
                                 if let Err(err) = self.settings.save() {
                                     self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                 } else if let Err(err) = self.journal.save() {
-                                    self.error = Error::new(err.to_string(), "Writing journal to disk failed.".to_string());
+                                    self.error = Error::new(err.clone(), "Writing journal to disk failed.".to_string());
                                 }
-                            };
+                            }
                         });
                     }).response
                 });
@@ -129,10 +129,10 @@ impl UrdState {
                                                 let overwrite_height = self.settings.overwrite_window_size_store[1].parse::<f32>();
                                                 if overwrite_height.is_err() {
                                                     self.error = Error::new(format!("{} = {}", self.settings.overwrite_window_size_store[1], overwrite_height.unwrap_err()), "Invalid window size height input".to_string());
-                                                    self.settings.overwrite_window_size_store[1] = "".to_string();
+                                                    self.settings.overwrite_window_size_store[1] = String::new();
                                                 } else if overwrite_width.is_err() {
                                                     self.error = Error::new(format!("{} = {}", self.settings.overwrite_window_size_store[0], overwrite_width.unwrap_err()), "Invalid window size width input".to_string());
-                                                    self.settings.overwrite_window_size_store[0] = "".to_string();
+                                                    self.settings.overwrite_window_size_store[0] = String::new();
                                                 } else {
                                                     self.settings.size.size[0] = overwrite_width.unwrap();
                                                     self.settings.size.size[1] = overwrite_height.unwrap();
@@ -154,7 +154,7 @@ impl UrdState {
                                                     self.settings.size.side_panel_width = overwrite_panel_width.unwrap();
                                                 }
                                                 println!("panel change triggered");
-                                            };
+                                            }
                                         }).response
                                     });
                                 });
@@ -167,11 +167,10 @@ impl UrdState {
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Text colour: ");
                                 }, |ui: &mut Ui| {
-                                    if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed() {
-                                        if let Err(err) = self.settings.save() {
+                                    if ui.color_edit_button_srgba(&mut self.settings.font.text_colour).changed()
+                                        && let Err(err) = self.settings.save() {
                                             self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                         }
-                                    };
                                 });
                                 Sides::new().show(ui, |ui: &mut Ui| {
                                     ui.label("Font size: ");
@@ -216,13 +215,13 @@ impl UrdState {
                                     if self.settings.password.new_password_input[0] == self.settings.password.new_password_input[1] {
                                         if pw_set {
                                             if self.settings.password.password == self.settings.password.password_input {
-                                                self.settings.password.password = self.settings.password.new_password_input[0].to_string();
+                                                self.settings.password.password = self.settings.password.new_password_input[0].clone();
                                                 set_pw_is_okay = true;
                                             } else {
                                                 self.error = Error::new("Incorrect old password".to_string(), "Setting new password failed.".to_string());
                                             }
                                         } else {
-                                            self.settings.password.password = self.settings.password.new_password_input[0].to_string();
+                                            self.settings.password.password = self.settings.password.new_password_input[0].clone();
                                             set_pw_is_okay = true;
                                         }
                                     } else {
@@ -238,13 +237,13 @@ impl UrdState {
                                             self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                         }
                                     }
-                                };
+                                }
                                 let remove_pw_allowed = self.settings.password.password_input == self.settings.password.password && pw_set;
                                 ui.add_enabled(remove_pw_allowed, |ui: &mut Ui| {
                                     let but = ui.button("Remove password");
                                     if but.clicked() {
-                                        self.settings.password.password = "".to_string();
-                                        self.settings.password.password_input = "".to_string();
+                                        self.settings.password.password = String::new();
+                                        self.settings.password.password_input = String::new();
                                         if let Err(err) = self.settings.save() {
                                             self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                         }
@@ -261,12 +260,11 @@ impl UrdState {
                                     ui.label("Timezone: ");
                                 }, |ui: &mut Ui| {
                                     ComboBox::from_label("").selected_text(self.settings.timezone.timezone.to_string()).show_ui(ui, |ui: &mut Ui| {
-                                        for tz in self.settings.timezone.all_timezones_str.iter() {
-                                            if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.to_string()).clicked() {
-                                                if let Err(err) = self.settings.save() {
+                                        for tz in &self.settings.timezone.all_timezones_str {
+                                            if ui.selectable_value(&mut self.settings.timezone.timezone, TimeZone::from(tz.clone()), tz.clone()).clicked()
+                                                && let Err(err) = self.settings.save() {
                                                     self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                                 }
-                                            }
                                         }
                                     })
                                 });
@@ -430,7 +428,7 @@ impl UrdState {
                                             self.journal.moods.insert(self.state_store.new_mood.name.clone(), self.state_store.new_mood.colour.to_array().to_vec());
                                             if let Err(err) = self.journal.save() {
                                                 self.error = Error::new(
-                                                    err.to_string(),
+                                                    err.clone(),
                                                     "Writing journal to disk failed.".to_string(),
                                                 );
                                             }
@@ -438,11 +436,11 @@ impl UrdState {
                                             self.state_store.new_mood = Mood::default();
                                             self.render.view.ui_state.show_add_mood_field = false;
                                         }
-                                    };
+                                    }
                                 });
                                 ui.group(|ui: &mut Ui| {
                                     ui.label("All moods");
-                                    for mood in self.state_store.all_moods.iter_mut() {
+                                    for mood in &mut self.state_store.all_moods {
                                         if !mood.name.is_empty() {
                                             Sides::new().show(ui, |ui: &mut Ui| {
                                                 ui.label(&mood.name);
@@ -452,11 +450,7 @@ impl UrdState {
                                         }
                                     }
                                 });
-                                if !self.render.view.ui_state.show_destructive_action_confirmation {
-                                    if ui.button("Restore default moods").on_hover_text("Restores the default moods - this action is destructive").clicked() {
-                                        self.render.view.ui_state.show_destructive_action_confirmation = true;
-                                                                            }
-                                } else {
+                                if self.render.view.ui_state.show_destructive_action_confirmation {
                                     ui.vertical_centered_justified(|ui: &mut Ui| {
                                         ui.heading("This action is destructive. If you have used ANY non default moods your journal will be unreadable!");
                                         ui.scope(|ui: &mut Ui| {
@@ -465,7 +459,7 @@ impl UrdState {
                                                 self.journal.moods = default_moods();
                                                 if let Err(err) = self.journal.save() {
                                                     self.error = Error::new(
-                                                        err.to_string(),
+                                                        err.clone(),
                                                         "Writing journal to disk failed.".to_string(),
                                                     );
                                                 }
@@ -476,6 +470,10 @@ impl UrdState {
                                             self.render.view.ui_state.show_destructive_action_confirmation = false;
                                         }
                                     });
+                                } else {
+                                    if ui.button("Restore default moods").on_hover_text("Restores the default moods - this action is destructive").clicked() {
+                                        self.render.view.ui_state.show_destructive_action_confirmation = true;
+                                                                            }
                                 }
                             }).response
                         });
@@ -488,11 +486,11 @@ impl UrdState {
                                 }, |ui: &mut Ui| {
                                     if ui.checkbox(&mut self.render.edit_all_aspirations, "Show all years").on_hover_text("Check to edit aspirations for all years").changed() {
                                         self.render.entities.aspirations = self.construct_aspirations();
-                                    };
+                                    }
                                 });
-                                for entry in self.render.entities.aspirations.iter_mut() {
+                                for entry in &mut self.render.entities.aspirations {
                                     ui.group(|ui: &mut Ui| {
-                                        ui.label(entry.year.to_string());
+                                        ui.label(entry.year.clone());
                                         Sides::new().show(ui, |ui: &mut Ui| {
                                             ui.label("Theme: ");
                                         }, |ui: &mut Ui| {
@@ -505,12 +503,12 @@ impl UrdState {
                                         });
                                         ui.vertical_centered_justified(|ui: &mut Ui| {
                                             ui.label("Resolutions: ");
-                                            for resolution in entry.edit_resolutions.iter_mut() {
+                                            for resolution in &mut entry.edit_resolutions {
                                                 ui.add(TextEdit::singleline(resolution).horizontal_align(Align::Center).hint_text("Go to the gym")).on_hover_text("Enter one resolution per line.");
                                             }
                                         });
                                         if ui.button("New resolution").on_hover_text("You can create as many resolutions as you want").clicked() {
-                                            entry.edit_resolutions.push("".to_string());
+                                            entry.edit_resolutions.push(String::new());
                                         }
                                     });
                                 };
@@ -531,7 +529,7 @@ impl UrdState {
                                 });
                                 if ui.button("Show tips and tricks").on_hover_text("Launch the tips and tricks pop up").clicked() {
                                     self.render.show_tips_and_tricks = true;
-                                };
+                                }
                             }).response
                         });
 
@@ -542,7 +540,7 @@ impl UrdState {
     }
 
     fn export_aspirations(&mut self) {
-        for entry in self.render.entities.aspirations.iter() {
+        for entry in &self.render.entities.aspirations {
             let xff_val = {
                 let mut out = Object::new();
                 out.insert(
@@ -560,7 +558,7 @@ impl UrdState {
                 XffValue::from(out)
             };
 
-            for year in self.journal.entries.iter_mut() {
+            for year in &mut self.journal.entries {
                 if year.get_folder().unwrap().name == entry.year {
                     year.get_folder_mut().unwrap().aspirations = xff_val;
                     break;
@@ -571,7 +569,7 @@ impl UrdState {
 
     fn export_moods(&mut self) {
         let mut tmp = Object::new();
-        for mood in self.state_store.all_moods.iter() {
+        for mood in &self.state_store.all_moods {
             tmp.insert(mood.name.clone(), mood.colour.to_array().to_vec());
         }
         self.journal.moods = tmp;

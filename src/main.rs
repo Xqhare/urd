@@ -24,7 +24,7 @@ fn main() {
         );
         if pos_err.is_err() {
             settings.error = Error::new(
-                pos_err.unwrap_err().to_string(),
+                pos_err.unwrap_err().clone(),
                 "Creating backup failed.".to_string(),
             );
         }

@@ -9,7 +9,7 @@ pub struct Mood {
 impl Default for Mood {
     fn default() -> Self {
         Self {
-            name: "".to_string(),
+            name: String::new(),
             colour: Color32::from_rgba_unmultiplied(0, 0, 0, 255),
         }
     }

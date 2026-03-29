@@ -6,7 +6,7 @@ impl UrdState {
     pub fn moods_page(&mut self, ctx: &Context) {
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             ui.horizontal_wrapped(|ui: &mut Ui| {
-                for (mood, colour) in self.journal.moods.iter() {
+                for (mood, colour) in &self.journal.moods {
                     let (r, g, b, a) = {
                         let ary = colour.into_array().unwrap().into_vec();
                         (
@@ -31,7 +31,7 @@ impl UrdState {
                 for year in &self.journal.entries {
                     ui.group(|ui: &mut Ui| {
                         ui.vertical_centered_justified(|ui: &mut Ui| {
-                            ui.heading(year.get_folder().unwrap().name.to_string());
+                            ui.heading(year.get_folder().unwrap().name.clone());
                             ui.label("01. <-- | --> 31.");
                         });
                         for month in &year.get_folder().unwrap().entries {

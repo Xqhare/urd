@@ -89,11 +89,8 @@ impl Settings {
         let serialized = self.serialize();
         let out = nabu::serde::write(SETTINGS_FILE, serialized);
         match out {
-            Ok(_) => Ok(()),
-            Err(e) => Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                e.to_string(),
-            )),
+            Ok(()) => Ok(()),
+            Err(e) => Err(std::io::Error::other(e.to_string())),
         }
     }
 
@@ -103,10 +100,7 @@ impl Settings {
             match out {
                 Ok(d) => d.into_object().unwrap(),
                 Err(e) => {
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        e.to_string(),
-                    ));
+                    return Err(std::io::Error::other(e.to_string()));
                 }
             }
         };
@@ -149,23 +143,12 @@ pub enum NeededPath {
     Restore,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct CustomPaths {
     pub backup_directory: String,
     pub export_directory: String,
     pub restore_file: String,
     pub needed_path: Option<NeededPath>,
-}
-
-impl Default for CustomPaths {
-    fn default() -> Self {
-        Self {
-            backup_directory: "".to_string(),
-            export_directory: "".to_string(),
-            restore_file: "".to_string(),
-            needed_path: None,
-        }
-    }
 }
 
 impl CustomPaths {
@@ -200,7 +183,7 @@ impl CustomPaths {
         Self {
             backup_directory,
             export_directory,
-            restore_file: "".to_string(),
+            restore_file: String::new(),
             needed_path: None,
         }
     }

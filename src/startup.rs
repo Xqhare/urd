@@ -30,7 +30,7 @@ pub fn startup_appstate() -> StartupState {
                     settings: fallback_settings,
                     journal: fallback_journal,
                     error: Error::new(
-                        journal.unwrap_err().to_string(),
+                        journal.unwrap_err().clone(),
                         "Loading journal failed.".to_string(),
                     ),
                     first_run: false,
@@ -54,7 +54,7 @@ pub fn startup_appstate() -> StartupState {
                     settings: tmp_settings,
                     journal: fallback_journal,
                     error: Error::new(
-                        journal.unwrap_err().to_string(),
+                        journal.unwrap_err().clone(),
                         "Loading journal failed.".to_string(),
                     ),
                     first_run: false,

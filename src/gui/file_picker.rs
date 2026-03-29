@@ -1,6 +1,6 @@
 use eframe::{
+    App, egui,
     egui::{CentralPanel, Ui},
-    *,
 };
 
 use crate::{error::Error, settings::NeededPath};
@@ -43,7 +43,7 @@ impl UrdState {
                                         self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                     }
                                     if let Err(err) = self.journal.create_backup(&self.settings, &self.settings.custom_paths.backup_directory) {
-                                        self.error = Error::new(err.to_string(), "Creating backup failed.".to_string());
+                                        self.error = Error::new(err.clone(), "Creating backup failed.".to_string());
                                     }
                                 }
                             }
@@ -75,7 +75,7 @@ impl UrdState {
                                         self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                     }
                                     if let Err(err) = self.journal.export(&self.settings.custom_paths.export_directory) {
-                                        self.error = Error::new(err.to_string(), "Creating backup failed.".to_string());
+                                        self.error = Error::new(err.clone(), "Creating backup failed.".to_string());
                                     }
                                 }
                             }
@@ -107,7 +107,7 @@ impl UrdState {
                                         self.error = Error::new(err.to_string(), "Writing settings to disk failed.".to_string());
                                     }
                                     if let Err(err) = self.journal.restore_backup(&self.settings, &self.settings.custom_paths.restore_file) {
-                                        self.error = Error::new(err.to_string(), "Restoring from backup failed.".to_string());
+                                        self.error = Error::new(err.clone(), "Restoring from backup failed.".to_string());
                                     }
                                 }
                             }

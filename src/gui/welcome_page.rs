@@ -42,7 +42,7 @@ impl UrdState {
                                 ui.add_space(ui.available_width() / 3.0);
                                 if ui.button("Setup wizard").clicked() {
                                     self.render.show_setup_wizard = true;
-                                };
+                                }
                                 if ui.button("Skip setup").clicked() {
                                     self.state_store.first_run = false;
                                     // Create basic state on disk
@@ -54,7 +54,7 @@ impl UrdState {
                                     }
                                     if let Err(err) = self.journal.save() {
                                         self.error = Error::new(
-                                            err.to_string(),
+                                            err.clone(),
                                             "Writing journal to disk failed.".to_string(),
                                         );
                                     }
@@ -65,7 +65,7 @@ impl UrdState {
                                     let _ = std::fs::remove_dir_all(APP_DIR);
                                     // exit process
                                     std::process::exit(0);
-                                };
+                                }
                             });
                         });
                     });
@@ -103,7 +103,7 @@ impl UrdState {
             });
             if self.error.show_error {
                 self.error_modal(ui);
-            };
+            }
         });
     }
 
@@ -127,7 +127,7 @@ impl UrdState {
                                 "Writing settings to disk failed.".to_string(),
                             );
                         }
-                    };
+                    }
                 },
             );
             Sides::new().show(
@@ -210,7 +210,7 @@ impl UrdState {
                         if self.settings.password.password == self.settings.password.password_input
                         {
                             self.settings.password.password =
-                                self.settings.password.new_password_input[0].to_string();
+                                self.settings.password.new_password_input[0].clone();
                             set_pw_is_okay = true;
                         } else {
                             self.error = Error::new(
@@ -220,7 +220,7 @@ impl UrdState {
                         }
                     } else {
                         self.settings.password.password =
-                            self.settings.password.new_password_input[0].to_string();
+                            self.settings.password.new_password_input[0].clone();
                         set_pw_is_okay = true;
                     }
                 } else {
@@ -244,7 +244,7 @@ impl UrdState {
                 }
                 self.state_store.wizard_setup_step = 2;
                 self.state_store.setup_wizard_progress = 0.40;
-            };
+            }
         });
         if ui.button("Previous").clicked() {
             self.state_store.wizard_setup_step = 0;
@@ -268,21 +268,20 @@ impl UrdState {
                     ComboBox::from_label("")
                         .selected_text(self.settings.timezone.timezone.to_string())
                         .show_ui(ui, |ui: &mut Ui| {
-                            for tz in self.settings.timezone.all_timezones_str.iter() {
+                            for tz in &self.settings.timezone.all_timezones_str {
                                 if ui
                                     .selectable_value(
                                         &mut self.settings.timezone.timezone,
                                         TimeZone::from(tz.clone()),
-                                        tz.to_string(),
+                                        tz.clone(),
                                     )
                                     .clicked()
+                                    && let Err(err) = self.settings.save()
                                 {
-                                    if let Err(err) = self.settings.save() {
-                                        self.error = Error::new(
-                                            err.to_string(),
-                                            "Writing settings to disk failed.".to_string(),
-                                        );
-                                    }
+                                    self.error = Error::new(
+                                        err.to_string(),
+                                        "Writing settings to disk failed.".to_string(),
+                                    );
                                 }
                             }
                         })
@@ -309,9 +308,9 @@ impl UrdState {
         ui.heading("Aspirations settings");
 
         self.render.entities.aspirations = self.construct_aspirations();
-        for entry in self.render.entities.aspirations.iter_mut() {
+        for entry in &mut self.render.entities.aspirations {
             ui.group(|ui: &mut Ui| {
-                ui.label(entry.year.to_string());
+                ui.label(entry.year.clone());
                 Sides::new().show(
                     ui,
                     |ui: &mut Ui| {
@@ -342,7 +341,7 @@ impl UrdState {
                 );
                 ui.vertical_centered_justified(|ui: &mut Ui| {
                     ui.label("Resolutions: ");
-                    for resolution in entry.edit_resolutions.iter_mut() {
+                    for resolution in &mut entry.edit_resolutions {
                         ui.add(
                             TextEdit::singleline(resolution)
                                 .horizontal_align(Align::Center)
@@ -352,7 +351,7 @@ impl UrdState {
                     }
                 });
                 if ui.button("Add resolution").clicked() {
-                    entry.edit_resolutions.push("".to_string());
+                    entry.edit_resolutions.push(String::new());
                 }
             });
             if ui.button("Previous").clicked() {
@@ -377,7 +376,7 @@ impl UrdState {
                     XffValue::from(out)
                 };
 
-                for year in self.journal.entries.iter_mut() {
+                for year in &mut self.journal.entries {
                     if year.get_folder().unwrap().name == entry.year {
                         year.get_folder_mut().unwrap().aspirations = xff_val;
                         break;
@@ -385,10 +384,8 @@ impl UrdState {
                 }
 
                 if let Err(err) = self.journal.save() {
-                    self.error = Error::new(
-                        err.to_string(),
-                        "Writing journal to disk failed.".to_string(),
-                    );
+                    self.error =
+                        Error::new(err.clone(), "Writing journal to disk failed.".to_string());
                 }
 
                 self.state_store.wizard_setup_step = 4;
@@ -442,10 +439,7 @@ impl UrdState {
         }
         if ui.button("Finish").clicked() {
             if let Err(err) = self.journal.save() {
-                self.error = Error::new(
-                    err.to_string(),
-                    "Writing journal to disk failed.".to_string(),
-                );
+                self.error = Error::new(err.clone(), "Writing journal to disk failed.".to_string());
             }
 
             if let Err(err) = self.settings.save() {
