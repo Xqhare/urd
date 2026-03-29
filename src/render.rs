@@ -81,7 +81,6 @@ pub struct Aspirations {
     pub edit_resolutions: Vec<String>,
 }
 
-
 impl Aspirations {
     /// Takes in a year and returns a new Aspirations struct
     pub fn new(year: String) -> Self {

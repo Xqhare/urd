@@ -90,9 +90,7 @@ impl Settings {
         let out = nabu::serde::write(SETTINGS_FILE, serialized);
         match out {
             Ok(()) => Ok(()),
-            Err(e) => Err(std::io::Error::other(
-                e.to_string(),
-            )),
+            Err(e) => Err(std::io::Error::other(e.to_string())),
         }
     }
 
@@ -102,9 +100,7 @@ impl Settings {
             match out {
                 Ok(d) => d.into_object().unwrap(),
                 Err(e) => {
-                    return Err(std::io::Error::other(
-                        e.to_string(),
-                    ));
+                    return Err(std::io::Error::other(e.to_string()));
                 }
             }
         };
@@ -147,15 +143,13 @@ pub enum NeededPath {
     Restore,
 }
 
-#[derive(Clone, Debug)]
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct CustomPaths {
     pub backup_directory: String,
     pub export_directory: String,
     pub restore_file: String,
     pub needed_path: Option<NeededPath>,
 }
-
 
 impl CustomPaths {
     pub fn serialize(&self) -> XffValue {

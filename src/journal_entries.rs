@@ -345,9 +345,10 @@ impl Journal {
         let urd_dir = this_dir.join("Urd-Journal/");
         // Clean up of possible previous export
         if urd_dir.exists()
-            && let Err(e) = std::fs::create_dir(urd_dir.clone()) {
-                return Err(e.to_string());
-            }
+            && let Err(e) = std::fs::create_dir(urd_dir.clone())
+        {
+            return Err(e.to_string());
+        }
 
         // Export
         if let Err(e) = std::fs::create_dir(urd_dir.clone()) {
@@ -414,9 +415,10 @@ impl Journal {
             tmp_dir.join(tmp)
         };
         if file_name.exists()
-            && let Err(e) = std::fs::remove_file(file_name.clone()) {
-                return Err(e.to_string());
-            }
+            && let Err(e) = std::fs::remove_file(file_name.clone())
+        {
+            return Err(e.to_string());
+        }
         if let Err(e) = nabu::serde::write(file_name.clone(), serialized) {
             Err(e.to_string())
         } else {

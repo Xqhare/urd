@@ -1,6 +1,6 @@
 use eframe::{
+    App, egui,
     egui::{CentralPanel, Ui},
-    egui, App,
 };
 
 use crate::{error::Error, settings::NeededPath};

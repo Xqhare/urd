@@ -276,12 +276,13 @@ impl UrdState {
                                         tz.clone(),
                                     )
                                     .clicked()
-                                    && let Err(err) = self.settings.save() {
-                                        self.error = Error::new(
-                                            err.to_string(),
-                                            "Writing settings to disk failed.".to_string(),
-                                        );
-                                    }
+                                    && let Err(err) = self.settings.save()
+                                {
+                                    self.error = Error::new(
+                                        err.to_string(),
+                                        "Writing settings to disk failed.".to_string(),
+                                    );
+                                }
                             }
                         })
                 },
@@ -383,10 +384,8 @@ impl UrdState {
                 }
 
                 if let Err(err) = self.journal.save() {
-                    self.error = Error::new(
-                        err.clone(),
-                        "Writing journal to disk failed.".to_string(),
-                    );
+                    self.error =
+                        Error::new(err.clone(), "Writing journal to disk failed.".to_string());
                 }
 
                 self.state_store.wizard_setup_step = 4;
@@ -440,10 +439,7 @@ impl UrdState {
         }
         if ui.button("Finish").clicked() {
             if let Err(err) = self.journal.save() {
-                self.error = Error::new(
-                    err.clone(),
-                    "Writing journal to disk failed.".to_string(),
-                );
+                self.error = Error::new(err.clone(), "Writing journal to disk failed.".to_string());
             }
 
             if let Err(err) = self.settings.save() {

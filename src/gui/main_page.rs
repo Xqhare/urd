@@ -1,6 +1,6 @@
 use eframe::{
+    App, egui,
     egui::{CentralPanel, Ui},
-    egui, App,
 };
 use egui::{Align, ComboBox, FontId, Margin, ScrollArea, TextEdit};
 use nabu::{Object, XffValue};
@@ -372,10 +372,8 @@ impl UrdState {
                         self.state_store.new_mood.colour.to_array().to_vec(),
                     );
                     if let Err(err) = self.journal.save() {
-                        self.error = Error::new(
-                            err.clone(),
-                            "Writing journal to disk failed.".to_string(),
-                        );
+                        self.error =
+                            Error::new(err.clone(), "Writing journal to disk failed.".to_string());
                     }
                     // Reset
                     self.state_store.new_mood = Mood::default();
@@ -402,12 +400,13 @@ impl UrdState {
                         .color_edit_button_srgba(&mut self.settings.font.text_colour)
                         .on_hover_text("Click to change the text colour")
                         .changed()
-                        && let Err(err) = self.settings.save() {
-                            self.error = Error::new(
-                                err.to_string(),
-                                "Writing settings to disk failed.".to_string(),
-                            );
-                        }
+                        && let Err(err) = self.settings.save()
+                    {
+                        self.error = Error::new(
+                            err.to_string(),
+                            "Writing settings to disk failed.".to_string(),
+                        );
+                    }
                 })
             });
             ui.group(|ui: &mut Ui| {
@@ -430,10 +429,8 @@ impl UrdState {
             {
                 self.save_entry_to_journal();
                 if let Err(err) = self.journal.save() {
-                    self.error = Error::new(
-                        err.clone(),
-                        "Writing journal to disk failed.".to_string(),
-                    );
+                    self.error =
+                        Error::new(err.clone(), "Writing journal to disk failed.".to_string());
                 }
             }
             //DEBUG LEAVE FOR LATER
@@ -473,10 +470,8 @@ impl UrdState {
             {
                 self.delete_entry_from_journal();
                 if let Err(err) = self.journal.save() {
-                    self.error = Error::new(
-                        err.clone(),
-                        "Writing journal to disk failed.".to_string(),
-                    );
+                    self.error =
+                        Error::new(err.clone(), "Writing journal to disk failed.".to_string());
                 }
             }
             // Fallback option, if urd is kept open for a long time (the date has changed since
@@ -642,10 +637,7 @@ impl UrdState {
             }
         }
         if let Err(err) = self.journal.save() {
-            self.error = Error::new(
-                err.clone(),
-                "Writing journal to disk failed.".to_string(),
-            );
+            self.error = Error::new(err.clone(), "Writing journal to disk failed.".to_string());
         }
     }
 
@@ -698,10 +690,7 @@ impl UrdState {
         }
         self.journal.current_entry.text = String::new();
         if let Err(err) = self.journal.save() {
-            self.error = Error::new(
-                err.clone(),
-                "Writing journal to disk failed.".to_string(),
-            );
+            self.error = Error::new(err.clone(), "Writing journal to disk failed.".to_string());
         }
     }
 }

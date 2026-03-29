@@ -9,9 +9,10 @@ use crate::{
     tips_and_tricks::TipsNTricks,
 };
 use eframe::{
+    App, NativeOptions, egui,
     egui::{CentralPanel, Ui},
     epaint::Vec2,
-    egui, App, NativeOptions, run_native,
+    run_native,
 };
 use egui::{Align, Color32, Id, Modal, TextEdit, TopBottomPanel};
 
