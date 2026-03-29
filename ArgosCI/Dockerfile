@@ -2,6 +2,9 @@
 
 FROM rust:latest
 
+RUN rustup component add rustfmt
+RUN rustup component add clippy
+
 # Install system dependencies for eframe (egui) and other requirements
 RUN apt-get update && apt-get install -y \
     libxcb-render0-dev \
