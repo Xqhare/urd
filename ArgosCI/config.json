@@ -1,5 +1,10 @@
 {
-  "all": true,
+  "test": {},
+  "doc": {},
+  "clippy": {},
+  "format": {},
+  "update": {},
+  "license": {},
   "requires": ["horae", "nabu", "fortuna"],
   "build": {
     "args": ["-r"]
