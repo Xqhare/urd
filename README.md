@@ -37,25 +37,11 @@ This association of `Urd` with the past is fitting for a journaling app.
 
 ## Roadmap
 
-*marker* for required features in next release
+`Urd` uses my [nomos](https://github.com/xqhare/nomos) project management system.
 
-- [ ] Edit journal page
-    - [ ] Deleting a journal entry
-    - [ ] Creating a custom journal entry
-- [ ] User onboarding
-    - [ ] Welcome screen
-        - [ ] Add first entry to setup-wizard
-        - [ ] Add open help page to setup-wizard
-- [ ] Contacts
-    - [ ] Name
-    - [ ] With text field for free form input? / key value pairs of custom metadata?
-    - [ ] Automatic metadata insertion
-        - [ ] Upon contact creation and edit
-        - [ ] Upon journal entry creation and edit
-    - [ ] Display on main screen of contacts in current entry
-    - [ ] Contacts in settings / own contacts page
-    - [ ] Searchable contacts list
-    - [ ] Searchable journal for entries with contacts
+The roadmap for this project can be found in the [nomos.md](nomos.md) file.
+
+All nomos files follow the syntax defined [here](https://github.com/Xqhare/nomos/blob/master/spec/).
 
 ## Issues preventing a stable release
 
