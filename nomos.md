@@ -1,4 +1,4 @@
-
+- [ ] Aspirations UI is broken :: If only a theme is set, pledge and resolutions (though empty) are still shown. (E.g. `This year I pledge to {BLANK}`)
 - [ ] Edit journal page ::
     - [ ] Deleting a journal entry ::
     - [ ] Creating a custom journal entry ::
